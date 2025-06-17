@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "m0eFzWYM42W6e52LJ/93tkWYBN8PA2xgohqZTuhcv7I=",
+  "Source": "MakerSchedule.API",
+  "BasePath": "_content/MakerSchedule.API",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

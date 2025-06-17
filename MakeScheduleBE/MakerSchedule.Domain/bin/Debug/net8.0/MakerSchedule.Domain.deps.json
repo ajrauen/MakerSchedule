@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "MakerSchedule.Domain/1.0.0": {
+        "runtime": {
+          "MakerSchedule.Domain.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MakerSchedule.Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
