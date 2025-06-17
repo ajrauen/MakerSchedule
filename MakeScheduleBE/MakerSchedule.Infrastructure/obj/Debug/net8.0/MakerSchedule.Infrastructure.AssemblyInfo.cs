@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MakerSchedule.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+da9b8908272060a4bcae89f66dbf26d2fcec4385")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+deb283f5e56cdea109b113d2881fe43599d8dfae")]
 [assembly: System.Reflection.AssemblyProductAttribute("MakerSchedule.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MakerSchedule.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
