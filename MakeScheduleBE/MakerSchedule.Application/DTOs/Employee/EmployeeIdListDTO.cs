@@ -5,6 +5,6 @@ namespace MakerSchedule.Application.DTOs.Employee
 {
     public class EmployeeIdListDTO
     {
-        public IEnumerable<Guid> Ids { get; set; }
+        public IEnumerable<string> Ids { get; set; }
     }
 } 

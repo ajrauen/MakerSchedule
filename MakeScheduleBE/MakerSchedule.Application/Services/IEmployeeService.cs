@@ -10,9 +10,9 @@ namespace MakerSchedule.Application.Services
     {
         Task<IEnumerable<Employee>> GetAllEmployeesWithDetailsAsync();
         Task<EmployeeIdListDTO> GetAllEmployeeIdsAsync();
-        Task<Employee> GetEmployeeByIdAsync(Guid id);
+        Task<Employee> GetEmployeeByIdAsync(string id);
         Task<Employee> CreateEmployeeAsync(CreateEmployeeDTOp createEmployeeDTO);
-        Task<Employee> UpdateEmployeeAsync(Guid id, UpdateEmployeeDTO updateEmployeeDTO);
-        Task<int> DeleteEmployeeByIdAsync(Guid id);
+        Task<Employee> UpdateEmployeeAsync(string id, UpdateEmployeeDTO updateEmployeeDTO);
+        Task<int> DeleteEmployeeByIdAsync(string id);
     }
 }

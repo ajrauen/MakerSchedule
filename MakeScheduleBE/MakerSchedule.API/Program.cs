@@ -6,6 +6,9 @@ using MakerSchedule.API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using MakerSchedule.Application.Mappings;
 using System.Text.Json;
+using MakerSchedule.Application.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using MakerSchedule.Domain.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +19,14 @@ builder.Services.AddCorsWithOptions();
 // Add Database
 builder.Services.AddDatabase(builder.Configuration);
 
+// Add Identity service
+builder.Services.AddIdentity<Employee, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 // Add Application Services
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
+builder.Services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
 
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(EmployeeMappingProfile));

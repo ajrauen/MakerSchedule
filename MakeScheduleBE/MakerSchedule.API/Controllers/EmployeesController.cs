@@ -38,7 +38,7 @@ namespace MakerSchedule.API.Controllers
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetById(Guid id)
+        public async Task<ActionResult<Employee>> GetById(string id)
         {
             var employee = await _employeeService.GetEmployeeByIdAsync(id);
             return Ok(employee);
@@ -64,7 +64,7 @@ namespace MakerSchedule.API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployeeByIdAsync(Guid id, [FromBody] UpdateEmployeeDTO updateEmployeeDTO)
+        public async Task<IActionResult> UpdateEmployeeByIdAsync(string id, [FromBody] UpdateEmployeeDTO updateEmployeeDTO)
         {
             var employee = await _employeeService.UpdateEmployeeAsync(id, updateEmployeeDTO);
             return Ok(employee);
@@ -72,7 +72,7 @@ namespace MakerSchedule.API.Controllers
 
     
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployeeByIdAsync(Guid id)
+        public async Task<IActionResult> DeleteEmployeeByIdAsync(string id)
         {
             await _employeeService.DeleteEmployeeByIdAsync(id);
              return NoContent();
