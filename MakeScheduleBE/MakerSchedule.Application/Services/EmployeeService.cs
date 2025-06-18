@@ -51,7 +51,7 @@ namespace MakerSchedule.Application.Services
             }
         }
 
-        public async Task<Employee> GetEmployeeByIdAsync(Guid id)
+        public async Task<Employee> GetEmployeeByIdAsync(string id)
         {
             try
             {
@@ -78,7 +78,6 @@ namespace MakerSchedule.Application.Services
             try
             {
                 var employee = _mapper.Map<Employee>(createEmployeeDTO);
-                employee.Id = Guid.NewGuid();
                 employee.CreatedAt = DateTime.UtcNow;
                 employee.UpdatedAt = null;
 
@@ -93,7 +92,7 @@ namespace MakerSchedule.Application.Services
             }
         }
 
-        public async Task<Employee> UpdateEmployeeAsync(Guid id, UpdateEmployeeDTO updateEmployeeDTO)
+        public async Task<Employee> UpdateEmployeeAsync(string id, UpdateEmployeeDTO updateEmployeeDTO)
         {
             try
             {
@@ -120,7 +119,7 @@ namespace MakerSchedule.Application.Services
             }
         }
         
-        public async Task<int> DeleteEmployeeByIdAsync(Guid id)
+        public async Task<int> DeleteEmployeeByIdAsync(string id)
         {
             try
             {

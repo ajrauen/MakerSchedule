@@ -1,19 +1,28 @@
-   using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace MakerSchedule.Domain.Entities
 {
-    public class Employee
+    public class Employee : IdentityUser
     {
-        [Key]
-        public Guid Id { get; set; }
-        public string Name { get; set; }
+        [Required]
+        public string FirstName { get; set; }
+
+        [Required]
+        public string LastName { get; set; }
+
+        [Required]
+        [EmailAddress]
         public string Email { get; set; }
-        public string Phone { get; set; }
+
+        [Required]
         public string Address { get; set; }
-        public DateTime? CreatedAt { get; set; }
+
+        [Required]
+        public string PhoneNumber { get; set; }
+
+        public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public bool IsActive { get; set; }
-
-        
     }
 }
