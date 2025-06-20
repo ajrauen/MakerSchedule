@@ -19,4 +19,4 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
 
         return new ApplicationDbContext(builder.Options);
     }
-} 
+}

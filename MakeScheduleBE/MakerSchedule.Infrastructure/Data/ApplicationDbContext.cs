@@ -1,11 +1,12 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using MakerSchedule.Domain.Entities;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace MakerSchedule.Infrastructure.Data;
 
-public class ApplicationDbContext : IdentityDbContext<Employee>
+public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -16,25 +17,21 @@ public class ApplicationDbContext : IdentityDbContext<Employee>
     {
         base.OnModelCreating(modelBuilder);
 
-        // Seed initial employee data
-        modelBuilder.Entity<Employee>().HasData(
-            new Employee
-            {
-                Id = "11111111-1111-1111-1111-111111111111",
-                FirstName = "John",
-                LastName = "Doe",
-                Email = "john.doe@example.com",
-                PhoneNumber = "123-456-7890",
-                Address = "123 Main St",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                IsActive = true,
-                UserName = "john.doe@example.com",
-                EmailConfirmed = true,
-                PhoneNumberConfirmed = true
-            }
-        );
+        // Configure AspNetUsers table to include UserType
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.Property(u => u.UserType).IsRequired();
+            entity.HasData(SeedData.SeedUsers.ToArray());
+        });
+
+        modelBuilder.Entity<Employee>().HasData(SeedData.SeedEmployees.ToArray());
+        modelBuilder.Entity<Customer>().HasData(SeedData.SeedCustomers.ToArray());
+
+        modelBuilder.Entity<Employee>()
+            .HasIndex(e => e.EmployeeNumber)
+            .IsUnique();
     }
 
     public DbSet<Employee> Employees { get; set; }
-} 
+    public DbSet<Customer> Customers { get; set; }
+}

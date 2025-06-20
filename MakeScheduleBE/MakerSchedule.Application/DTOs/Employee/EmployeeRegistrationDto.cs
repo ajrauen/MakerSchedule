@@ -23,4 +23,4 @@ public class EmployeeRegistrationDto
 
     [Required]
     public string Address { get; set; }
-} 
+}

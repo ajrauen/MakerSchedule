@@ -1,14 +1,13 @@
-using Microsoft.OpenApi.Models;
-using MakerSchedule.Infrastructure.Data;
-using MakerSchedule.Application.Services;
 using MakerSchedule.API.Exceptions;
 using MakerSchedule.API.Extensions;
-using Microsoft.AspNetCore.Mvc;
-using MakerSchedule.Application.Mappings;
-using System.Text.Json;
 using MakerSchedule.Application.Interfaces;
-using Microsoft.AspNetCore.Identity;
+using MakerSchedule.Application.Mappings;
+using MakerSchedule.Application.Services;
 using MakerSchedule.Domain.Entities;
+using MakerSchedule.Infrastructure.Data;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,15 +18,26 @@ builder.Services.AddCorsWithOptions();
 // Add Database
 builder.Services.AddDatabase(builder.Configuration);
 
-// Add Identity service
-builder.Services.AddIdentity<Employee, IdentityRole>()
+// Add Identity service with role support for User
+builder.Services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 // Add Application Services
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
+builder.Services.AddScoped<ICustomerRegistrationService, CustomerRegistrationService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Events.OnRedirectToLogin = context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        return Task.CompletedTask;
+    };
+});
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(EmployeeMappingProfile));
 
@@ -63,6 +73,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MakerSchedule API v1"));
 }
+
 
 app.UseHttpsRedirection();
 app.UseRouting();

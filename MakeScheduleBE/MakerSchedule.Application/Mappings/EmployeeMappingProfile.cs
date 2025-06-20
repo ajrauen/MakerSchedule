@@ -1,6 +1,7 @@
 using AutoMapper;
-using MakerSchedule.Domain.Entities;
+
 using MakerSchedule.Application.DTOs.Employee;
+using MakerSchedule.Domain.Entities;
 
 namespace MakerSchedule.Application.Mappings
 {
@@ -8,15 +9,7 @@ namespace MakerSchedule.Application.Mappings
     {
         public EmployeeMappingProfile()
         {
-            CreateMap<CreateEmployeeDTOp, Employee>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore());
 
-            CreateMap<UpdateEmployeeDTO, Employee>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
-} 
+}

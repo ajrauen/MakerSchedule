@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace MakerSchedule.Application.DTOs.EmployeeRegistration;
+namespace MakerSchedule.Application.DTOs.CustomerRegistration;
 
-public class EmployeeRegristrationDTO
+public class CustomerRegistrationDTO
 {
     [Required]
     [EmailAddress]
@@ -23,4 +23,8 @@ public class EmployeeRegristrationDTO
 
     [Required]
     public string Address { get; set; }
-} 
+
+    public string CustomerNumber { get; set; }
+    public string PreferredContactMethod { get; set; }
+    public string Notes { get; set; }
+}

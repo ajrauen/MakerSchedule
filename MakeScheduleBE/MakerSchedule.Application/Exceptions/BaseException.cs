@@ -14,4 +14,4 @@ namespace MakerSchedule.Application.Exceptions
             StatusCode = statusCode;
         }
     }
-} 
+}

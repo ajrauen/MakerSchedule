@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Text.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MakerSchedule.API.Exceptions
 {
@@ -19,12 +20,12 @@ namespace MakerSchedule.API.Exceptions
                         return new
                         {
                             Field = "request",
-                            Errors = e.Value.Errors.Select(err => 
-                                err.ErrorMessage.Replace("JSON deserialization for type 'MakerSchedule.Application.DTOs.Employee.CreateEmployeeDTOp' was missing required properties, including the following: ", 
+                            Errors = e.Value.Errors.Select(err =>
+                                err.ErrorMessage.Replace("JSON deserialization for type 'MakerSchedule.Application.DTOs.Employee.CreateEmployeeDTOp' was missing required properties, including the following: ",
                                 "Missing required properties: ")).ToList()
                         };
                     }
-   
+
                     // Handle normal validation errors
                     return new
                     {
@@ -41,4 +42,4 @@ namespace MakerSchedule.API.Exceptions
             });
         }
     }
-} 
+}

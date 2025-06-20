@@ -13,4 +13,4 @@ namespace MakerSchedule.Application.Exceptions
         {
         }
     }
-} 
+}

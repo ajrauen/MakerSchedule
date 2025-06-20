@@ -1,9 +1,11 @@
 using System.Net;
 using System.Text.Json;
+
+using MakerSchedule.Application.Exceptions;
+
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using MakerSchedule.Application.Exceptions;
 
 namespace MakerSchedule.API.Exceptions
 {
@@ -22,7 +24,7 @@ namespace MakerSchedule.API.Exceptions
             CancellationToken cancellationToken)
         {
             _logger.LogError(exception, "An unhandled exception has occurred");
-            
+
             var response = context.Response;
             response.ContentType = "application/json";
 
@@ -45,4 +47,4 @@ namespace MakerSchedule.API.Exceptions
             return true;
         }
     }
-} 
+}

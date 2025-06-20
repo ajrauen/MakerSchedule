@@ -17,7 +17,108 @@ namespace MakerSchedule.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
 
+            modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomerNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PreferredContactMethod")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CustomerNumber = "CUST001",
+                            Notes = "VIP customer",
+                            PreferredContactMethod = "Email",
+                            UserId = "33333333-3333-3333-3333-333333333333"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CustomerNumber = "CUST002",
+                            Notes = "Frequent buyer",
+                            PreferredContactMethod = "Phone",
+                            UserId = "44444444-4444-4444-4444-444444444444"
+                        });
+                });
+
             modelBuilder.Entity("MakerSchedule.Domain.Entities.Employee", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Department")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EmployeeNumber")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("HireDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Position")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Employees");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Department = "HR",
+                            EmployeeNumber = "EMP001",
+                            HireDate = new DateTime(2020, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Position = "Manager",
+                            UserId = "11111111-1111-1111-1111-111111111111"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Department = "IT",
+                            EmployeeNumber = "EMP002",
+                            HireDate = new DateTime(2021, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Position = "Developer",
+                            UserId = "22222222-2222-2222-2222-222222222222"
+                        });
+                });
+
+            modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
@@ -37,7 +138,6 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
-                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
@@ -73,7 +173,6 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("PhoneNumberConfirmed")
@@ -90,6 +189,10 @@ namespace MakerSchedule.Infrastructure.Migrations
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserType")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -110,7 +213,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             Address = "123 Main St",
                             ConcurrencyStamp = "31372edb-255c-4acc-869a-3a3aa8dc0ab7",
-                            CreatedAt = new DateTime(2025, 6, 17, 23, 45, 49, 86, DateTimeKind.Utc).AddTicks(7376),
+                            CreatedAt = new DateTime(2025, 6, 17, 23, 45, 49, 86, DateTimeKind.Utc),
                             Email = "john.doe@example.com",
                             EmailConfirmed = true,
                             FirstName = "John",
@@ -121,8 +224,72 @@ namespace MakerSchedule.Infrastructure.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "5191f6eb-ce10-4825-8ff9-1edb55809163",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 6, 17, 23, 45, 49, 86, DateTimeKind.Utc).AddTicks(7377),
-                            UserName = "john.doe@example.com"
+                            UpdatedAt = new DateTime(2025, 6, 17, 23, 45, 49, 86, DateTimeKind.Utc),
+                            UserName = "john.doe@example.com",
+                            UserType = 2
+                        },
+                        new
+                        {
+                            Id = "22222222-2222-2222-2222-222222222222",
+                            AccessFailedCount = 0,
+                            Address = "456 Oak Ave",
+                            ConcurrencyStamp = "b2c3d4e5-f678-90ab-cdef-1234567890ab",
+                            CreatedAt = new DateTime(2025, 6, 19, 4, 26, 21, 212, DateTimeKind.Utc).AddTicks(7060),
+                            Email = "jane.smith@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Jane",
+                            IsActive = true,
+                            LastName = "Smith",
+                            LockoutEnabled = false,
+                            PhoneNumber = "555-123-4567",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2025, 6, 19, 4, 26, 21, 212, DateTimeKind.Utc).AddTicks(7061),
+                            UserName = "jane.smith@example.com",
+                            UserType = 2
+                        },
+                        new
+                        {
+                            Id = "33333333-3333-3333-3333-333333333333",
+                            AccessFailedCount = 0,
+                            Address = "789 Pine Rd",
+                            ConcurrencyStamp = "d4e5f678-90ab-cdef-1234-567890abcdef",
+                            CreatedAt = new DateTime(2025, 6, 19, 4, 26, 21, 212, DateTimeKind.Utc).AddTicks(7068),
+                            Email = "alice.johnson@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Alice",
+                            IsActive = true,
+                            LastName = "Johnson",
+                            LockoutEnabled = false,
+                            PhoneNumber = "444-555-6666",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "c3d4e5f6-7890-abcd-ef12-34567890abcd",
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2025, 6, 19, 4, 26, 21, 212, DateTimeKind.Utc).AddTicks(7068),
+                            UserName = "alice.johnson@example.com",
+                            UserType = 1
+                        },
+                        new
+                        {
+                            Id = "44444444-4444-4444-4444-444444444444",
+                            AccessFailedCount = 0,
+                            Address = "321 Maple St",
+                            ConcurrencyStamp = "f67890ab-cdef-1234-5678-90abcdef1234",
+                            CreatedAt = new DateTime(2025, 6, 19, 4, 26, 21, 212, DateTimeKind.Utc).AddTicks(7074),
+                            Email = "bob.williams@example.com",
+                            EmailConfirmed = true,
+                            FirstName = "Bob",
+                            IsActive = true,
+                            LastName = "Williams",
+                            LockoutEnabled = false,
+                            PhoneNumber = "777-888-9999",
+                            PhoneNumberConfirmed = true,
+                            SecurityStamp = "e5f67890-abcd-ef12-3456-7890abcdef12",
+                            TwoFactorEnabled = false,
+                            UpdatedAt = new DateTime(2025, 6, 19, 4, 26, 21, 212, DateTimeKind.Utc).AddTicks(7074),
+                            UserName = "bob.williams@example.com",
+                            UserType = 1
                         });
                 });
 
@@ -254,6 +421,28 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
+                {
+                    b.HasOne("MakerSchedule.Domain.Entities.User", "User")
+                        .WithOne("Customer")
+                        .HasForeignKey("MakerSchedule.Domain.Entities.Customer", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MakerSchedule.Domain.Entities.Employee", b =>
+                {
+                    b.HasOne("MakerSchedule.Domain.Entities.User", "User")
+                        .WithOne("Employee")
+                        .HasForeignKey("MakerSchedule.Domain.Entities.Employee", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -265,7 +454,7 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("MakerSchedule.Domain.Entities.Employee", null)
+                    b.HasOne("MakerSchedule.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -274,7 +463,7 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("MakerSchedule.Domain.Entities.Employee", null)
+                    b.HasOne("MakerSchedule.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -289,7 +478,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MakerSchedule.Domain.Entities.Employee", null)
+                    b.HasOne("MakerSchedule.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -298,11 +487,18 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("MakerSchedule.Domain.Entities.Employee", null)
+                    b.HasOne("MakerSchedule.Domain.Entities.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>
+                {
+                    b.Navigation("Customer");
+
+                    b.Navigation("Employee");
                 });
 #pragma warning restore 612, 618
         }

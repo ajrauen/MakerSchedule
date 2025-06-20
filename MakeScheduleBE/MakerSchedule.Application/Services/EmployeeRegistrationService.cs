@@ -1,36 +1,42 @@
 using AutoMapper;
-using MakerSchedule.Application.DTOs.EmployeeRegistration;
+
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Entities;
+using MakerSchedule.Infrastructure.Data;
+
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services;
 
 public class EmployeeRegistrationService : IEmployeeRegistrationService
 {
-    private readonly UserManager<Employee> _userManager;
-    private readonly SignInManager<Employee> _signInManager;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
     private readonly ILogger<EmployeeRegistrationService> _logger;
     private readonly IMapper _mapper;
+    private readonly ApplicationDbContext _context;
+    private const string EmployeePrefix = "EP";
 
     public EmployeeRegistrationService(
-        UserManager<Employee> userManager,
-        SignInManager<Employee> signInManager,
+        UserManager<User> userManager,
+        SignInManager<User> signInManager,
         ILogger<EmployeeRegistrationService> logger,
-        IMapper mapper)
+        IMapper mapper,
+        ApplicationDbContext context)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
         _logger = logger;
         _mapper = mapper;
+        _context = context;
     }
-
-    public async Task<IdentityResult> RegisterAsync(EmployeeRegristrationDTO registrationDto)
+    public async Task<IdentityResult> RegisterAsync(EmployeeRegistrationDTO registrationDto)
     {
         try
         {
-            var employee = new Employee
+            var user = new User
             {
                 UserName = registrationDto.Email,
                 Email = registrationDto.Email,
@@ -43,17 +49,43 @@ public class EmployeeRegistrationService : IEmployeeRegistrationService
                 IsActive = true
             };
 
-            var result = await _userManager.CreateAsync(employee, registrationDto.Password);
+            var result = await _userManager.CreateAsync(user, registrationDto.Password);
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("Employee registered successfully: {Email}", registrationDto.Email);
-                await _signInManager.SignInAsync(employee, isPersistent: false);
+                const int maxRetries = 5;
+                for (int attempt = 0; attempt < maxRetries; attempt++)
+                {
+                    var employeeID = await generateEmployeeNumberAsync();
+                    var employee = new Employee
+                    {
+                        UserId = user.Id,
+                        EmployeeNumber = employeeID,
+                    };
+                    _context.Employees.Add(employee);
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        _logger.LogInformation("Employee registered successfully: {Email}", registrationDto.Email);
+                        await _signInManager.SignInAsync(user, isPersistent: false);
+                        break; // Success
+                    }
+                    catch (DbUpdateException dbEx) when (dbEx.InnerException?.Message.Contains("UNIQUE") == true)
+                    {
+                        // Unique constraint violation, try again
+                        _context.Entry(employee).State = EntityState.Detached;
+                        if (attempt == maxRetries - 1)
+                        {
+                            _logger.LogError(dbEx, "Failed to register employee after multiple attempts due to duplicate EmployeeNumber.");
+                            throw;
+                        }
+                    }
+                }
             }
             else
             {
-                _logger.LogWarning("Failed to register employee: {Email}. Errors: {Errors}", 
-                    registrationDto.Email, 
+                _logger.LogWarning("Failed to register employee: {Email}. Errors: {Errors}",
+                    registrationDto.Email,
                     string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
@@ -65,5 +97,33 @@ public class EmployeeRegistrationService : IEmployeeRegistrationService
             throw;
         }
     }
+
+    private async Task<string> generateEmployeeNumberAsync()
+    {
+        int nextEmployeeNumber = 1;
+        int maxAttempts = 10_00;
+        var lastEmployee = await _context.Employees
+          .OrderByDescending(e => e.EmployeeNumber)
+          .FirstOrDefaultAsync();
+
+        if (lastEmployee != null && int.TryParse(lastEmployee.EmployeeNumber.Replace(EmployeePrefix, ""), out int lastNumber))
+        {
+            nextEmployeeNumber = lastNumber + 1;
+        }
+
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            string candidateEmployeeNumber = $"{EmployeePrefix}{nextEmployeeNumber}";
+            bool exist = await _context.Employees.AnyAsync(e => e.EmployeeNumber == $"{EmployeePrefix}i");
+            if (!exist)
+            {
+                return candidateEmployeeNumber;
+            }
+            nextEmployeeNumber++;
+        }
+        throw new Exception("Can not generate a uqiue employee number");
+
+    }
+
 }
 

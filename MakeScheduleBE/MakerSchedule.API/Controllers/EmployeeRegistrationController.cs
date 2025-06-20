@@ -1,7 +1,8 @@
-using MakerSchedule.Application.DTOs.EmployeeRegistration;
+using MakerSchedule.Application.DTOs;
 using MakerSchedule.Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MakerSchedule.API.Controllers
 {
@@ -19,7 +20,7 @@ namespace MakerSchedule.API.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(EmployeeRegristrationDTO dto)
+        public async Task<IActionResult> Register(EmployeeRegistrationDTO dto)
         {
             var result = await _employeeRegService.RegisterAsync(dto);
             if (result.Succeeded)

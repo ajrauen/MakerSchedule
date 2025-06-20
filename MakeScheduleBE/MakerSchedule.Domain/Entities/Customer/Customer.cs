@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MakerSchedule.Domain.Entities;
 
-public class Employee
+public class Customer
 {
     [Required]
     public int Id { get; set; }
@@ -10,11 +10,8 @@ public class Employee
     public string UserId { get; set; } = string.Empty;  // Foreign key to User
     public User User { get; set; } = null!;  // Navigation property
 
-    // Additional Employee-specific properties
-    public string EmployeeNumber { get; set; } = string.Empty;
-    public string Department { get; set; } = string.Empty;
-    public string Position { get; set; } = string.Empty;
-    public DateTime HireDate { get; set; }
-
-
+    // Additional Customer-specific properties
+    public string CustomerNumber { get; set; } = string.Empty;
+    public string PreferredContactMethod { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
 }

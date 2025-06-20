@@ -19,4 +19,4 @@ namespace MakerSchedule.Application.DTOs.Employee
 
         public bool? IsActive { get; set; }
     }
-} 
+}

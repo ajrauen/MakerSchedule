@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using MakerSchedule.API.Exceptions;
+
 using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace MakerSchedule.API.Extensions
@@ -21,7 +23,7 @@ namespace MakerSchedule.API.Extensions
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
             })
-            .AddXmlDataContractSerializerFormatters(); 
+            .AddXmlDataContractSerializerFormatters();
         }
 
         public static IServiceCollection AddCorsWithOptions(this IServiceCollection services)
@@ -37,5 +39,5 @@ namespace MakerSchedule.API.Extensions
 
     }
 
-} 
+}
 

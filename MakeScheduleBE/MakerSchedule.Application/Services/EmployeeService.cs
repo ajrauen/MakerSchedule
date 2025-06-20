@@ -1,12 +1,12 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using AutoMapper;
+
+using MakerSchedule.Application.DTOs.Employee;
+using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using MakerSchedule.Application.Exceptions;
-using MakerSchedule.Application.DTOs.Employee;
-using AutoMapper;
 
 namespace MakerSchedule.Application.Services
 {
@@ -39,28 +39,60 @@ namespace MakerSchedule.Application.Services
             }
         }
 
-        public async Task<EmployeeIdListDTO> GetAllEmployeeIdsAsync()
+
+        public async Task<IEnumerable<EmployeeListDTO>> GetAllEmployeesAsync()
         {
             try
             {
-                var ids = await _context.Employees.Select(employee => employee.Id).ToListAsync();
-                return new EmployeeIdListDTO { Ids = ids };
-            } catch (Exception ex) {
+                var employees = await _context.Employees
+                                .Include(e => e.User)
+                                .ToListAsync();
+
+                var employeeDTOs = employees.Select(employee => new EmployeeListDTO
+                {
+                    Id = employee.Id,
+                    EmployeeID = employee.EmployeeNumber,
+                    FirstName = employee.User.FirstName,
+                    LastName = employee.User.LastName,
+
+                }).ToList();
+
+
+                return employeeDTOs;
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError(ex, "Error fetch employee Ids");
                 throw new BaseException("Failed to fetch employee IDs", "FETCH_ERROR", 500, ex);
             }
         }
 
-        public async Task<Employee> GetEmployeeByIdAsync(string id)
+        public async Task<EmployeeDTO> GetEmployeeByIdAsync(int id)
         {
             try
             {
-                var employee = await _context.Employees.FindAsync(id);
+                var employee = await _context.Employees
+                    .Include(e => e.User)
+                    .FirstOrDefaultAsync(e => e.Id == id);
                 if (employee == null)
                 {
                     throw new NotFoundException("Employee", id);
                 }
-                return employee;
+                return new EmployeeDTO
+                {
+                    Id = employee.Id,
+                    EmployeeNumber = employee.EmployeeNumber,
+                    Department = employee.Department,
+                    Position = employee.Position,
+                    HireDate = employee.HireDate,
+                    UserId = employee.UserId,
+                    Email = employee.User.Email,
+                    FirstName = employee.User.FirstName,
+                    LastName = employee.User.LastName,
+                    PhoneNumber = employee.User.PhoneNumber,
+                    Address = employee.User.Address,
+                    IsActive = employee.User.IsActive
+                };
             }
             catch (NotFoundException)
             {
@@ -73,52 +105,6 @@ namespace MakerSchedule.Application.Services
             }
         }
 
-        public async Task<Employee> CreateEmployeeAsync(CreateEmployeeDTOp createEmployeeDTO)
-        {
-            try
-            {
-                var employee = _mapper.Map<Employee>(createEmployeeDTO);
-                employee.CreatedAt = DateTime.UtcNow;
-                employee.UpdatedAt = null;
-
-                _context.Employees.Add(employee);
-                await _context.SaveChangesAsync();
-                return employee;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating employee");
-                throw new BaseException("Failed to create employee", "CREATE_ERROR", 500, ex);
-            }
-        }
-
-        public async Task<Employee> UpdateEmployeeAsync(string id, UpdateEmployeeDTO updateEmployeeDTO)
-        {
-            try
-            {
-                var employee = await _context.Employees.FindAsync(id);
-                if (employee == null)
-                {
-                    throw new NotFoundException("Employee", id);
-                }
-
-                _mapper.Map(updateEmployeeDTO, employee);
-                employee.UpdatedAt = DateTime.UtcNow;
-
-                await _context.SaveChangesAsync();
-                return employee;
-            }
-            catch (NotFoundException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating employee: {Id}", id);
-                throw new BaseException("Failed to update employee", "UPDATE_ERROR", 500, ex);
-            }
-        }
-        
         public async Task<int> DeleteEmployeeByIdAsync(string id)
         {
             try
@@ -142,4 +128,4 @@ namespace MakerSchedule.Application.Services
             }
         }
     }
-} 
+}
