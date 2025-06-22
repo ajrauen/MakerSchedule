@@ -8,29 +8,57 @@ using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
+var configuration = builder.Configuration;
 
 // Add services to the container.
-builder.Services.AddControllersWithErrorParser();
+services.AddControllersWithErrorParser();
 
-builder.Services.AddCorsWithOptions();
+services.AddCorsWithOptions();
 // Add Database
-builder.Services.AddDatabase(builder.Configuration);
+services.AddDatabase(configuration);
 
 // Add Identity service with role support for User
-builder.Services.AddIdentity<User, IdentityRole>()
+services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 // Add Application Services
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-builder.Services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
-builder.Services.AddScoped<ICustomerRegistrationService, CustomerRegistrationService>();
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+services.AddScoped<IEmployeeService, EmployeeService>();
+services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
+services.AddScoped<ICustomerRegistrationService, CustomerRegistrationService>();
+services.AddScoped<IAuthenticationService, AuthenticationService>();
+services.AddScoped<JwtService>();
 
+services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+    {
+        var jwtKey = configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT key is not configured");
+        var jwtIssuer = configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT issuer is not configured");
+        var jwtAudience = configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT audience is not configured");
+        
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = false,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = jwtIssuer,
+            ValidAudience = jwtAudience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+        };
+    });
 
-builder.Services.ConfigureApplicationCookie(options =>
+services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnRedirectToLogin = context =>
     {
@@ -39,17 +67,17 @@ builder.Services.ConfigureApplicationCookie(options =>
     };
 });
 // Add AutoMapper
-builder.Services.AddAutoMapper(typeof(EmployeeMappingProfile));
+services.AddAutoMapper(typeof(EmployeeMappingProfile));
 
 // Add Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MakerSchedule API", Version = "v1" });
 });
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-builder.Services.AddProblemDetails();
+services.AddExceptionHandler<GlobalExceptionHandler>();
+services.AddProblemDetails();
 
 var app = builder.Build();
 
@@ -74,6 +102,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MakerSchedule API v1"));
 }
 
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"[DEBUG] Request received at (UTC): {DateTime.UtcNow:o}");
+    await next.Invoke();
+});
 
 app.UseHttpsRedirection();
 app.UseRouting();

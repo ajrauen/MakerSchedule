@@ -52,8 +52,8 @@ namespace MakerSchedule.Application.Services
                 {
                     Id = employee.Id,
                     EmployeeID = employee.EmployeeNumber,
-                    FirstName = employee.User.FirstName,
-                    LastName = employee.User.LastName,
+                    FirstName = employee.User?.FirstName ?? string.Empty,
+                    LastName = employee.User?.LastName ?? string.Empty,
 
                 }).ToList();
 
@@ -86,12 +86,12 @@ namespace MakerSchedule.Application.Services
                     Position = employee.Position,
                     HireDate = employee.HireDate,
                     UserId = employee.UserId,
-                    Email = employee.User.Email,
-                    FirstName = employee.User.FirstName,
-                    LastName = employee.User.LastName,
-                    PhoneNumber = employee.User.PhoneNumber,
-                    Address = employee.User.Address,
-                    IsActive = employee.User.IsActive
+                    Email = employee.User?.Email ?? string.Empty,
+                    FirstName = employee.User?.FirstName ?? string.Empty,
+                    LastName = employee.User?.LastName ?? string.Empty,
+                    PhoneNumber = employee.User?.PhoneNumber ?? string.Empty,
+                    Address = employee.User?.Address ?? string.Empty,
+                    IsActive = employee.User?.IsActive ?? false
                 };
             }
             catch (NotFoundException)

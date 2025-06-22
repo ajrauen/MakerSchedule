@@ -11,6 +11,8 @@ public class User : IdentityUser
     public DateTime? UpdatedAt { get; set; }
     public bool IsActive { get; set; }
     public UserType UserType { get; set; }
+    public string? RefreshToken { get; set; }
+    public DateTime? RefreshTokenExpiryTime { get; set; }
 
     // Navigation properties
     public Employee? Employee { get; set; }

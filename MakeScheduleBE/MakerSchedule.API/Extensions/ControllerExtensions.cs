@@ -1,9 +1,5 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
-using MakerSchedule.API.Exceptions;
-
-using Microsoft.AspNetCore.Cors.Infrastructure;
 
 namespace MakerSchedule.API.Extensions
 {
@@ -11,14 +7,7 @@ namespace MakerSchedule.API.Extensions
     {
         public static IMvcBuilder AddControllersWithErrorParser(this IServiceCollection services)
         {
-            return services.AddControllers(options =>
-            {
-                options.ReturnHttpNotAcceptable = true;
-            })
-            .ConfigureApiBehaviorOptions(options =>
-            {
-                options.InvalidModelStateResponseFactory = actionContext => ValidationErrorHandler.HandleValidationErrors(actionContext.ModelState);
-            })
+            return services.AddControllers()
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -32,12 +21,13 @@ namespace MakerSchedule.API.Extensions
             {
                 options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
+                          .AllowCredentials();
                 });
             });
         }
-
     }
-
 }
 
