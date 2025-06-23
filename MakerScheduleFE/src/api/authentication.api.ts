@@ -17,6 +17,7 @@ const login = async ({ creds }: LoginApiProps) => {
   };
   const response = await sendRequest(req);
   localStorage.setItem("accessToken", response.data.accessToken);
+  console.log(response.data.accessToken);
 
   return response;
 };

@@ -6,7 +6,6 @@ using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services
@@ -33,7 +32,7 @@ namespace MakerSchedule.Application.Services
             _context = context;
         }
 
-        public async Task<IdentityResult> RegisterAsync(CustomerRegistrationDTO registrationDto)
+        public async Task<IdentityResult> RegisterCustomerAsync(CustomerRegistrationDTO registrationDto)
         {
             try
             {

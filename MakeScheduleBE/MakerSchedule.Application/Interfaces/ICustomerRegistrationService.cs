@@ -1,12 +1,11 @@
 using MakerSchedule.Application.DTOs.CustomerRegistration;
-using MakerSchedule.Domain.Entities;
-
 using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
-namespace MakerSchedule.Application.Interfaces;
-
-public interface ICustomerRegistrationService
+namespace MakerSchedule.Application.Interfaces
 {
-    // Registration and Login
-    Task<IdentityResult> RegisterAsync(CustomerRegistrationDTO registrationDto);
-}
+    public interface ICustomerRegistrationService
+    {
+        Task<IdentityResult> RegisterCustomerAsync(CustomerRegistrationDTO registrationDto);
+    }
+} 

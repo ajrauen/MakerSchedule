@@ -5,6 +5,7 @@ using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -15,15 +16,18 @@ namespace MakerSchedule.Application.Services
         private readonly ApplicationDbContext _context;
         private readonly ILogger<EmployeeService> _logger;
         private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
 
         public EmployeeService(
             ApplicationDbContext context,
             ILogger<EmployeeService> logger,
+            UserManager<User> userManager,
             IMapper mapper)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _logger = logger;
             _mapper = mapper;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<Employee>> GetAllEmployeesWithDetailsAsync()
@@ -105,26 +109,44 @@ namespace MakerSchedule.Application.Services
             }
         }
 
-        public async Task<int> DeleteEmployeeByIdAsync(string id)
+        public async Task DeleteEmployeeByIdAsync(int id)
         {
-            try
+            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
+            if (employee == null)
             {
-                var employee = await _context.Employees.FindAsync(id);
-                if (employee == null)
+                throw new NotFoundException("Employee", id); 
+            }
+
+            var user = await _userManager.FindByIdAsync(employee.UserId);
+            if (user == null)
+            {
+                _logger.LogWarning("User with ID {UserId} not found.", employee.UserId);
+                throw new NotFoundException("User not found", employee.UserId); 
+            }
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
                 {
-                    throw new NotFoundException("Employee", id);
+                    _context.Employees.Remove(employee);
+                    var result = await _userManager.DeleteAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        throw new BaseException(
+                                    message: $"Failed to delete user '{user.Id}'.",
+                                    errorCode: "USER_DELETION_FAILED",
+                                    statusCode: 500 // Or another appropriate status code like 400 Bad Request
+                                );
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
                 }
-                _context.Employees.Remove(employee);
-                return await _context.SaveChangesAsync();
-            }
-            catch (NotFoundException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error deleting employee: {Id}", id);
-                throw new BaseException("Failed to delete employee", "DELETE_ERROR", 500, ex);
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
             }
         }
     }

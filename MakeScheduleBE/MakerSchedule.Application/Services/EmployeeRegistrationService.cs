@@ -1,5 +1,6 @@
 using AutoMapper;
 
+using MakerSchedule.Application.DTOs.Employee;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
@@ -32,7 +33,7 @@ public class EmployeeRegistrationService : IEmployeeRegistrationService
         _mapper = mapper;
         _context = context;
     }
-    public async Task<IdentityResult> RegisterAsync(EmployeeRegistrationDTO registrationDto)
+    public async Task<IdentityResult> RegisterEmployeeAsync(EmployeeRegistrationDTO registrationDto)
     {
         try
         {
@@ -97,7 +98,6 @@ public class EmployeeRegistrationService : IEmployeeRegistrationService
             throw;
         }
     }
-
     private async Task<string> generateEmployeeNumberAsync()
     {
         int nextEmployeeNumber = 1;

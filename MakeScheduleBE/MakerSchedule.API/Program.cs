@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using MakerSchedule.API.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -30,9 +31,11 @@ services.AddIdentity<User, IdentityRole>()
 
 // Add Application Services
 services.AddScoped<IEmployeeService, EmployeeService>();
-services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
 services.AddScoped<ICustomerRegistrationService, CustomerRegistrationService>();
+services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
 services.AddScoped<IAuthenticationService, AuthenticationService>();
+services.AddScoped<IUserService, UserService>();
+services.AddScoped<IEmployeeProfileService, EmployeeProfileService>();
 services.AddScoped<JwtService>();
 
 services.AddAuthentication(options =>
@@ -74,6 +77,33 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MakerSchedule API", Version = "v1" });
+
+    // Define the Bearer token security scheme
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT"
+    });
+
+    // Make sure Swagger UI requires a Bearer token to be specified
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
 });
 
 services.AddExceptionHandler<GlobalExceptionHandler>();

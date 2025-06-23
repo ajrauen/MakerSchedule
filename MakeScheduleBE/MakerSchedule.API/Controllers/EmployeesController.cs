@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
 using MakerSchedule.Application.DTOs.Employee;
+using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Services;
 using MakerSchedule.Domain.Entities;
 
@@ -15,16 +16,17 @@ namespace MakerSchedule.API.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
+        private readonly IEmployeeProfileService _employeeProfileService;
         private readonly ILogger<EmployeesController> _logger;
 
-        public EmployeesController(IEmployeeService employeeService, ILogger<EmployeesController> logger)
+        public EmployeesController(IEmployeeService employeeService, IEmployeeProfileService employeeProfileService, ILogger<EmployeesController> logger)
         {
             _employeeService = employeeService;
+            _employeeProfileService = employeeProfileService;
             _logger = logger;
         }
 
         [HttpGet]
-        [Authorize]
         public async Task<ActionResult<IEnumerable<EmployeeListDTO>>> GetAllEmployeesAsync()
         {
             var employees = await _employeeService.GetAllEmployeesAsync();
@@ -38,16 +40,24 @@ namespace MakerSchedule.API.Controllers
             return Ok(employee);
         }
 
-
-    
-
-
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployeeByIdAsync(string id)
+        public async Task<IActionResult> DeleteEmployeeByIdAsync(int id)
         {
             await _employeeService.DeleteEmployeeByIdAsync(id);
             return NoContent();
 
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateEmployeeProfile(int id, [FromBody] UpdateEmployeeProfileDTO dto)
+        {
+            var success = await _employeeProfileService.UpdateEmployeeProfileAsync(id, dto);
+            if (success)
+            {
+                return NoContent();
+            }
+
+            return NotFound();
         }
     }
 }

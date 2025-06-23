@@ -8,7 +8,6 @@ namespace MakerSchedule.Application.Services
         Task<IEnumerable<Employee>> GetAllEmployeesWithDetailsAsync();
         Task<IEnumerable<EmployeeListDTO>> GetAllEmployeesAsync();
         Task<EmployeeDTO> GetEmployeeByIdAsync(int id);
-        Task<int> DeleteEmployeeByIdAsync(string id);
-
+        Task DeleteEmployeeByIdAsync(int itd);
     }
 }

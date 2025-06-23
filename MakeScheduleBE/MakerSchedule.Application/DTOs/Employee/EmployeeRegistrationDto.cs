@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MakerSchedule.Application.DTOs.Employee;
 
-public class EmployeeRegistrationDto
+public class EmployeeRegistrationDTO
 {
     [Required]
     [EmailAddress]
