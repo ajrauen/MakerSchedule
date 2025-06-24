@@ -1,4 +1,3 @@
-using MakerSchedule.API.Exceptions;
 using MakerSchedule.API.Extensions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Mappings;
@@ -11,7 +10,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using MakerSchedule.API.Controllers;
+using MakerSchedule.API.Exceptions;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -31,11 +30,15 @@ services.AddIdentity<User, IdentityRole>()
 
 // Add Application Services
 services.AddScoped<IEmployeeService, EmployeeService>();
+services.AddScoped<ICustomerService,CustomerService>();
 services.AddScoped<ICustomerRegistrationService, CustomerRegistrationService>();
 services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
 services.AddScoped<IAuthenticationService, AuthenticationService>();
 services.AddScoped<IUserService, UserService>();
 services.AddScoped<IEmployeeProfileService, EmployeeProfileService>();
+services.AddScoped<ICustomerProfileService, CustomerProfileService>();
+services.AddScoped<IEventService, EventService>();
+
 services.AddScoped<JwtService>();
 
 services.AddAuthentication(options =>

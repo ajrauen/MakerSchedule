@@ -59,5 +59,18 @@ namespace MakerSchedule.API.Controllers
 
             return NotFound();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateEmployeeProfile([FromBody] CreateEmployeeDTO employeeDTO)
+        {
+            
+            var newEmployeeId = await _employeeProfileService.CreateEmployeeAsync(employeeDTO);
+            if (newEmployeeId > 0)
+            {
+                return CreatedAtAction(nameof(GetById), new { id = newEmployeeId }, new { id = newEmployeeId });
+            }
+            return BadRequest("Employee could not be created.");
+          
+        }
     }
 }

@@ -2,7 +2,7 @@ using MakerSchedule.Application.DTOs.User;
 
 namespace MakerSchedule.Application.DTOs.Employee
 {
-    public class UpdateEmployeeProfileDTO : UpdateUserProfileDTO
+    public class UpdateEmployeeProfileDTO : UserProfileUpdateFields
     {
         // Employee-Specific Properties
         public string? Department { get; set; }

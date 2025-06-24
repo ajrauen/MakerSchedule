@@ -31,6 +31,7 @@ namespace MakerSchedule.API.Exceptions
             var (statusCode, errorCode, message) = exception switch
             {
                 BaseException baseException => (baseException.StatusCode, baseException.ErrorCode, baseException.Message),
+                InvalidOperationException => (StatusCodes.Status400BadRequest, "VALIDATION_ERROR", exception.Message),
                 _ => (StatusCodes.Status500InternalServerError, "INTERNAL_SERVER_ERROR", "An unexpected error occurred")
             };
 

@@ -1,6 +1,6 @@
 namespace MakerSchedule.Application.DTOs.User
 {
-    public class UpdateUserProfileDTO
+    public class UserProfileUpdateFields
     {
         // User Profile Properties
         public string? FirstName { get; set; }

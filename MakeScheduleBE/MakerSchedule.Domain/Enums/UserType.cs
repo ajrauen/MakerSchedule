@@ -1,5 +1,8 @@
-public enum UserType
+namespace MakerSchedule.Domain.Enums
 {
-    Customer = 1,
-    Employee = 2,
+    public enum UserType
+    {
+        Customer = 1,
+        Employee = 2,
+    }
 }

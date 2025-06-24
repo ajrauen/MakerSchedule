@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Enums;
 
 namespace MakerSchedule.Infrastructure.Data
 {

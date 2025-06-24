@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using MakerSchedule.Domain.Enums;
 
 namespace MakerSchedule.Domain.Entities;
 

@@ -4,35 +4,35 @@ using Microsoft.Extensions.Logging;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Infrastructure.Data;
 using MakerSchedule.Application.Services;
-using MakerSchedule.Application.DTOs.Employee;
+using MakerSchedule.Application.DTOs.Customer;
+using MakerSchedule.Application.DTOs.User;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using MakerSchedule.Application.DTOs.User;
 using MakerSchedule.Domain.Enums;
 
 namespace MakerSchedule.Application.Services
 {
-    public class EmployeeProfileService : IEmployeeProfileService
+    public class CustomerProfileService : ICustomerProfileService
     {
         private readonly IUserService _userService;
-        private readonly IEmployeeService _employeeService; // Assume this only updates Employee-specific fields now
+        private readonly ICustomerService _customerService; // Assume this only updatesCustomer-specific fields now
         private readonly ApplicationDbContext _context; // It needs the DbContext to manage the transaction
         private readonly UserManager<User> _userManager;
-        private readonly ILogger<EmployeeProfileService> _logger;
+        private readonly ILogger<CustomerProfileService> _logger;
 
-        public EmployeeProfileService(IUserService userService, IEmployeeService employeeService, ApplicationDbContext context, UserManager<User> userManager, ILogger<EmployeeProfileService> logger)
+        public CustomerProfileService(IUserService userService, ICustomerService customerService, ApplicationDbContext context, UserManager<User> userManager, ILogger<CustomerProfileService> logger)
         {
             _userService = userService;
-            _employeeService = employeeService;
+            _customerService = customerService;
             _context = context;
             _userManager = userManager;
             _logger = logger;
         }
 
-        public async Task<int> CreateEmployeeAsync(CreateEmployeeDTO dto)
+        public async Task<int> CreateCustomerAsync(CreateCustomerDTO dto)
         {
-            _logger.LogInformation("Attempting to create employee with email: {Email}", dto.Email);
+            _logger.LogInformation("Attempting to create customer with email: {Email}", dto.Email);
 
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -49,7 +49,7 @@ namespace MakerSchedule.Application.Services
                         Address = dto.Address,
                         CreatedAt = DateTime.UtcNow,
                         IsActive = true,
-                        UserType = UserType.Employee
+                        UserType = UserType.Customer
                     };
 
                     var userResult = await _userManager.CreateAsync(user, dto.Password);
@@ -68,25 +68,24 @@ namespace MakerSchedule.Application.Services
                         throw new InvalidOperationException($"Failed to create user: {string.Join(", ", errors)}");
                     }
 
-                    // Create the Employee
-                    var employee = new Employee
+                    // Create the Customer
+                    var customer = new Customer
                     {
                         UserId = user.Id,
-                        EmployeeNumber = dto.EmployeeNumber,
-                        Department = dto.Department,
-                        Position = dto.Position,
-                        HireDate = dto.HireDate
+                        CustomerNumber = GenerateCustomerNumber(),
+                        PreferredContactMethod = dto.PreferredContactMethod ?? string.Empty,
+                        Notes = dto.Notes ?? string.Empty
                     };
 
-                    _context.Employees.Add(employee);
+                    _context.Customers.Add(customer);
                     await _context.SaveChangesAsync();
 
                     await transaction.CommitAsync();
 
-                    _logger.LogInformation("Successfully created employee with ID: {EmployeeId}", employee.Id);
+                    _logger.LogInformation("Successfully created customer with ID: {CustomerId}", customer.Id);
 
-                    // Return the employee ID
-                    return employee.Id;
+                    // Return the customer ID
+                    return customer.Id;
                 }
                 catch (BaseException)
                 {
@@ -101,40 +100,38 @@ namespace MakerSchedule.Application.Services
                 catch (Exception ex)
                 {
                     await transaction.RollbackAsync();
-                    _logger.LogError(ex, "Unexpected error creating employee");
-                    throw new InvalidOperationException("An unexpected error occurred while creating the employee", ex);
+                    _logger.LogError(ex, "Unexpected error creating customer");
+                    throw new InvalidOperationException("An unexpected error occurred while creating the customer", ex);
                 }
             }
         }
 
-        private string GenerateEmployeeNumber()
+        private string GenerateCustomerNumber()
         {
-            // Generate a unique employee number (you can implement your own logic)
-            return $"EMP-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+            // Generate a unique customer number (you can implement your own logic)
+            return $"CUST-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
         }
 
-        public async Task<bool> UpdateEmployeeProfileAsync(int id, UpdateEmployeeProfileDTO dto)
+        public async Task<bool> UpdateCustomerProfileAsync(int id, UpdateCustomerProfileDTO dto)
         {
             _logger.LogInformation("Attempting to update profile for UserId: {UserId}. Received FirstName: {FirstName}", id, dto.FirstName);
 
             // Step 1: Find the User by their primary key from the URL.
       
-            // Step 2: Find the associated Employee record using the UserId.
-            var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
-            if (employee == null)
+            // Step 2: Find the associatedCustomer record using the UserId.
+            var customer = await _context.Customers.FirstOrDefaultAsync(e => e.Id == id);
+            if (customer == null)
             {
-                _logger.LogWarning("No employee found for User with ID {UserId}", id);
+                _logger.LogWarning("No customer found for User with ID {UserId}", id);
                 return false;
             }
 
-            var user = await _userManager.FindByIdAsync(employee.UserId);
+            var user = await _userManager.FindByIdAsync(customer.UserId);
             if (user == null)
             {
-                _logger.LogWarning("User with ID {UserId} not found.", employee.UserId);
+                _logger.LogWarning("User with ID {UserId} not found.", customer.UserId);
                 return false;
             }
-
-
 
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -142,12 +139,10 @@ namespace MakerSchedule.Application.Services
                 {
                     bool userWasUpdated = UserProfileUpdater.UpdateUserFields(user, dto, _userManager);
 
-                    bool employeeWasUpdated = false;
-                    if (dto.Department != null) { employee.Department = dto.Department; employeeWasUpdated = true; }
-                    if (dto.Position != null) { employee.Position = dto.Position; employeeWasUpdated = true; }
-                    if (dto.HireDate.HasValue) { employee.HireDate = dto.HireDate.Value; employeeWasUpdated = true; }
+                    bool customerWasUpdated = false;
+                    if (dto.Notes != null) { customer.Notes = dto.Notes; customerWasUpdated = true; }
 
-                    if (employeeWasUpdated)
+                    if (customerWasUpdated)
                     {
                         await _context.SaveChangesAsync();
                     }

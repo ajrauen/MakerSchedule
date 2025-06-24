@@ -1,0 +1,150 @@
+using AutoMapper;
+
+using MakerSchedule.Application.DTOs.Customer;
+using MakerSchedule.Application.Exceptions;
+using MakerSchedule.Domain.Entities;
+using MakerSchedule.Infrastructure.Data;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+namespace MakerSchedule.Application.Services
+{
+    public class CustomerService : ICustomerService
+    {
+        private readonly ApplicationDbContext _context;
+        private readonly ILogger<CustomerService> _logger;
+        private readonly IMapper _mapper;
+        private readonly UserManager<User> _userManager;
+
+        public CustomerService(
+            ApplicationDbContext context,
+            ILogger<CustomerService> logger,
+            UserManager<User> userManager,
+            IMapper mapper)
+        {
+            _context = context ?? throw new ArgumentNullException(nameof(context));
+            _logger = logger;
+            _mapper = mapper;
+            _userManager = userManager;
+        }
+
+        public async Task<IEnumerable<Customer>> GetAllCustomersWithDetailsAsync()
+        {
+            try
+            {
+                return await _context.Customers.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching employees");
+                throw new BaseException("Failed to fetch employees", "FETCH_ERROR", 500, ex);
+            }
+        }
+
+
+        public async Task<IEnumerable<CustomerListDTO>> GetAllCustomersAsync()
+        {
+            try
+            {
+                var employees = await _context.Customers
+                                .Include(e => e.User)
+                                .ToListAsync();
+
+                var employeeDTOs = employees.Select(employee => new CustomerListDTO
+                {
+                    Id = employee.Id,
+                    CustomerID = employee.CustomerNumber,
+                    FirstName = employee.User?.FirstName ?? string.Empty,
+                    LastName = employee.User?.LastName ?? string.Empty,
+
+                }).ToList();
+
+
+                return employeeDTOs;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetch employee Ids");
+                throw new BaseException("Failed to fetch employee IDs", "FETCH_ERROR", 500, ex);
+            }
+        }
+
+        public async Task<CustomerDTO> GetCustomerByIdAsync(int id)
+        {
+            try
+            {
+                var employee = await _context.Customers
+                    .Include(e => e.User)
+                    .FirstOrDefaultAsync(e => e.Id == id);
+                if (employee == null)
+                {
+                    throw new NotFoundException("Customer", id);
+                }
+                return new CustomerDTO
+                {
+                    Id = employee.Id,
+     
+                    UserId = employee.UserId,
+                    Email = employee.User?.Email ?? string.Empty,
+                    FirstName = employee.User?.FirstName ?? string.Empty,
+                    LastName = employee.User?.LastName ?? string.Empty,
+                    PhoneNumber = employee.User?.PhoneNumber ?? string.Empty,
+                    Address = employee.User?.Address ?? string.Empty,
+                    IsActive = employee.User?.IsActive ?? false
+                };
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error fetching employee by id: {Id}", id);
+                throw new BaseException("Failed to fetch employee", "FETCH_ERROR", 500, ex);
+            }
+        }
+
+        public async Task DeleteCustomerByIdAsync(int id)
+        {
+            var employee = await _context.Customers.FirstOrDefaultAsync(e => e.Id == id);
+            if (employee == null)
+            {
+                throw new NotFoundException("Customer", id); 
+            }
+
+            var user = await _userManager.FindByIdAsync(employee.UserId);
+            if (user == null)
+            {
+                _logger.LogWarning("User with ID {UserId} not found.", employee.UserId);
+                throw new NotFoundException("User not found", employee.UserId); 
+            }
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    _context.Customers.Remove(employee);
+                    var result = await _userManager.DeleteAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        throw new BaseException(
+                                    message: $"Failed to delete user '{user.Id}'.",
+                                    errorCode: "USER_DELETION_FAILED",
+                                    statusCode: 500 // Or another appropriate status code like 400 Bad Request
+                                );
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+                }
+                catch (Exception)
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            }
+        }
+    }
+}
