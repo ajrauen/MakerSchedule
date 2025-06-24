@@ -77,6 +77,7 @@ namespace MakerSchedule.Application.Services
             {
                 var employee = await _context.Employees
                     .Include(e => e.User)
+                    .Include(e =>e.EventsLed)
                     .FirstOrDefaultAsync(e => e.Id == id);
                 if (employee == null)
                 {
@@ -95,7 +96,12 @@ namespace MakerSchedule.Application.Services
                     LastName = employee.User?.LastName ?? string.Empty,
                     PhoneNumber = employee.User?.PhoneNumber ?? string.Empty,
                     Address = employee.User?.Address ?? string.Empty,
-                    IsActive = employee.User?.IsActive ?? false
+                    IsActive = employee.User?.IsActive ?? false,
+                    EventsLed = employee.EventsLed.Select(e => new EventSummaryDTO
+                    {
+                        Id = e.Id,
+                        EventName = e.EventName,
+                    }).ToList(),
                 };
             }
             catch (NotFoundException)

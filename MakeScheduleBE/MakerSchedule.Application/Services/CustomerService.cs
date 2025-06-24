@@ -1,6 +1,7 @@
 using AutoMapper;
 
 using MakerSchedule.Application.DTOs.Customer;
+using MakerSchedule.Application.DTOs.Employee;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
@@ -38,8 +39,8 @@ namespace MakerSchedule.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching employees");
-                throw new BaseException("Failed to fetch employees", "FETCH_ERROR", 500, ex);
+                _logger.LogError(ex, "Error fetching customers");
+                throw new BaseException("Failed to fetch customers", "FETCH_ERROR", 500, ex);
             }
         }
 
@@ -48,26 +49,26 @@ namespace MakerSchedule.Application.Services
         {
             try
             {
-                var employees = await _context.Customers
+                var customers = await _context.Customers
                                 .Include(e => e.User)
                                 .ToListAsync();
 
-                var employeeDTOs = employees.Select(employee => new CustomerListDTO
+                var customerDTOs = customers.Select(customer => new CustomerListDTO
                 {
-                    Id = employee.Id,
-                    CustomerID = employee.CustomerNumber,
-                    FirstName = employee.User?.FirstName ?? string.Empty,
-                    LastName = employee.User?.LastName ?? string.Empty,
+                    Id = customer.Id,
+                    CustomerID = customer.CustomerNumber,
+                    FirstName = customer.User?.FirstName ?? string.Empty,
+                    LastName = customer.User?.LastName ?? string.Empty,
 
                 }).ToList();
 
 
-                return employeeDTOs;
+                return customerDTOs;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetch employee Ids");
-                throw new BaseException("Failed to fetch employee IDs", "FETCH_ERROR", 500, ex);
+                _logger.LogError(ex, "Error fetch customer Ids");
+                throw new BaseException("Failed to fetch customer IDs", "FETCH_ERROR", 500, ex);
             }
         }
 
@@ -75,24 +76,30 @@ namespace MakerSchedule.Application.Services
         {
             try
             {
-                var employee = await _context.Customers
+                var customer = await _context.Customers
                     .Include(e => e.User)
+                    .Include(e => e.EventsAttended)
                     .FirstOrDefaultAsync(e => e.Id == id);
-                if (employee == null)
+                if (customer == null)
                 {
                     throw new NotFoundException("Customer", id);
                 }
                 return new CustomerDTO
                 {
-                    Id = employee.Id,
-     
-                    UserId = employee.UserId,
-                    Email = employee.User?.Email ?? string.Empty,
-                    FirstName = employee.User?.FirstName ?? string.Empty,
-                    LastName = employee.User?.LastName ?? string.Empty,
-                    PhoneNumber = employee.User?.PhoneNumber ?? string.Empty,
-                    Address = employee.User?.Address ?? string.Empty,
-                    IsActive = employee.User?.IsActive ?? false
+                    Id = customer.Id,
+
+                    UserId = customer.UserId,
+                    Email = customer.User?.Email ?? string.Empty,
+                    FirstName = customer.User?.FirstName ?? string.Empty,
+                    LastName = customer.User?.LastName ?? string.Empty,
+                    PhoneNumber = customer.User?.PhoneNumber ?? string.Empty,
+                    Address = customer.User?.Address ?? string.Empty,
+                    IsActive = customer.User?.IsActive ?? false,
+                    EventsAttended = customer.EventsAttended.Select(e => new EventSummaryDTO
+                    {
+                        EventName = e.EventName,
+                        Id = e.Id,
+                    }).ToList(),
                 };
             }
             catch (NotFoundException)
@@ -101,31 +108,31 @@ namespace MakerSchedule.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error fetching employee by id: {Id}", id);
-                throw new BaseException("Failed to fetch employee", "FETCH_ERROR", 500, ex);
+                _logger.LogError(ex, "Error fetching customer by id: {Id}", id);
+                throw new BaseException("Failed to fetch customer", "FETCH_ERROR", 500, ex);
             }
         }
 
         public async Task DeleteCustomerByIdAsync(int id)
         {
-            var employee = await _context.Customers.FirstOrDefaultAsync(e => e.Id == id);
-            if (employee == null)
+            var customer = await _context.Customers.FirstOrDefaultAsync(e => e.Id == id);
+            if (customer == null)
             {
                 throw new NotFoundException("Customer", id); 
             }
 
-            var user = await _userManager.FindByIdAsync(employee.UserId);
+            var user = await _userManager.FindByIdAsync(customer.UserId);
             if (user == null)
             {
-                _logger.LogWarning("User with ID {UserId} not found.", employee.UserId);
-                throw new NotFoundException("User not found", employee.UserId); 
+                _logger.LogWarning("User with ID {UserId} not found.", customer.UserId);
+                throw new NotFoundException("User not found", customer.UserId); 
             }
 
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
-                    _context.Customers.Remove(employee);
+                    _context.Customers.Remove(customer);
                     var result = await _userManager.DeleteAsync(user);
                     if (!result.Succeeded)
                     {

@@ -1,5 +1,5 @@
 namespace MakerSchedule.Application.DTOs.Employee;
-
+using MakerSchedule.Domain.Entities;
 public class EmployeeDTO
 {
     // Employee fields
@@ -17,4 +17,6 @@ public class EmployeeDTO
     public string PhoneNumber { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public bool IsActive { get; set; }
+
+    public List<EventSummaryDTO> EventsLed { get; set; } = [];
 }

@@ -3,6 +3,7 @@ using System;
 using MakerSchedule.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,42 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakerSchedule.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250624190631_AddEventAttendeesAndLeaders")]
+    partial class AddEventAttendeesAndLeaders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
-
-            modelBuilder.Entity("CustomerEvent", b =>
-                {
-                    b.Property<int>("AttendeesId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("EventsAttendedId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("AttendeesId", "EventsAttendedId");
-
-                    b.HasIndex("EventsAttendedId");
-
-                    b.ToTable("CustomerEvent");
-                });
-
-            modelBuilder.Entity("EmployeeEvent", b =>
-                {
-                    b.Property<int>("EventsLedId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("LeadersId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("EventsLedId", "LeadersId");
-
-                    b.HasIndex("LeadersId");
-
-                    b.ToTable("EmployeeEvent");
-                });
 
             modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
                 {
@@ -56,6 +29,9 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.Property<string>("CustomerNumber")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<int?>("EventId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Notes")
                         .IsRequired()
@@ -70,6 +46,8 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -109,6 +87,9 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int?>("EventId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("HireDate")
                         .HasColumnType("TEXT");
 
@@ -124,6 +105,8 @@ namespace MakerSchedule.Infrastructure.Migrations
 
                     b.HasIndex("EmployeeNumber")
                         .IsUnique();
+
+                    b.HasIndex("EventId");
 
                     b.HasIndex("UserId")
                         .IsUnique();
@@ -294,7 +277,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             Address = "456 Oak Ave",
                             ConcurrencyStamp = "b2c3d4e5-f678-90ab-cdef-1234567890ab",
-                            CreatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(507),
+                            CreatedAt = new DateTime(2025, 6, 24, 19, 6, 31, 428, DateTimeKind.Utc).AddTicks(5374),
                             Email = "jane.smith@example.com",
                             EmailConfirmed = true,
                             FirstName = "Jane",
@@ -305,7 +288,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(508),
+                            UpdatedAt = new DateTime(2025, 6, 24, 19, 6, 31, 428, DateTimeKind.Utc).AddTicks(5375),
                             UserName = "jane.smith@example.com",
                             UserType = 2
                         },
@@ -315,7 +298,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             Address = "789 Pine Rd",
                             ConcurrencyStamp = "d4e5f678-90ab-cdef-1234-567890abcdef",
-                            CreatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(520),
+                            CreatedAt = new DateTime(2025, 6, 24, 19, 6, 31, 428, DateTimeKind.Utc).AddTicks(5385),
                             Email = "alice.johnson@example.com",
                             EmailConfirmed = true,
                             FirstName = "Alice",
@@ -326,7 +309,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "c3d4e5f6-7890-abcd-ef12-34567890abcd",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(520),
+                            UpdatedAt = new DateTime(2025, 6, 24, 19, 6, 31, 428, DateTimeKind.Utc).AddTicks(5385),
                             UserName = "alice.johnson@example.com",
                             UserType = 1
                         },
@@ -336,7 +319,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             Address = "321 Maple St",
                             ConcurrencyStamp = "f67890ab-cdef-1234-5678-90abcdef1234",
-                            CreatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(525),
+                            CreatedAt = new DateTime(2025, 6, 24, 19, 6, 31, 428, DateTimeKind.Utc).AddTicks(5390),
                             Email = "bob.williams@example.com",
                             EmailConfirmed = true,
                             FirstName = "Bob",
@@ -347,7 +330,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "e5f67890-abcd-ef12-3456-7890abcdef12",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(525),
+                            UpdatedAt = new DateTime(2025, 6, 24, 19, 6, 31, 428, DateTimeKind.Utc).AddTicks(5390),
                             UserName = "bob.williams@example.com",
                             UserType = 1
                         });
@@ -481,38 +464,12 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CustomerEvent", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.Customer", null)
-                        .WithMany()
-                        .HasForeignKey("AttendeesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MakerSchedule.Domain.Entities.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsAttendedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EmployeeEvent", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsLedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MakerSchedule.Domain.Entities.Employee", null)
-                        .WithMany()
-                        .HasForeignKey("LeadersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
                 {
+                    b.HasOne("MakerSchedule.Domain.Entities.Event", null)
+                        .WithMany("Attendees")
+                        .HasForeignKey("EventId");
+
                     b.HasOne("MakerSchedule.Domain.Entities.User", "User")
                         .WithOne("Customer")
                         .HasForeignKey("MakerSchedule.Domain.Entities.Customer", "UserId")
@@ -524,6 +481,10 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("MakerSchedule.Domain.Entities.Employee", b =>
                 {
+                    b.HasOne("MakerSchedule.Domain.Entities.Event", null)
+                        .WithMany("Leaders")
+                        .HasForeignKey("EventId");
+
                     b.HasOne("MakerSchedule.Domain.Entities.User", "User")
                         .WithOne("Employee")
                         .HasForeignKey("MakerSchedule.Domain.Entities.Employee", "UserId")
@@ -582,6 +543,13 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MakerSchedule.Domain.Entities.Event", b =>
+                {
+                    b.Navigation("Attendees");
+
+                    b.Navigation("Leaders");
                 });
 
             modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>

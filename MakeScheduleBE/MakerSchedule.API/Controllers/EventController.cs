@@ -1,5 +1,6 @@
 
 using MakerSchedule.Application.Services;
+using MakerSchedule.Domain.Entities;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -31,6 +32,24 @@ namespace MakerSchedule.API.Controllers
         {
             var eventItem = await _eventService.GetEventAsync(id);
             return Ok(eventItem);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateEvent([FromBody] CreateEventDTO dto)
+        {
+            var eventId = await _eventService.CreateEventAsync(dto);
+            return Ok(eventId);
+        }
+
+        [HttpDelete("${eventId}")]
+        public async Task<IActionResult> DeleteEvent(int eventId)
+        {
+            var deleted = await _eventService.DeleteEventAsync(eventId);
+            if (deleted)
+            {
+                return Ok(deleted);
+            }
+            return NotFound();
         }
 
 

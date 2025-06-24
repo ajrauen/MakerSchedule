@@ -1,3 +1,5 @@
+using MakerSchedule.Application.DTOs.Employee;
+
 namespace MakerSchedule.Application.DTOs.Customer;
 
 public class CustomerDTO
@@ -13,4 +15,6 @@ public class CustomerDTO
     public string PhoneNumber { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
     public bool IsActive { get; set; }
+    public List<EventSummaryDTO> EventsAttended { get; set; } = [];
+
 }

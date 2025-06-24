@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace MakerSchedule.Domain.Entities
 {
@@ -12,8 +13,9 @@ namespace MakerSchedule.Domain.Entities
         [Required]
         public required string Description { get; set; }
 
-        public IEnumerable<Customer> Attendees { get; set; } = Array.Empty<Customer>();
-        public IEnumerable<Employee> Leaders { get; set; } = Array.Empty<Employee>();
+        // Navigation properties for many-to-many
+        public ICollection<Customer> Attendees { get; set; } = new List<Customer>();
+        public ICollection<Employee> Leaders { get; set; } = new List<Employee>();
 
         public DateTime ScheduleStart { get; set; }
         

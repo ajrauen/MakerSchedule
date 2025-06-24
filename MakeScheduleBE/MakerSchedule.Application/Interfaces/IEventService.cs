@@ -8,6 +8,7 @@ namespace MakerSchedule.Application.Services
         Task<IEnumerable<EventListDTO>> GetAllEventsAsync();
         Task<EventDTO> GetEventAsync(int eventId);
         Task<int> CreateEventAsync(CreateEventDTO eventDTO);
+        Task<bool> DeleteEventAsync(int eventId);
         
     }
 }

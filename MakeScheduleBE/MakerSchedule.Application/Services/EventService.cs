@@ -6,6 +6,7 @@ using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services
@@ -49,7 +50,10 @@ namespace MakerSchedule.Application.Services
         {
             try
             {
-                var eventItem = await _dbContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+                var eventItem = await _dbContext.Events
+                                .Include(e => e.Attendees)
+                                .Include(e => e.Leaders)
+                                .FirstOrDefaultAsync(e => e.Id == eventId);
 
                 if (eventItem == null)
                 {
@@ -60,9 +64,9 @@ namespace MakerSchedule.Application.Services
                 {
                     Description = eventItem.Description,
                     EventName = eventItem.EventName,
-                    Attendees = eventItem.Attendees,
+                    Attendees = eventItem.Attendees.Select(e => e.Id).ToList(),
                     Id = eventId,
-                    Leaders = eventItem.Leaders,
+                    Leaders = eventItem.Leaders.Select(e => e.Id).ToList(),
                     ScheduleStart = eventItem.ScheduleStart,
                 };
 
@@ -78,12 +82,16 @@ namespace MakerSchedule.Application.Services
         {
             try
             {
+
+                var attendees = await _dbContext.Customers.Where(c => eventDTO.Attendees.Contains(c.Id)).ToListAsync();
+                var leaders = await _dbContext.Employees.Where(e => eventDTO.Leaders.Contains(e.Id)).ToListAsync();
+
                 var eventItem = new Event
                 {
                     EventName = eventDTO.EventName,
                     Description = eventDTO.Description,
-                    Attendees = eventDTO.Attendees,
-                    Leaders = eventDTO.Leaders,
+                    Attendees = attendees,
+                    Leaders = leaders,
                     ScheduleStart = eventDTO.ScheduleStart
                 };
 
@@ -97,8 +105,27 @@ namespace MakerSchedule.Application.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating event");
-                throw; 
+                throw;
             }
+        }
+
+        public async Task<bool> DeleteEventAsync(int eventId)
+        {
+            var eventItem = await _dbContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
+            if (eventItem == null)
+            {
+                _logger.LogWarning("Event with ID {eventId} not found.", eventId);
+                throw new NotFoundException("Event not found", eventId);
+            }
+
+            _dbContext.Remove(eventItem);
+            var result = await _dbContext.SaveChangesAsync();
+            if (result > 0)
+            {
+                return true;
+             }
+             return false;
+
         }
     }
 }

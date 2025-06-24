@@ -12,10 +12,17 @@ namespace MakerSchedule.Domain.Entities
         [Required]
         public required string Description { get; set; }
 
-        public IEnumerable<Customer> Attendees { get; set; } = Array.Empty<Customer>();
-        public IEnumerable<Employee> Leaders { get; set; } = Array.Empty<Employee>();
+        public ICollection<int> Attendees { get; set; } = Array.Empty<int>();
+        public ICollection<int> Leaders { get; set; } = Array.Empty<int>();
 
         public DateTime ScheduleStart { get; set; }
         
+    }
+
+    public class PersonSummaryDTO
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace MakerSchedule.Domain.Entities;
 
@@ -16,5 +17,6 @@ public class Employee
     public string Position { get; set; } = string.Empty;
     public DateTime HireDate { get; set; }
 
-
+    // Many-to-many navigation property
+    public ICollection<Event> EventsLed { get; set; } = new List<Event>();
 }
