@@ -33,6 +33,8 @@ namespace MakerSchedule.Application.Services
                 {
                     Id = e.Id,
                     EventName = e.EventName,
+                    ScheduleStart = ((DateTimeOffset)e.ScheduleStart).ToUnixTimeMilliseconds(),
+                    Duration = e.Duration,
 
                 }).ToList();
 
@@ -60,6 +62,8 @@ namespace MakerSchedule.Application.Services
                     throw new NotFoundException("Event", eventId);
                 }
 
+                var scheduleStart = ((DateTimeOffset)eventItem.ScheduleStart).ToUnixTimeMilliseconds();
+
                 return new EventDTO
                 {
                     Description = eventItem.Description,
@@ -67,7 +71,8 @@ namespace MakerSchedule.Application.Services
                     Attendees = eventItem.Attendees.Select(e => e.Id).ToList(),
                     Id = eventId,
                     Leaders = eventItem.Leaders.Select(e => e.Id).ToList(),
-                    ScheduleStart = eventItem.ScheduleStart,
+                    ScheduleStart = scheduleStart,
+                    Duration = eventItem.Duration,
                 };
 
             }
@@ -85,6 +90,7 @@ namespace MakerSchedule.Application.Services
 
                 var attendees = await _dbContext.Customers.Where(c => eventDTO.Attendees.Contains(c.Id)).ToListAsync();
                 var leaders = await _dbContext.Employees.Where(e => eventDTO.Leaders.Contains(e.Id)).ToListAsync();
+                var startDateTime = DateTimeOffset.FromUnixTimeMilliseconds(eventDTO.ScheduleStart).UtcDateTime;    
 
                 var eventItem = new Event
                 {
@@ -92,13 +98,14 @@ namespace MakerSchedule.Application.Services
                     Description = eventDTO.Description,
                     Attendees = attendees,
                     Leaders = leaders,
-                    ScheduleStart = eventDTO.ScheduleStart
+                    ScheduleStart = startDateTime,
+                    Duration = eventDTO.Duration,
                 };
 
                 _dbContext.Events.Add(eventItem);
                 await _dbContext.SaveChangesAsync();
 
-                _logger.LogInformation("Successfully created event with ID: {EventId}", eventItem.Id);
+                _logger.LogInformation("Successfully created event with ID: {EventId}", eventItem.Duration);
 
                 return eventItem.Id;
             }

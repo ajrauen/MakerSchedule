@@ -14,15 +14,7 @@ namespace MakerSchedule.Domain.Entities
 
         public ICollection<int> Attendees { get; set; } = Array.Empty<int>();
         public ICollection<int> Leaders { get; set; } = Array.Empty<int>();
-
-        public DateTime ScheduleStart { get; set; }
-        
-    }
-
-    public class PersonSummaryDTO
-    {
-        public int Id { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
+        public long ScheduleStart { get; set; }
+        public int Duration { get; set; }
     }
 }

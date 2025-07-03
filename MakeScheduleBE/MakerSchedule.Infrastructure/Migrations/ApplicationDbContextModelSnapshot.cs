@@ -161,6 +161,9 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Duration")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("EventName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -294,7 +297,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             Address = "456 Oak Ave",
                             ConcurrencyStamp = "b2c3d4e5-f678-90ab-cdef-1234567890ab",
-                            CreatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(507),
+                            CreatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4249),
                             Email = "jane.smith@example.com",
                             EmailConfirmed = true,
                             FirstName = "Jane",
@@ -305,7 +308,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(508),
+                            UpdatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4250),
                             UserName = "jane.smith@example.com",
                             UserType = 2
                         },
@@ -315,7 +318,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             Address = "789 Pine Rd",
                             ConcurrencyStamp = "d4e5f678-90ab-cdef-1234-567890abcdef",
-                            CreatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(520),
+                            CreatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4261),
                             Email = "alice.johnson@example.com",
                             EmailConfirmed = true,
                             FirstName = "Alice",
@@ -326,7 +329,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "c3d4e5f6-7890-abcd-ef12-34567890abcd",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(520),
+                            UpdatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4261),
                             UserName = "alice.johnson@example.com",
                             UserType = 1
                         },
@@ -336,7 +339,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             AccessFailedCount = 0,
                             Address = "321 Maple St",
                             ConcurrencyStamp = "f67890ab-cdef-1234-5678-90abcdef1234",
-                            CreatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(525),
+                            CreatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4266),
                             Email = "bob.williams@example.com",
                             EmailConfirmed = true,
                             FirstName = "Bob",
@@ -347,7 +350,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             PhoneNumberConfirmed = true,
                             SecurityStamp = "e5f67890-abcd-ef12-3456-7890abcdef12",
                             TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 6, 24, 19, 24, 42, 416, DateTimeKind.Utc).AddTicks(525),
+                            UpdatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4266),
                             UserName = "bob.williams@example.com",
                             UserType = 1
                         });

@@ -13,7 +13,7 @@ namespace MakerSchedule.Domain.Entities
         public ICollection<int> Attendees { get; set; } = Array.Empty<int>();
         public ICollection<int> Leaders { get; set; } = Array.Empty<int>();
 
-        public DateTime ScheduleStart { get; set; }
-        
+        public long ScheduleStart { get; set; }
+        public int Duration { get; set; }
     }
 }

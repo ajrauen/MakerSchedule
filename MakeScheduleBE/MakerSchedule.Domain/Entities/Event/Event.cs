@@ -18,6 +18,6 @@ namespace MakerSchedule.Domain.Entities
         public ICollection<Employee> Leaders { get; set; } = new List<Employee>();
 
         public DateTime ScheduleStart { get; set; }
-        
+        public int Duration { get; set; }
     }
 }

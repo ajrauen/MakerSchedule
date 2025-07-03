@@ -14,7 +14,6 @@ export default defineConfig({
       target: "react",
       autoCodeSplitting: true,
     }),
-    basicSsl(),
   ],
   resolve: {
     alias: {
