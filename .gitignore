@@ -54,4 +54,8 @@ bld/
 [Oo]ut/
 msbuild.log
 msbuild.err
-msbuild.wrn 
+msbuild.wrn
+
+# Local SSL certificates
+cert/localhost.pem
+cert/localhost-key.pem 
