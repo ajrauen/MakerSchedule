@@ -30,20 +30,19 @@ const FormDialog = ({
 }: FormDialogProps) => {
   return (
     <Dialog open={open} {...props}>
-      {title ? <DialogTitle>{title}</DialogTitle> : null}
-      <DialogContent sx={{ paddingBottom: 0 }}>
-        {description ? (
-          <DialogContentText>{description}</DialogContentText>
-        ) : null}
-
-        {children}
-        <DialogActions>
-          <Button onClick={onClose}>{closeText}</Button>
-          <Button type="submit" onClick={onSubmit}>
-            {submitText}
-          </Button>
-        </DialogActions>
-      </DialogContent>
+      <form onSubmit={onSubmit} style={{ margin: 0 }}>
+        {title ? <DialogTitle>{title}</DialogTitle> : null}
+        <DialogContent sx={{ paddingBottom: 0 }}>
+          {description ? (
+            <DialogContentText>{description}</DialogContentText>
+          ) : null}
+          {children}
+          <DialogActions>
+            <Button onClick={onClose}>{closeText}</Button>
+            <Button type="submit">{submitText}</Button>
+          </DialogActions>
+        </DialogContent>
+      </form>
     </Dialog>
   );
 };

@@ -1,8 +1,29 @@
 import { Login } from "@ms/Pages/Home/Login/Login";
+import { RegisterUser } from "@ms/Pages/Home/RegisterUser/RegisterUser";
+import { useIsLoggedIn } from "@ms/utils/auth.utils";
 import { Link as MuiLink } from "@mui/material";
 import { Link } from "@tanstack/react-router";
+import { refreshToken } from "@ms/api/authentication.api";
+import { useEffect } from "react";
+import { removeToken } from "@ms/utils/auth.utils";
+import { useQuery } from "@tanstack/react-query";
 
 const Home = () => {
+  const isLoggedIn = useIsLoggedIn();
+
+  const { error, isError } = useQuery({
+    queryKey: ["refreshTokenOnLoad"],
+    queryFn: refreshToken,
+    enabled: isLoggedIn,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (isError) {
+      removeToken();
+    }
+  }, [isError]);
+
   return (
     <div className="w-full h-full ">
       <div className="w-full h-full absolute">
@@ -33,11 +54,14 @@ const Home = () => {
         </div>
         <div className="justify-self-end text-white">
           <ul className="flex gap-2">
-            <li className="border-r-[1px] pr-2">
-              <Login />
-            </li>
+            {!isLoggedIn && (
+              <li className="border-r-[1px] pr-2">
+                <Login />
+              </li>
+            )}
+
             <li>
-              <Login />
+              <RegisterUser />
             </li>
           </ul>
           <div>

@@ -45,15 +45,18 @@ AxiosInstance.interceptors.response.use(
   },
   async (error) => {
     const originalRequest = error.config;
-
     // Check if the error is 401 and it's not a retry request
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // If the failed request is the refresh endpoint itself, do not retry
+      if (originalRequest.url?.includes("/refresh")) {
+        // Optionally: clear tokens, trigger logout, etc.
+        return Promise.reject(error);
+      }
       if (isRefreshing) {
         return new Promise(function (resolve, reject) {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            debugger;
             originalRequest.headers["Authorization"] = "Bearer " + token;
             return AxiosInstance(originalRequest);
           })

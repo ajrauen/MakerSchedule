@@ -48,7 +48,7 @@ const Login = () => {
   } = useMutation({
     mutationKey: ["login"],
     mutationFn: login,
-    onSuccess: () => navigate({ to: "/" }),
+    onSuccess: () => setIsLoginFormOpen(false),
   });
 
   const submit = () => {
@@ -57,7 +57,6 @@ const Login = () => {
       email,
       password,
     };
-
     doLogin({
       creds: login,
     });
@@ -79,7 +78,7 @@ const Login = () => {
       </span>
       <FormDialog
         open={isLoginFormOpen}
-        onSubmit={() => handleSubmit(submit)}
+        onSubmit={handleSubmit(submit)}
         onClose={closeLoginForm}
         submitText="Login"
         maxWidth="sm"
