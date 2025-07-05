@@ -9,6 +9,7 @@ import { FormDialog } from "@ms/Components/FormComponents/FormDialog";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import type { RegisterCustomerRequest } from "@ms/types/customer.types";
 import { registerNewCustomerUser } from "@ms/api/customer.api";
+import { login } from "@ms/api/authentication.api";
 import type { AxiosError } from "axios";
 import type { RequestError } from "@ms/types/request-error.types";
 
@@ -54,10 +55,25 @@ const RegisterUser = () => {
       defaultValues: registerInitialFormData,
     });
 
+  const { mutate: doLogin } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: login,
+    onSuccess: () => {
+      setIsRegisterFormOpen(false);
+    },
+    onError: () => {
+      setIsRegisterFormOpen(false);
+    },
+  });
+
   const { mutate: doRegister } = useMutation({
     mutationKey: ["registerUser"],
     mutationFn: registerNewCustomerUser,
-    onSuccess: () => setIsRegisterFormOpen(false),
+    onSuccess: (_, variables) => {
+      doLogin({
+        creds: { email: variables.email, password: variables.password },
+      });
+    },
     onError: (error: AxiosError<RequestError>) => {
       setErrorCode(error.response?.data.code);
     },

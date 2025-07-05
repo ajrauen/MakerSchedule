@@ -58,4 +58,12 @@ msbuild.wrn
 
 # Local SSL certificates
 cert/localhost.pem
-cert/localhost-key.pem 
+cert/localhost-key.pem
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+makerschedule.db
+makerschedule.db-shm
+makerschedule.db-wal 

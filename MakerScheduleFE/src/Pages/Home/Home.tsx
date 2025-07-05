@@ -55,14 +55,16 @@ const Home = () => {
         <div className="justify-self-end text-white">
           <ul className="flex gap-2">
             {!isLoggedIn && (
-              <li className="border-r-[1px] pr-2">
-                <Login />
-              </li>
+              <>
+                <li className="border-r-[1px] pr-2">
+                  <Login />
+                </li>
+                <li>
+                  <RegisterUser />
+                </li>
+              </>
             )}
-
-            <li>
-              <RegisterUser />
-            </li>
+            <li>whatever</li>
           </ul>
           <div>
             <Link to={"classes"}>
