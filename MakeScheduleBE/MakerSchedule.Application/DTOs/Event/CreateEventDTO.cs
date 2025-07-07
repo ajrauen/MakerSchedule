@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+using MakerSchedule.Domain.Enums;
+
 namespace MakerSchedule.Domain.Entities
 {
     public class CreateEventDTO
@@ -15,5 +17,7 @@ namespace MakerSchedule.Domain.Entities
 
         public long ScheduleStart { get; set; }
         public int Duration { get; set; }
+        [Required]
+        public EventTypeEnum EventType{ get; set; }
     }
 }

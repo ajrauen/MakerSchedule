@@ -15,7 +15,7 @@ namespace MakerSchedule.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.2");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
 
             modelBuilder.Entity("CustomerEvent", b =>
                 {
@@ -75,24 +75,6 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("Customers");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CustomerNumber = "CUST001",
-                            Notes = "VIP customer",
-                            PreferredContactMethod = "Email",
-                            UserId = "33333333-3333-3333-3333-333333333333"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CustomerNumber = "CUST002",
-                            Notes = "Frequent buyer",
-                            PreferredContactMethod = "Phone",
-                            UserId = "44444444-4444-4444-4444-444444444444"
-                        });
                 });
 
             modelBuilder.Entity("MakerSchedule.Domain.Entities.Employee", b =>
@@ -134,20 +116,11 @@ namespace MakerSchedule.Infrastructure.Migrations
                         new
                         {
                             Id = 1,
-                            Department = "HR",
+                            Department = "Administration",
                             EmployeeNumber = "EMP001",
                             HireDate = new DateTime(2020, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Position = "Manager",
+                            Position = "Administrator",
                             UserId = "11111111-1111-1111-1111-111111111111"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Department = "IT",
-                            EmployeeNumber = "EMP002",
-                            HireDate = new DateTime(2021, 5, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Position = "Developer",
-                            UserId = "22222222-2222-2222-2222-222222222222"
                         });
                 });
 
@@ -168,12 +141,62 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("EventType")
+                        .HasColumnType("INTEGER");
+
                     b.Property<DateTime>("ScheduleStart")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.ToTable("Events");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.",
+                            Duration = 7200000,
+                            EventName = "Advanced Pottery",
+                            EventType = 2,
+                            ScheduleStart = new DateTime(2025, 7, 7, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2581)
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.",
+                            Duration = 10800000,
+                            EventName = "Woodworking Workshop",
+                            EventType = 1,
+                            ScheduleStart = new DateTime(2025, 7, 8, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2593)
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.",
+                            Duration = 5400000,
+                            EventName = "Sewing Basics",
+                            EventType = 3,
+                            ScheduleStart = new DateTime(2025, 7, 10, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2594)
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Introduction to pottery and clay work. Learn basic hand-building techniques. This beginner-friendly class introduces you to the world of ceramics through hand-building methods like pinch pots, coil building, and slab construction. You will learn about different types of clay, basic glazing techniques, and the firing process. The instructor will guide you through creating several small pieces that will be fired and glazed. No prior experience is necessary. All materials and firing fees are included.",
+                            Duration = 9000000,
+                            EventName = "Pottery for Beginners",
+                            EventType = 2,
+                            ScheduleStart = new DateTime(2025, 7, 12, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2596)
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Advanced woodworking techniques for experienced craftsmen. Learn joinery and finishing methods. This advanced workshop focuses on traditional woodworking joinery techniques such as dovetails, mortise and tenon, and finger joints. You will also learn advanced finishing techniques including French polishing, oil finishes, and lacquer application. The class includes safety training for power tools and hand tools. Participants should have basic woodworking experience. Bring your own safety equipment or use ours.",
+                            Duration = 14400000,
+                            EventName = "Advanced Woodworking",
+                            EventType = 1,
+                            ScheduleStart = new DateTime(2025, 7, 15, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2597)
+                        });
                 });
 
             modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>
@@ -268,92 +291,6 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "11111111-1111-1111-1111-111111111111",
-                            AccessFailedCount = 0,
-                            Address = "123 Main St",
-                            ConcurrencyStamp = "31372edb-255c-4acc-869a-3a3aa8dc0ab7",
-                            CreatedAt = new DateTime(2025, 6, 17, 23, 45, 49, 86, DateTimeKind.Utc),
-                            Email = "john.doe@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "John",
-                            IsActive = true,
-                            LastName = "Doe",
-                            LockoutEnabled = false,
-                            PhoneNumber = "123-456-7890",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "5191f6eb-ce10-4825-8ff9-1edb55809163",
-                            TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 6, 17, 23, 45, 49, 86, DateTimeKind.Utc),
-                            UserName = "john.doe@example.com",
-                            UserType = 2
-                        },
-                        new
-                        {
-                            Id = "22222222-2222-2222-2222-222222222222",
-                            AccessFailedCount = 0,
-                            Address = "456 Oak Ave",
-                            ConcurrencyStamp = "b2c3d4e5-f678-90ab-cdef-1234567890ab",
-                            CreatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4249),
-                            Email = "jane.smith@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "Jane",
-                            IsActive = true,
-                            LastName = "Smith",
-                            LockoutEnabled = false,
-                            PhoneNumber = "555-123-4567",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-                            TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4250),
-                            UserName = "jane.smith@example.com",
-                            UserType = 2
-                        },
-                        new
-                        {
-                            Id = "33333333-3333-3333-3333-333333333333",
-                            AccessFailedCount = 0,
-                            Address = "789 Pine Rd",
-                            ConcurrencyStamp = "d4e5f678-90ab-cdef-1234-567890abcdef",
-                            CreatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4261),
-                            Email = "alice.johnson@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "Alice",
-                            IsActive = true,
-                            LastName = "Johnson",
-                            LockoutEnabled = false,
-                            PhoneNumber = "444-555-6666",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "c3d4e5f6-7890-abcd-ef12-34567890abcd",
-                            TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4261),
-                            UserName = "alice.johnson@example.com",
-                            UserType = 1
-                        },
-                        new
-                        {
-                            Id = "44444444-4444-4444-4444-444444444444",
-                            AccessFailedCount = 0,
-                            Address = "321 Maple St",
-                            ConcurrencyStamp = "f67890ab-cdef-1234-5678-90abcdef1234",
-                            CreatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4266),
-                            Email = "bob.williams@example.com",
-                            EmailConfirmed = true,
-                            FirstName = "Bob",
-                            IsActive = true,
-                            LastName = "Williams",
-                            LockoutEnabled = false,
-                            PhoneNumber = "777-888-9999",
-                            PhoneNumberConfirmed = true,
-                            SecurityStamp = "e5f67890-abcd-ef12-3456-7890abcdef12",
-                            TwoFactorEnabled = false,
-                            UpdatedAt = new DateTime(2025, 7, 1, 3, 44, 47, 228, DateTimeKind.Utc).AddTicks(4266),
-                            UserName = "bob.williams@example.com",
-                            UserType = 1
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

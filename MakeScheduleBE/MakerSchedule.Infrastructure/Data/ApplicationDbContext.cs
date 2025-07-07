@@ -21,15 +21,22 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
         modelBuilder.Entity<User>(entity =>
         {
             entity.Property(u => u.UserType).IsRequired();
-            entity.HasData(SeedData.SeedUsers.ToArray());
+            // Remove HasData for users since we'll create them through UserManager
         });
 
         modelBuilder.Entity<Employee>().HasData(SeedData.SeedEmployees.ToArray());
         modelBuilder.Entity<Customer>().HasData(SeedData.SeedCustomers.ToArray());
+        modelBuilder.Entity<Event>().HasData(SeedData.SeedEvents.ToArray());
 
         modelBuilder.Entity<Employee>()
             .HasIndex(e => e.EmployeeNumber)
             .IsUnique();
+
+        // Configure Event entity to include EventType
+        modelBuilder.Entity<Event>(entity =>
+        {
+            entity.Property(e => e.EventType).IsRequired();
+        });
     }
 
     public DbSet<Employee> Employees { get; set; }

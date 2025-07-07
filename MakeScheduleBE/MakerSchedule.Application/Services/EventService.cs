@@ -35,6 +35,8 @@ namespace MakerSchedule.Application.Services
                     EventName = e.EventName,
                     ScheduleStart = ((DateTimeOffset)e.ScheduleStart).ToUnixTimeMilliseconds(),
                     Duration = e.Duration,
+                    EventType = e.EventType,
+                    Description = e.Description,
 
                 }).ToList();
 
@@ -100,6 +102,7 @@ namespace MakerSchedule.Application.Services
                     Leaders = leaders,
                     ScheduleStart = startDateTime,
                     Duration = eventDTO.Duration,
+                    EventType = eventDTO.EventType
                 };
 
                 _dbContext.Events.Add(eventItem);

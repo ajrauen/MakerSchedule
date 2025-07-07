@@ -41,6 +41,9 @@ services.AddScoped<IEventService, EventService>();
 
 services.AddScoped<JwtService>();
 
+// Add Database Seeder
+services.AddScoped<DatabaseSeeder>();
+
 services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -125,6 +128,20 @@ try
 catch (Exception ex)
 {
     app.Logger.LogError(ex, "Failed to connect to the database. Application will exit.");
+    throw; // This will cause the application to exit
+}
+
+// Seed the database
+try
+{
+    using var scope = app.Services.CreateScope();
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.SeedAsync();
+    app.Logger.LogInformation("Database seeding completed successfully.");
+}
+catch (Exception ex)
+{
+    app.Logger.LogError(ex, "Failed to seed the database.");
     throw; // This will cause the application to exit
 }
 
