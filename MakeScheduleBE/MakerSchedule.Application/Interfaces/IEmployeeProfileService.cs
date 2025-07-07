@@ -1,11 +1,10 @@
 using MakerSchedule.Application.DTOs.Employee;
 using System.Threading.Tasks;
 
-namespace MakerSchedule.Application.Interfaces
+namespace MakerSchedule.Application.Interfaces;
+
+public interface IEmployeeProfileService
 {
-    public interface IEmployeeProfileService
-    {
-        Task<int> CreateEmployeeAsync(CreateEmployeeDTO dto);
-        Task<bool> UpdateEmployeeProfileAsync(int userId, UpdateEmployeeProfileDTO dto);
-    }
+    Task<int> CreateEmployeeAsync(CreateEmployeeDTO dto);
+    Task<bool> UpdateEmployeeProfileAsync(int userId, UpdateEmployeeProfileDTO dto);
 }

@@ -8,532 +8,531 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace MakerSchedule.Infrastructure.Migrations
+namespace MakerSchedule.Infrastructure.Migrations;
+
+[DbContext(typeof(ApplicationDbContext))]
+[Migration("20250705051728_InitialCreate")]
+partial class InitialCreate
 {
-    [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250705051728_InitialCreate")]
-    partial class InitialCreate
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
+        modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
 
-            modelBuilder.Entity("CustomerEvent", b =>
-                {
-                    b.Property<int>("AttendeesId")
-                        .HasColumnType("INTEGER");
+        modelBuilder.Entity("CustomerEvent", b =>
+            {
+                b.Property<int>("AttendeesId")
+                    .HasColumnType("INTEGER");
 
-                    b.Property<int>("EventsAttendedId")
-                        .HasColumnType("INTEGER");
+                b.Property<int>("EventsAttendedId")
+                    .HasColumnType("INTEGER");
 
-                    b.HasKey("AttendeesId", "EventsAttendedId");
+                b.HasKey("AttendeesId", "EventsAttendedId");
 
-                    b.HasIndex("EventsAttendedId");
+                b.HasIndex("EventsAttendedId");
 
-                    b.ToTable("CustomerEvent");
-                });
+                b.ToTable("CustomerEvent");
+            });
 
-            modelBuilder.Entity("EmployeeEvent", b =>
-                {
-                    b.Property<int>("EventsLedId")
-                        .HasColumnType("INTEGER");
+        modelBuilder.Entity("EmployeeEvent", b =>
+            {
+                b.Property<int>("EventsLedId")
+                    .HasColumnType("INTEGER");
 
-                    b.Property<int>("LeadersId")
-                        .HasColumnType("INTEGER");
+                b.Property<int>("LeadersId")
+                    .HasColumnType("INTEGER");
 
-                    b.HasKey("EventsLedId", "LeadersId");
+                b.HasKey("EventsLedId", "LeadersId");
 
-                    b.HasIndex("LeadersId");
+                b.HasIndex("LeadersId");
 
-                    b.ToTable("EmployeeEvent");
-                });
+                b.ToTable("EmployeeEvent");
+            });
 
-            modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+        modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER");
 
-                    b.Property<string>("CustomerNumber")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                b.Property<string>("CustomerNumber")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                b.Property<string>("Notes")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
 
-                    b.Property<string>("PreferredContactMethod")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                b.Property<string>("PreferredContactMethod")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Customers");
-                });
-
-            modelBuilder.Entity("MakerSchedule.Domain.Entities.Employee", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Department")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EmployeeNumber")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("HireDate")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Position")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeNumber")
-                        .IsUnique();
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Employees");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Department = "Administration",
-                            EmployeeNumber = "EMP001",
-                            HireDate = new DateTime(2020, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Position = "Administrator",
-                            UserId = "11111111-1111-1111-1111-111111111111"
-                        });
-                });
-
-            modelBuilder.Entity("MakerSchedule.Domain.Entities.Event", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Duration")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("EventName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("EventType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("ScheduleStart")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Events");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Description = "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.",
-                            Duration = 7200000,
-                            EventName = "Advanced Pottery",
-                            EventType = 2,
-                            ScheduleStart = new DateTime(2025, 7, 7, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2581)
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Description = "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.",
-                            Duration = 10800000,
-                            EventName = "Woodworking Workshop",
-                            EventType = 1,
-                            ScheduleStart = new DateTime(2025, 7, 8, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2593)
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Description = "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.",
-                            Duration = 5400000,
-                            EventName = "Sewing Basics",
-                            EventType = 3,
-                            ScheduleStart = new DateTime(2025, 7, 10, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2594)
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Description = "Introduction to pottery and clay work. Learn basic hand-building techniques. This beginner-friendly class introduces you to the world of ceramics through hand-building methods like pinch pots, coil building, and slab construction. You will learn about different types of clay, basic glazing techniques, and the firing process. The instructor will guide you through creating several small pieces that will be fired and glazed. No prior experience is necessary. All materials and firing fees are included.",
-                            Duration = 9000000,
-                            EventName = "Pottery for Beginners",
-                            EventType = 2,
-                            ScheduleStart = new DateTime(2025, 7, 12, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2596)
-                        },
-                        new
-                        {
-                            Id = 5,
-                            Description = "Advanced woodworking techniques for experienced craftsmen. Learn joinery and finishing methods. This advanced workshop focuses on traditional woodworking joinery techniques such as dovetails, mortise and tenon, and finger joints. You will also learn advanced finishing techniques including French polishing, oil finishes, and lacquer application. The class includes safety training for power tools and hand tools. Participants should have basic woodworking experience. Bring your own safety equipment or use ours.",
-                            Duration = 14400000,
-                            EventName = "Advanced Woodworking",
-                            EventType = 1,
-                            ScheduleStart = new DateTime(2025, 7, 15, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2597)
-                        });
-                });
-
-            modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("RefreshToken")
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime?>("RefreshTokenExpiryTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("UserType")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
+                b.Property<string>("UserId")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Id");
+
+                b.HasIndex("UserId")
+                    .IsUnique();
+
+                b.ToTable("Customers");
+            });
+
+        modelBuilder.Entity("MakerSchedule.Domain.Entities.Employee", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("Department")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("EmployeeNumber")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.Property<DateTime>("HireDate")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("Position")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("UserId")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Id");
+
+                b.HasIndex("EmployeeNumber")
+                    .IsUnique();
+
+                b.HasIndex("UserId")
+                    .IsUnique();
+
+                b.ToTable("Employees");
+
+                b.HasData(
+                    new
+                    {
+                        Id = 1,
+                        Department = "Administration",
+                        EmployeeNumber = "EMP001",
+                        HireDate = new DateTime(2020, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                        Position = "Administrator",
+                        UserId = "11111111-1111-1111-1111-111111111111"
+                    });
+            });
+
+        modelBuilder.Entity("MakerSchedule.Domain.Entities.Event", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("Description")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.Property<int>("Duration")
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("EventName")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.Property<int>("EventType")
+                    .HasColumnType("INTEGER");
+
+                b.Property<DateTime>("ScheduleStart")
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Id");
+
+                b.ToTable("Events");
+
+                b.HasData(
+                    new
+                    {
+                        Id = 1,
+                        Description = "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.",
+                        Duration = 7200000,
+                        EventName = "Advanced Pottery",
+                        EventType = 2,
+                        ScheduleStart = new DateTime(2025, 7, 7, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2581)
+                    },
+                    new
+                    {
+                        Id = 2,
+                        Description = "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.",
+                        Duration = 10800000,
+                        EventName = "Woodworking Workshop",
+                        EventType = 1,
+                        ScheduleStart = new DateTime(2025, 7, 8, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2593)
+                    },
+                    new
+                    {
+                        Id = 3,
+                        Description = "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.",
+                        Duration = 5400000,
+                        EventName = "Sewing Basics",
+                        EventType = 3,
+                        ScheduleStart = new DateTime(2025, 7, 10, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2594)
+                    },
+                    new
+                    {
+                        Id = 4,
+                        Description = "Introduction to pottery and clay work. Learn basic hand-building techniques. This beginner-friendly class introduces you to the world of ceramics through hand-building methods like pinch pots, coil building, and slab construction. You will learn about different types of clay, basic glazing techniques, and the firing process. The instructor will guide you through creating several small pieces that will be fired and glazed. No prior experience is necessary. All materials and firing fees are included.",
+                        Duration = 9000000,
+                        EventName = "Pottery for Beginners",
+                        EventType = 2,
+                        ScheduleStart = new DateTime(2025, 7, 12, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2596)
+                    },
+                    new
+                    {
+                        Id = 5,
+                        Description = "Advanced woodworking techniques for experienced craftsmen. Learn joinery and finishing methods. This advanced workshop focuses on traditional woodworking joinery techniques such as dovetails, mortise and tenon, and finger joints. You will also learn advanced finishing techniques including French polishing, oil finishes, and lacquer application. The class includes safety training for power tools and hand tools. Participants should have basic woodworking experience. Bring your own safety equipment or use ours.",
+                        Duration = 14400000,
+                        EventName = "Advanced Woodworking",
+                        EventType = 1,
+                        ScheduleStart = new DateTime(2025, 7, 15, 5, 17, 28, 547, DateTimeKind.Utc).AddTicks(2597)
+                    });
+            });
+
+        modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>
+            {
+                b.Property<string>("Id")
+                    .HasColumnType("TEXT");
+
+                b.Property<int>("AccessFailedCount")
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("Address")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("ConcurrencyStamp")
+                    .IsConcurrencyToken()
+                    .HasColumnType("TEXT");
+
+                b.Property<DateTime>("CreatedAt")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("Email")
+                    .HasMaxLength(256)
+                    .HasColumnType("TEXT");
+
+                b.Property<bool>("EmailConfirmed")
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("FirstName")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.Property<bool>("IsActive")
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("LastName")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.Property<bool>("LockoutEnabled")
+                    .HasColumnType("INTEGER");
+
+                b.Property<DateTimeOffset?>("LockoutEnd")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("NormalizedEmail")
+                    .HasMaxLength(256)
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("NormalizedUserName")
+                    .HasMaxLength(256)
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("PasswordHash")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("PhoneNumber")
+                    .HasColumnType("TEXT");
+
+                b.Property<bool>("PhoneNumberConfirmed")
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("RefreshToken")
+                    .HasColumnType("TEXT");
+
+                b.Property<DateTime?>("RefreshTokenExpiryTime")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("SecurityStamp")
+                    .HasColumnType("TEXT");
+
+                b.Property<bool>("TwoFactorEnabled")
+                    .HasColumnType("INTEGER");
+
+                b.Property<DateTime?>("UpdatedAt")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("UserName")
+                    .HasMaxLength(256)
+                    .HasColumnType("TEXT");
+
+                b.Property<int>("UserType")
+                    .HasColumnType("INTEGER");
+
+                b.HasKey("Id");
+
+                b.HasIndex("NormalizedEmail")
+                    .HasDatabaseName("EmailIndex");
+
+                b.HasIndex("NormalizedUserName")
+                    .IsUnique()
+                    .HasDatabaseName("UserNameIndex");
+
+                b.ToTable("AspNetUsers", (string)null);
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
+            {
+                b.Property<string>("Id")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("ConcurrencyStamp")
+                    .IsConcurrencyToken()
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("Name")
+                    .HasMaxLength(256)
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("NormalizedName")
+                    .HasMaxLength(256)
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Id");
+
+                b.HasIndex("NormalizedName")
+                    .IsUnique()
+                    .HasDatabaseName("RoleNameIndex");
+
+                b.ToTable("AspNetRoles", (string)null);
+            });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("CustomerEvent", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.Customer", null)
-                        .WithMany()
-                        .HasForeignKey("AttendeesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MakerSchedule.Domain.Entities.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsAttendedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("EmployeeEvent", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.Event", null)
-                        .WithMany()
-                        .HasForeignKey("EventsLedId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MakerSchedule.Domain.Entities.Employee", null)
-                        .WithMany()
-                        .HasForeignKey("LeadersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.User", "User")
-                        .WithOne("Customer")
-                        .HasForeignKey("MakerSchedule.Domain.Entities.Customer", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("MakerSchedule.Domain.Entities.Employee", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.User", "User")
-                        .WithOne("Employee")
-                        .HasForeignKey("MakerSchedule.Domain.Entities.Employee", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MakerSchedule.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.HasOne("MakerSchedule.Domain.Entities.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>
-                {
-                    b.Navigation("Customer");
-
-                    b.Navigation("Employee");
-                });
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("ClaimType")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("ClaimValue")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("RoleId")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Id");
+
+                b.HasIndex("RoleId");
+
+                b.ToTable("AspNetRoleClaims", (string)null);
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("INTEGER");
+
+                b.Property<string>("ClaimType")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("ClaimValue")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("UserId")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.HasKey("Id");
+
+                b.HasIndex("UserId");
+
+                b.ToTable("AspNetUserClaims", (string)null);
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            {
+                b.Property<string>("LoginProvider")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("ProviderKey")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("ProviderDisplayName")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("UserId")
+                    .IsRequired()
+                    .HasColumnType("TEXT");
+
+                b.HasKey("LoginProvider", "ProviderKey");
+
+                b.HasIndex("UserId");
+
+                b.ToTable("AspNetUserLogins", (string)null);
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            {
+                b.Property<string>("UserId")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("RoleId")
+                    .HasColumnType("TEXT");
+
+                b.HasKey("UserId", "RoleId");
+
+                b.HasIndex("RoleId");
+
+                b.ToTable("AspNetUserRoles", (string)null);
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            {
+                b.Property<string>("UserId")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("LoginProvider")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("Name")
+                    .HasColumnType("TEXT");
+
+                b.Property<string>("Value")
+                    .HasColumnType("TEXT");
+
+                b.HasKey("UserId", "LoginProvider", "Name");
+
+                b.ToTable("AspNetUserTokens", (string)null);
+            });
+
+        modelBuilder.Entity("CustomerEvent", b =>
+            {
+                b.HasOne("MakerSchedule.Domain.Entities.Customer", null)
+                    .WithMany()
+                    .HasForeignKey("AttendeesId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("MakerSchedule.Domain.Entities.Event", null)
+                    .WithMany()
+                    .HasForeignKey("EventsAttendedId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("EmployeeEvent", b =>
+            {
+                b.HasOne("MakerSchedule.Domain.Entities.Event", null)
+                    .WithMany()
+                    .HasForeignKey("EventsLedId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("MakerSchedule.Domain.Entities.Employee", null)
+                    .WithMany()
+                    .HasForeignKey("LeadersId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
+            {
+                b.HasOne("MakerSchedule.Domain.Entities.User", "User")
+                    .WithOne("Customer")
+                    .HasForeignKey("MakerSchedule.Domain.Entities.Customer", "UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("User");
+            });
+
+        modelBuilder.Entity("MakerSchedule.Domain.Entities.Employee", b =>
+            {
+                b.HasOne("MakerSchedule.Domain.Entities.User", "User")
+                    .WithOne("Employee")
+                    .HasForeignKey("MakerSchedule.Domain.Entities.Employee", "UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.Navigation("User");
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            {
+                b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    .WithMany()
+                    .HasForeignKey("RoleId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            {
+                b.HasOne("MakerSchedule.Domain.Entities.User", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            {
+                b.HasOne("MakerSchedule.Domain.Entities.User", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            {
+                b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    .WithMany()
+                    .HasForeignKey("RoleId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+
+                b.HasOne("MakerSchedule.Domain.Entities.User", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            {
+                b.HasOne("MakerSchedule.Domain.Entities.User", null)
+                    .WithMany()
+                    .HasForeignKey("UserId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
+            });
+
+        modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>
+            {
+                b.Navigation("Customer");
+
+                b.Navigation("Employee");
+            });
 #pragma warning restore 612, 618
-        }
     }
 }

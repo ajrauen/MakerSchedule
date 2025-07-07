@@ -1,5 +1,6 @@
 namespace MakerSchedule.Application.DTOs.Employee;
 using MakerSchedule.Domain.Entities;
+
 public class EmployeeDTO
 {
     // Employee fields

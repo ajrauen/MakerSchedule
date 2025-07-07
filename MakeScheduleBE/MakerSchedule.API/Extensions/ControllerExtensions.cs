@@ -1,33 +1,31 @@
 using System.Text.Json;
 
+namespace MakerSchedule.API.Extensions;
 
-namespace MakerSchedule.API.Extensions
+public static class ControllerExtensions
 {
-    public static class ControllerExtensions
+    public static IMvcBuilder AddControllersWithErrorParser(this IServiceCollection services)
     {
-        public static IMvcBuilder AddControllersWithErrorParser(this IServiceCollection services)
+        return services.AddControllers()
+        .AddJsonOptions(options =>
         {
-            return services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-            })
-            .AddXmlDataContractSerializerFormatters();
-        }
+            options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        })
+        .AddXmlDataContractSerializerFormatters();
+    }
 
-        public static IServiceCollection AddCorsWithOptions(this IServiceCollection services)
+    public static IServiceCollection AddCorsWithOptions(this IServiceCollection services)
+    {
+        return services.AddCors(options =>
         {
-            return services.AddCors(options =>
+            options.AddPolicy("AllowAll", policy =>
             {
-                options.AddPolicy("AllowAll", policy =>
-                {
-                    policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
-                });
+                policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
             });
-        }
+        });
     }
 }
 

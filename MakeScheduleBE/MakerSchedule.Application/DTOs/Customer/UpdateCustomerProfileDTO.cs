@@ -1,11 +1,10 @@
 using MakerSchedule.Application.DTOs.User;
 
-namespace MakerSchedule.Application.DTOs.Customer
+namespace MakerSchedule.Application.DTOs.Customer;
+
+public class UpdateCustomerProfileDTO : UserProfileUpdateFields
 {
-    public class UpdateCustomerProfileDTO : UserProfileUpdateFields
-    {
-        // Customer-Specific Properties
-        public string? PreferredContactMethod { get; set; }
-        public string? Notes { get; set; }
-    }
+    // Customer-Specific Properties
+    public string? PreferredContactMethod { get; set; }
+    public string? Notes { get; set; }
 } 

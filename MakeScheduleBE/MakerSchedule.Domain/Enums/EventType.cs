@@ -1,9 +1,8 @@
-namespace MakerSchedule.Domain.Enums
+namespace MakerSchedule.Domain.Enums;
+
+public enum EventTypeEnum
 {
-    public enum EventTypeEnum
-    {
-        Woodworking = 1,
-        Pottery = 2,
-        Sewing = 3
-    }
+    Woodworking = 1,
+    Pottery = 2,
+    Sewing = 3
 }

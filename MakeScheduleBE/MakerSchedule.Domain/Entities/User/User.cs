@@ -1,7 +1,7 @@
+namespace MakerSchedule.Domain.Entities;
+
 using Microsoft.AspNetCore.Identity;
 using MakerSchedule.Domain.Enums;
-
-namespace MakerSchedule.Domain.Entities;
 
 public class User : IdentityUser
 {

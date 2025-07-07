@@ -1,7 +1,6 @@
-namespace MakerSchedule.Application.DTOs.Authentication
+namespace MakerSchedule.Application.DTOs.Authentication;
+
+public class LoginResponseDTO
 {
-    public class LoginResponseDTO
-    {
-        public required string AccessToken { get; set; }
-    }
+    public required string AccessToken { get; set; }
 } 

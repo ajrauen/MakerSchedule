@@ -1,7 +1,7 @@
+namespace MakerSchedule.Domain.Entities;
+
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
-
-namespace MakerSchedule.Domain.Entities;
 
 public class Customer
 {
