@@ -136,10 +136,13 @@ catch (Exception ex)
 }
 
 // Configure the HTTP request pipeline.
+// Enable Swagger for both Development and Production
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MakerSchedule API v1"));
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MakerSchedule API v1"));
+    // Additional development-only configurations can go here
 }
 
 app.Use(async (context, next) =>
