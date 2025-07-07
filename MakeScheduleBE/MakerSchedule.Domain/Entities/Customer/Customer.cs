@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class Customer
 {
-    [Required]
+    [Key]
     public int Id { get; set; }
     [Required]
     public string UserId { get; set; } = string.Empty;  // Foreign key to User

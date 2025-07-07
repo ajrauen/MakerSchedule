@@ -2,9 +2,12 @@ namespace MakerSchedule.Domain.Entities;
 
 using Microsoft.AspNetCore.Identity;
 using MakerSchedule.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 public class User : IdentityUser
 {
+    [Key]
+    public override string Id { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;

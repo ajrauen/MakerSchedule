@@ -24,9 +24,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
             // Remove HasData for users since we'll create them through UserManager
         });
 
-        modelBuilder.Entity<Employee>().HasData(SeedData.SeedEmployees.ToArray());
         modelBuilder.Entity<Customer>().HasData(SeedData.SeedCustomers.ToArray());
         modelBuilder.Entity<Event>().HasData(SeedData.SeedEvents.ToArray());
+        modelBuilder.Entity<Occurrence>().HasData(SeedData.SeedOccurrences.ToArray());
 
         modelBuilder.Entity<Employee>()
             .HasIndex(e => e.EmployeeNumber)
@@ -42,4 +42,5 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Event> Events { get; set; }
+    public DbSet<Occurrence> Occurences { get; set; }
 }

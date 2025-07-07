@@ -1,5 +1,4 @@
 using MakerSchedule.API.Extensions;
-using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Mappings;
 using MakerSchedule.Application.Services;
 using MakerSchedule.Domain.Entities;
@@ -28,16 +27,7 @@ services.AddIdentity<User, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Add Application Services
-services.AddScoped<IEmployeeService, EmployeeService>();
-services.AddScoped<ICustomerService,CustomerService>();
-services.AddScoped<ICustomerRegistrationService, CustomerRegistrationService>();
-services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
-services.AddScoped<IAuthenticationService, AuthenticationService>();
-services.AddScoped<IUserService, UserService>();
-services.AddScoped<IEmployeeProfileService, EmployeeProfileService>();
-services.AddScoped<ICustomerProfileService, CustomerProfileService>();
-services.AddScoped<IEventService, EventService>();
+services.AddApplicationServices();
 
 services.AddScoped<JwtService>();
 

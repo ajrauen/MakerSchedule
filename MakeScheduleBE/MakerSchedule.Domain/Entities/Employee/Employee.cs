@@ -5,13 +5,12 @@ using System.Collections.Generic;
 
 public class Employee
 {
-    [Required]
+    [Key]
     public int Id { get; set; }
     [Required]
-    public string UserId { get; set; } = string.Empty;  // Foreign key to User
-    public User User { get; set; } = null!;  // Navigation property
+    public string UserId { get; set; } = string.Empty;  
+    public User User { get; set; } = null!;  
 
-    // Additional Employee-specific properties
     public string EmployeeNumber { get; set; } = string.Empty;
     public string Department { get; set; } = string.Empty;
     public string Position { get; set; } = string.Empty;

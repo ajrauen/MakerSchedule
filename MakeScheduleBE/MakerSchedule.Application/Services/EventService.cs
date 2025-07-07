@@ -4,6 +4,7 @@ using MakerSchedule.Application.DTOs.Event;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
+using MakerSchedule.Domain.Enums;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -13,128 +14,61 @@ namespace MakerSchedule.Application.Services;
 
 public class EventService : IEventService
 {
+    private readonly ApplicationDbContext _context;
     private readonly ILogger<EventService> _logger;
-    private readonly ApplicationDbContext _dbContext;
 
-
-
-    public EventService(ILogger<EventService> logger, ApplicationDbContext context)
+    public EventService(ApplicationDbContext context, ILogger<EventService> logger)
     {
+        _context = context;
         _logger = logger;
-        _dbContext = context;
     }
+
     public async Task<IEnumerable<EventListDTO>> GetAllEventsAsync()
     {
-        try
+        return await _context.Events.Select(e => new EventListDTO
         {
-            var events = await _dbContext.Events.ToListAsync();
-
-            var eventListDTO = events.Select(e => new EventListDTO
-            {
-                Id = e.Id,
-                EventName = e.EventName,
-                ScheduleStart = ((DateTimeOffset)e.ScheduleStart).ToUnixTimeMilliseconds(),
-                Duration = e.Duration,
-                EventType = e.EventType,
-                Description = e.Description,
-
-            }).ToList();
-
-            return eventListDTO;
-
-        }
-        catch (BaseException ex)
-        {
-            _logger.LogError(ex, "Error fetching events");
-            throw new BaseException("Failed to fetch events", "FETCH_ERROR", 500, ex);
-        }
+            Id = e.Id,
+            EventName = e.EventName,
+            Description = e.Description,
+            EventType = e.EventType,
+            Duration = e.Duration
+        }).ToListAsync();
     }
 
-    public async Task<EventDTO> GetEventAsync(int eventId)
+    public async Task<EventDTO> GetEventAsync(int id)
     {
-        try
+        var e = await _context.Events.FindAsync(id);
+        if (e == null) throw new NotFoundException("Event", id);
+        return new EventDTO
         {
-            var eventItem = await _dbContext.Events
-                            .Include(e => e.Attendees)
-                            .Include(e => e.Leaders)
-                            .FirstOrDefaultAsync(e => e.Id == eventId);
-
-            if (eventItem == null)
-            {
-                throw new NotFoundException("Event", eventId);
-            }
-
-            var scheduleStart = ((DateTimeOffset)eventItem.ScheduleStart).ToUnixTimeMilliseconds();
-
-            return new EventDTO
-            {
-                Description = eventItem.Description,
-                EventName = eventItem.EventName,
-                Attendees = eventItem.Attendees.Select(e => e.Id).ToList(),
-                Id = eventId,
-                Leaders = eventItem.Leaders.Select(e => e.Id).ToList(),
-                ScheduleStart = scheduleStart,
-                Duration = eventItem.Duration,
-            };
-
-        }
-        catch (BaseException ex)
-        {
-            _logger.LogError(ex, "Error fetching event");
-            throw new BaseException("Failed to fetch event", "FETCH_ERROR", 500, ex);
-        }
+            Id = e.Id,
+            EventName = e.EventName,
+            Description = e.Description,
+            EventType = e.EventType,
+            Duration = e.Duration
+        };
     }
 
-    public async Task<int> CreateEventAsync(CreateEventDTO eventDTO)
+    public async Task<int> CreateEventAsync(CreateEventDTO dto)
     {
-        try
+        var e = new Event
         {
-
-            var attendees = await _dbContext.Customers.Where(c => eventDTO.Attendees.Contains(c.Id)).ToListAsync();
-            var leaders = await _dbContext.Employees.Where(e => eventDTO.Leaders.Contains(e.Id)).ToListAsync();
-            var startDateTime = DateTimeOffset.FromUnixTimeMilliseconds(eventDTO.ScheduleStart).UtcDateTime;    
-
-            var eventItem = new Event
-            {
-                EventName = eventDTO.EventName,
-                Description = eventDTO.Description,
-                Attendees = attendees,
-                Leaders = leaders,
-                ScheduleStart = startDateTime,
-                Duration = eventDTO.Duration,
-                EventType = eventDTO.EventType
-            };
-
-            _dbContext.Events.Add(eventItem);
-            await _dbContext.SaveChangesAsync();
-
-            _logger.LogInformation("Successfully created event with ID: {EventId}", eventItem.Duration);
-
-            return eventItem.Id;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error creating event");
-            throw;
-        }
+            EventName = dto.EventName,
+            Description = dto.Description,
+            EventType = dto.EventType,
+            Duration = dto.Duration
+        };
+        _context.Events.Add(e);
+        await _context.SaveChangesAsync();
+        return e.Id;
     }
 
-    public async Task<bool> DeleteEventAsync(int eventId)
+    public async Task<bool> DeleteEventAsync(int id)
     {
-        var eventItem = await _dbContext.Events.FirstOrDefaultAsync(e => e.Id == eventId);
-        if (eventItem == null)
-        {
-            _logger.LogWarning("Event with ID {eventId} not found.", eventId);
-            throw new NotFoundException("Event not found", eventId);
-        }
-
-        _dbContext.Remove(eventItem);
-        var result = await _dbContext.SaveChangesAsync();
-        if (result > 0)
-        {
-            return true;
-         }
-         return false;
-
+        var e = await _context.Events.FindAsync(id);
+        if (e == null) return false;
+        _context.Events.Remove(e);
+        await _context.SaveChangesAsync();
+        return true;
     }
 }

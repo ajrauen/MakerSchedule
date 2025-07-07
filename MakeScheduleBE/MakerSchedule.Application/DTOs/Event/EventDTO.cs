@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
+using MakerSchedule.Domain.Enums;
 
-namespace MakerSchedule.Domain.Entities;
+namespace MakerSchedule.Application.DTOs.Event;
 
 public class EventDTO
 {
@@ -12,8 +13,7 @@ public class EventDTO
     [Required]
     public required string Description { get; set; }
 
-    public ICollection<int> Attendees { get; set; } = Array.Empty<int>();
-    public ICollection<int> Leaders { get; set; } = Array.Empty<int>();
-    public long ScheduleStart { get; set; }
+    public EventTypeEnum EventType { get; set; }
+
     public int Duration { get; set; }
 }
