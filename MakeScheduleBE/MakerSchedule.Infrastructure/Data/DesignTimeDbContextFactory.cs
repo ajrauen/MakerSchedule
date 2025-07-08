@@ -8,15 +8,30 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
-        var configuration = new ConfigurationBuilder()
+
+
+       var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+        var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
+            .AddJsonFile($"appsettings.{env}.json", optional: true)
+            .AddEnvironmentVariables()
             .Build();
 
-        var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
-        builder.UseSqlite(connectionString);
+        var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
+        var connectionString = config.GetConnectionString("DefaultConnection");
 
-        return new ApplicationDbContext(builder.Options);
+        if (env == "Development")
+        {
+            optionsBuilder.UseSqlite(connectionString);
+        }
+        else
+        {
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+
+        return new ApplicationDbContext(optionsBuilder.Options);
+
+
     }
 }
