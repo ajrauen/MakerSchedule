@@ -122,19 +122,7 @@ catch (Exception ex)
     throw; // This will cause the application to exit
 }
 
-// Seed the database
-try
-{
-    using var scope = app.Services.CreateScope();
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedAsync();
-    app.Logger.LogInformation("Database seeding completed successfully.");
-}
-catch (Exception ex)
-{
-    app.Logger.LogError(ex, "Failed to seed the database. Application will continue without seeding.");
-    // Don't throw - let the application continue without seeding
-}
+
 
 // Configure the HTTP request pipeline.
 // Enable Swagger for both Development and Production
