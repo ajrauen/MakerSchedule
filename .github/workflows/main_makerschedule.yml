@@ -32,6 +32,13 @@ jobs:
       - name: dotnet publish
         run: dotnet publish MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
+      - name: Run EF Core Migrations
+        run: |
+          dotnet tool install --global dotnet-ef
+          dotnet ef database update --project MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj --connection "$AZURE_SQL_CONNECTION_STRING"
+        env:
+          AZURE_SQL_CONNECTION_STRING: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
@@ -58,13 +65,6 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_68F52280DCDD4A01BA7C692AFFD0CEB4 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BCBE5C55F4A84AC69B721BAAF5B359CA }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_90F0CCE009DC47FC9F98584F08230502 }}
-
-      - name: Run EF Core Migrations
-        run: |
-          dotnet tool install --global dotnet-ef
-          dotnet ef database update --project MakeScheduleBE/MakerSchedule.API --connection "$AZURE_SQL_CONNECTION_STRING"
-        env:
-          AZURE_SQL_CONNECTION_STRING: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
