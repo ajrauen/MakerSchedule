@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MakerSchedule.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate2 : Migration
+    public partial class FixOccurrenceConfiguration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,10 +17,10 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -31,30 +31,30 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    UserType = table.Column<int>(type: "INTEGER", nullable: false),
-                    RefreshToken = table.Column<string>(type: "TEXT", nullable: true),
-                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    UserType = table.Column<int>(type: "int", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -65,11 +65,11 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    RoleId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -86,11 +86,11 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    ClaimType = table.Column<string>(type: "TEXT", nullable: true),
-                    ClaimValue = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -107,10 +107,10 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: false)
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -127,8 +127,8 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    RoleId = table.Column<string>(type: "TEXT", nullable: false)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -151,10 +151,10 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
-                    Name = table.Column<string>(type: "TEXT", nullable: false),
-                    Value = table.Column<string>(type: "TEXT", nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -171,12 +171,12 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    CustomerNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    PreferredContactMethod = table.Column<string>(type: "TEXT", nullable: false),
-                    Notes = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CustomerNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PreferredContactMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -193,13 +193,13 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "Employees",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    EmployeeNumber = table.Column<string>(type: "TEXT", nullable: false),
-                    Department = table.Column<string>(type: "TEXT", nullable: false),
-                    Position = table.Column<string>(type: "TEXT", nullable: false),
-                    HireDate = table.Column<DateTime>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EmployeeNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Department = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Position = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -216,14 +216,14 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "Events",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    EventName = table.Column<string>(type: "TEXT", nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    EventType = table.Column<int>(type: "INTEGER", nullable: false),
-                    Duration = table.Column<int>(type: "INTEGER", nullable: false),
-                    CustomerId = table.Column<int>(type: "INTEGER", nullable: true),
-                    EmployeeId = table.Column<int>(type: "INTEGER", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EventType = table.Column<int>(type: "int", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: true),
+                    EmployeeId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -244,13 +244,13 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "Occurences",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    EventId = table.Column<int>(type: "INTEGER", nullable: false),
-                    ScheduleStart = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Duration = table.Column<int>(type: "INTEGER", nullable: true),
-                    Attendees = table.Column<string>(type: "TEXT", nullable: false),
-                    Leaders = table.Column<string>(type: "TEXT", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventId = table.Column<int>(type: "int", nullable: false),
+                    ScheduleStart = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: true),
+                    Attendees = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Leaders = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -280,33 +280,33 @@ namespace MakerSchedule.Infrastructure.Migrations
                 columns: new[] { "Id", "Attendees", "Duration", "EventId", "Leaders", "ScheduleStart" },
                 values: new object[,]
                 {
-                    { 1, "[]", 90, 1, "[]", new DateTime(2025, 7, 19, 22, 48, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 2, "[]", 105, 1, "[]", new DateTime(2025, 7, 23, 2, 6, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 3, "[]", 120, 1, "[]", new DateTime(2025, 8, 22, 23, 58, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 4, "[]", 90, 1, "[]", new DateTime(2025, 7, 29, 1, 58, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 5, "[]", 60, 1, "[]", new DateTime(2025, 8, 5, 4, 56, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 6, "[]", 120, 1, "[]", new DateTime(2025, 8, 22, 20, 38, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 7, "[]", 30, 2, "[]", new DateTime(2025, 8, 11, 23, 27, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 8, "[]", 90, 2, "[]", new DateTime(2025, 9, 9, 15, 23, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 9, "[]", 45, 2, "[]", new DateTime(2025, 7, 11, 12, 52, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 10, "[]", 90, 2, "[]", new DateTime(2025, 9, 27, 12, 25, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 11, "[]", 60, 2, "[]", new DateTime(2025, 7, 23, 20, 47, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 12, "[]", 90, 3, "[]", new DateTime(2025, 9, 18, 19, 53, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 13, "[]", 75, 3, "[]", new DateTime(2025, 9, 18, 13, 45, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 14, "[]", 30, 3, "[]", new DateTime(2025, 7, 20, 20, 25, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 15, "[]", 30, 3, "[]", new DateTime(2025, 9, 16, 10, 50, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 16, "[]", 60, 3, "[]", new DateTime(2025, 7, 30, 14, 20, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 17, "[]", 90, 4, "[]", new DateTime(2025, 7, 19, 20, 52, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 18, "[]", 75, 4, "[]", new DateTime(2025, 8, 22, 21, 1, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 19, "[]", 45, 4, "[]", new DateTime(2025, 9, 9, 10, 52, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 20, "[]", 60, 4, "[]", new DateTime(2025, 7, 9, 4, 33, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 21, "[]", 30, 4, "[]", new DateTime(2025, 7, 14, 13, 2, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 22, "[]", 120, 4, "[]", new DateTime(2025, 8, 17, 20, 5, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 23, "[]", 30, 5, "[]", new DateTime(2025, 8, 23, 7, 47, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 24, "[]", 30, 5, "[]", new DateTime(2025, 9, 19, 20, 6, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 25, "[]", 30, 5, "[]", new DateTime(2025, 7, 13, 11, 29, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 26, "[]", 75, 5, "[]", new DateTime(2025, 9, 28, 18, 5, 40, 399, DateTimeKind.Utc).AddTicks(4874) },
-                    { 27, "[]", 30, 5, "[]", new DateTime(2025, 8, 10, 10, 35, 40, 399, DateTimeKind.Utc).AddTicks(4874) }
+                    { 1, "[]", 90, 1, "[]", new DateTime(2025, 7, 20, 8, 6, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 2, "[]", 105, 1, "[]", new DateTime(2025, 7, 23, 11, 24, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 3, "[]", 120, 1, "[]", new DateTime(2025, 8, 23, 9, 16, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 4, "[]", 90, 1, "[]", new DateTime(2025, 7, 29, 11, 16, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 5, "[]", 60, 1, "[]", new DateTime(2025, 8, 5, 14, 14, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 6, "[]", 120, 1, "[]", new DateTime(2025, 8, 23, 5, 56, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 7, "[]", 30, 2, "[]", new DateTime(2025, 8, 12, 8, 45, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 8, "[]", 90, 2, "[]", new DateTime(2025, 9, 10, 0, 41, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 9, "[]", 45, 2, "[]", new DateTime(2025, 7, 11, 22, 10, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 10, "[]", 90, 2, "[]", new DateTime(2025, 9, 27, 21, 43, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 11, "[]", 60, 2, "[]", new DateTime(2025, 7, 24, 6, 5, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 12, "[]", 90, 3, "[]", new DateTime(2025, 9, 19, 5, 11, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 13, "[]", 75, 3, "[]", new DateTime(2025, 9, 18, 23, 3, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 14, "[]", 30, 3, "[]", new DateTime(2025, 7, 21, 5, 43, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 15, "[]", 30, 3, "[]", new DateTime(2025, 9, 16, 20, 8, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 16, "[]", 60, 3, "[]", new DateTime(2025, 7, 30, 23, 38, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 17, "[]", 90, 4, "[]", new DateTime(2025, 7, 20, 6, 10, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 18, "[]", 75, 4, "[]", new DateTime(2025, 8, 23, 6, 19, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 19, "[]", 45, 4, "[]", new DateTime(2025, 9, 9, 20, 10, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 20, "[]", 60, 4, "[]", new DateTime(2025, 7, 9, 13, 51, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 21, "[]", 30, 4, "[]", new DateTime(2025, 7, 14, 22, 20, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 22, "[]", 120, 4, "[]", new DateTime(2025, 8, 18, 5, 23, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 23, "[]", 30, 5, "[]", new DateTime(2025, 8, 23, 17, 5, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 24, "[]", 30, 5, "[]", new DateTime(2025, 9, 20, 5, 24, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 25, "[]", 30, 5, "[]", new DateTime(2025, 7, 13, 20, 47, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 26, "[]", 75, 5, "[]", new DateTime(2025, 9, 29, 3, 23, 17, 436, DateTimeKind.Utc).AddTicks(4894) },
+                    { 27, "[]", 30, 5, "[]", new DateTime(2025, 8, 10, 19, 53, 17, 436, DateTimeKind.Utc).AddTicks(4894) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -318,7 +318,8 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -344,7 +345,8 @@ namespace MakerSchedule.Infrastructure.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true);
+                unique: true,
+                filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_UserId",
