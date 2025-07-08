@@ -1,13 +1,12 @@
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
-import { FormHelperText, Link, Paper } from "@mui/material";
+import { FormHelperText, Paper } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { UserLogin } from "@ms/types/auth.types";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "@ms/api/authentication.api";
-import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { FormDialog } from "@ms/Components/FormComponents/FormDialog";
 
 const loginInitialFormData = {
@@ -33,19 +32,12 @@ type loginFormData = z.infer<typeof loginValidationSchema>;
 const Login = () => {
   const [isLoginFormOpen, setIsLoginFormOpen] = useState(false);
 
-  const navigate = useNavigate();
+  const { getValues, control, handleSubmit, reset } = useForm<loginFormData>({
+    resolver: zodResolver(loginValidationSchema),
+    defaultValues: loginInitialFormData,
+  });
 
-  const { getValues, control, handleSubmit, reset, formState } =
-    useForm<loginFormData>({
-      resolver: zodResolver(loginValidationSchema),
-      defaultValues: loginInitialFormData,
-    });
-
-  const {
-    mutate: doLogin,
-    isError: loginError,
-    isPending: isPendingLogin,
-  } = useMutation({
+  const { mutate: doLogin, isError: loginError } = useMutation({
     mutationKey: ["login"],
     mutationFn: login,
     onSuccess: () => setIsLoginFormOpen(false),
@@ -63,10 +55,10 @@ const Login = () => {
     reset(undefined, { keepValues: true });
   };
 
-  const loginButtonDisabled = useMemo(() => {
-    const { email, password } = getValues();
-    return email !== "" && password !== "";
-  }, [formState]);
+  // const loginButtonDisabled = useMemo(() => {
+  //   const { email, password } = getValues();
+  //   return email !== "" && password !== "";
+  // }, [formState]);
 
   const openLoginForm = () => setIsLoginFormOpen(true);
   const closeLoginForm = () => setIsLoginFormOpen(false);

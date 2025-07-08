@@ -49,11 +49,10 @@ const RegisterUser = () => {
   const [isRegisterFormOpen, setIsRegisterFormOpen] = useState(false);
   const [errorCode, setErrorCode] = useState<string | undefined>();
 
-  const { control, handleSubmit, reset, formState } =
-    useForm<RegisterCustomerRequest>({
-      resolver: zodResolver(registerValidationSchema),
-      defaultValues: registerInitialFormData,
-    });
+  const { control, handleSubmit, reset } = useForm<RegisterCustomerRequest>({
+    resolver: zodResolver(registerValidationSchema),
+    defaultValues: registerInitialFormData,
+  });
 
   const { mutate: doLogin } = useMutation({
     mutationKey: ["login"],

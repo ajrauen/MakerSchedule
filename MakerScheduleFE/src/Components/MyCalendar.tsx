@@ -8,7 +8,7 @@ import {
 import { enUS } from "date-fns/locale";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { CalendarEvent } from "@ms/Components/CalendarEvent/CalendarEvent";
 import { CalendarEventWrapper } from "@ms/Components/CalendarEventWrapper/CalendarEventWrapper";
 import { useQuery } from "@tanstack/react-query";

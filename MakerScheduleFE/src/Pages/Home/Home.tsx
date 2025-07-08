@@ -11,7 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 const Home = () => {
   const isLoggedIn = useIsLoggedIn();
 
-  const { error, isError } = useQuery({
+  const { error: isError } = useQuery({
     queryKey: ["refreshTokenOnLoad"],
     queryFn: refreshToken,
     enabled: isLoggedIn,

@@ -77,18 +77,17 @@ const CreateEvent = () => {
     }),
   ];
 
-  const { getValues, control, handleSubmit, reset, formState } =
-    useForm<CreateEventFormData>({
-      resolver: zodResolver(createEventvalidationSchema),
-      defaultValues: createEventInitialFormData,
-    });
+  const { getValues, control, handleSubmit } = useForm<CreateEventFormData>({
+    resolver: zodResolver(createEventvalidationSchema),
+    defaultValues: createEventInitialFormData,
+  });
 
   const { data: employeeListData } = useQuery({
     queryKey: ["employeeList"],
     queryFn: getEmployeeList,
   });
 
-  const { data: mutationData, mutate: saveEvent } = useMutation({
+  const { mutate: saveEvent } = useMutation({
     mutationKey: ["createClient"],
     mutationFn: createEvent,
   });
@@ -104,6 +103,7 @@ const CreateEvent = () => {
       leaders: [leaders],
       scheduleStart: startDate,
       duration: duration,
+      eventType: 1,
     };
 
     saveEvent(eventOffering);
