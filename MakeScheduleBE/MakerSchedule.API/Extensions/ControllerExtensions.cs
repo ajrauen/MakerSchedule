@@ -20,7 +20,7 @@ public static class ControllerExtensions
         {
             options.AddPolicy("AllowAll", policy =>
             {
-                policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+                policy.WithOrigins("https://mango-water-01fdd2010.2.azurestaticapps.net", "http://localhost:5173", "https://localhost:5173")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
