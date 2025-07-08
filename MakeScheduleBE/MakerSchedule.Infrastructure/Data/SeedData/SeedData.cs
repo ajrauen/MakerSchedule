@@ -131,70 +131,100 @@ public class DatabaseSeeder
 
     public async Task SeedAsync()
     {
-        await SeedAdminUserAsync();
+        try
+        {
+            _logger.LogInformation("Starting database seeding process...");
+            await SeedAdminUserAsync();
+            _logger.LogInformation("Database seeding process completed.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred during database seeding");
+            // Don't re-throw - let the application continue
+        }
     }
 
     private async Task SeedAdminUserAsync()
     {
-        const string adminEmail = "admin@ms.com";
-        const string adminPassword = "Admin123!"; // Default password - should be changed after first login
-        var adminUserId = "11111111-1111-1111-1111-111111111111";
-
-        var existingUser = await _userManager.FindByEmailAsync(adminEmail);
-        User adminUser;
-        if (existingUser != null)
+        try
         {
-            _logger.LogInformation("Admin user already exists: {Email}", adminEmail);
-            adminUser = existingUser;
-        }
-        else
-        {
-            adminUser = new User
-            {
-                Id = adminUserId, // Fixed ID to match seed data
-                UserName = adminEmail,
-                Email = adminEmail,
-                FirstName = "Admin",
-                LastName = "User",
-                Address = "123 Admin St",
-                PhoneNumber = "123-456-7890",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                IsActive = true,
-                UserType = UserType.Employee,
-                EmailConfirmed = true,
-                PhoneNumberConfirmed = true
-            };
+            const string adminEmail = "admin@ms.com";
+            const string adminPassword = "Admin123!"; // Default password - should be changed after first login
+            var adminUserId = "11111111-1111-1111-1111-111111111111";
 
-            var result = await _userManager.CreateAsync(adminUser, adminPassword);
-            if (result.Succeeded)
+            _logger.LogInformation("Starting admin user seeding process...");
+
+            var existingUser = await _userManager.FindByEmailAsync(adminEmail);
+            User adminUser;
+            if (existingUser != null)
             {
-                _logger.LogInformation("Admin user created successfully: {Email}", adminEmail);
-                _logger.LogWarning("Default admin password is: {Password}. Please change it after first login.", adminPassword);
+                _logger.LogInformation("Admin user already exists: {Email}", adminEmail);
+                adminUser = existingUser;
             }
             else
             {
-                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                _logger.LogError("Failed to create admin user: {Errors}", errors);
-                throw new InvalidOperationException($"Failed to create admin user: {errors}");
-            }
-        }
+                _logger.LogInformation("Creating new admin user: {Email}", adminEmail);
+                adminUser = new User
+                {
+                    Id = adminUserId, // Fixed ID to match seed data
+                    UserName = adminEmail,
+                    Email = adminEmail,
+                    FirstName = "Admin",
+                    LastName = "User",
+                    Address = "123 Admin St",
+                    PhoneNumber = "123-456-7890",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsActive = true,
+                    UserType = UserType.Employee,
+                    EmailConfirmed = true,
+                    PhoneNumberConfirmed = true
+                };
 
-        // Ensure associated Employee exists
-        var adminEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == adminUser.Id);
-        if (adminEmployee == null)
-        {
-            var employee = new Employee
+                var result = await _userManager.CreateAsync(adminUser, adminPassword);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation("Admin user created successfully: {Email}", adminEmail);
+                    _logger.LogWarning("Default admin password is: {Password}. Please change it after first login.", adminPassword);
+                }
+                else
+                {
+                    var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                    _logger.LogError("Failed to create admin user: {Errors}", errors);
+                    _logger.LogWarning("Skipping admin user creation due to errors");
+                    return; // Don't throw, just return
+                }
+            }
+
+            // Ensure associated Employee exists
+            _logger.LogInformation("Checking for admin employee record...");
+            var adminEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == adminUser.Id);
+            if (adminEmployee == null)
             {
-                UserId = adminUser.Id,
-                EmployeeNumber = "EMP001",
-                Department = "Administration",
-                Position = "Administrator",
-                HireDate = new DateTime(2020, 1, 15)
-            };
-            _context.Employees.Add(employee);
-            await _context.SaveChangesAsync();
-            _logger.LogInformation("Admin employee record created for user: {Email}", adminEmail);
+                _logger.LogInformation("Creating admin employee record...");
+                var employee = new Employee
+                {
+                    UserId = adminUser.Id,
+                    EmployeeNumber = "EMP001",
+                    Department = "Administration",
+                    Position = "Administrator",
+                    HireDate = new DateTime(2020, 1, 15)
+                };
+                _context.Employees.Add(employee);
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Admin employee record created for user: {Email}", adminEmail);
+            }
+            else
+            {
+                _logger.LogInformation("Admin employee record already exists for user: {Email}", adminEmail);
+            }
+
+            _logger.LogInformation("Admin user seeding completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred during admin user seeding");
+            // Don't re-throw - let the application continue
         }
     }
 }

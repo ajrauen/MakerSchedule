@@ -131,8 +131,8 @@ try
 }
 catch (Exception ex)
 {
-    app.Logger.LogError(ex, "Failed to seed the database.");
-    throw; // This will cause the application to exit
+    app.Logger.LogError(ex, "Failed to seed the database. Application will continue without seeding.");
+    // Don't throw - let the application continue without seeding
 }
 
 // Configure the HTTP request pipeline.
