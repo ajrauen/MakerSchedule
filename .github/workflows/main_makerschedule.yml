@@ -35,8 +35,14 @@ jobs:
       - name: Run EF Core Migrations
         run: |
           dotnet tool install --global dotnet-ef
-          dotnet ef database update --project MakeScheduleBE/MakerSchedule.Infrastructure/MakerSchedule.Infrastructure.csproj --startup-project MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj --connection "$AZURE_SQL_CONNECTION_STRING"
+          export ASPNETCORE_ENVIRONMENT=Production
+          echo "Environment: $ASPNETCORE_ENVIRONMENT"
+          echo "Connection string length: ${#AZURE_SQL_CONNECTION_STRING}"
+          echo "Connection string preview: ${AZURE_SQL_CONNECTION_STRING:0:50}..."
+          dotnet ef database update --project MakeScheduleBE/MakerSchedule.Infrastructure/MakerSchedule.Infrastructure.csproj --startup-project MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj --connection "$AZURE_SQL_CONNECTION_STRING" --verbose
         env:
+          ASPNETCORE_ENVIRONMENT: Production
+          ConnectionStrings__DefaultConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
           AZURE_SQL_CONNECTION_STRING: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
 
       - name: Upload artifact for deployment job
