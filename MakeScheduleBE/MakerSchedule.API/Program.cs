@@ -5,6 +5,7 @@ using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -114,6 +115,10 @@ try
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await dbContext.Database.CanConnectAsync();
     app.Logger.LogInformation("Successfully connected to the database.");
+    
+    // Apply any pending migrations
+    await dbContext.Database.MigrateAsync();
+    app.Logger.LogInformation("Database migrations applied successfully.");
 }
 catch (Exception ex)
 {

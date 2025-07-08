@@ -8,12 +8,10 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
 {
     public ApplicationDbContext CreateDbContext(string[] args)
     {
-
-
-       var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
         var config = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
+            .AddJsonFile("appsettings.json", optional: true)
             .AddJsonFile($"appsettings.{env}.json", optional: true)
             .AddEnvironmentVariables()
             .Build();
@@ -31,7 +29,5 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
         }
 
         return new ApplicationDbContext(optionsBuilder.Options);
-
-
     }
 }
