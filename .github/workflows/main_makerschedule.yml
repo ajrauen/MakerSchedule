@@ -35,7 +35,7 @@ jobs:
       - name: Run EF Core Migrations
         run: |
           dotnet tool install --global dotnet-ef
-          dotnet ef database update --project MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj --connection "$AZURE_SQL_CONNECTION_STRING"
+          dotnet ef database update --project MakeScheduleBE/MakerSchedule.Infrastructure/MakerSchedule.Infrastructure.csproj --startup-project MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj --connection "$AZURE_SQL_CONNECTION_STRING"
         env:
           AZURE_SQL_CONNECTION_STRING: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
 
