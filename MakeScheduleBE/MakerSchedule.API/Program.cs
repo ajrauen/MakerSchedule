@@ -32,9 +32,6 @@ services.AddApplicationServices();
 
 services.AddScoped<JwtService>();
 
-// Add Database Seeder
-services.AddScoped<DatabaseSeeder>();
-
 services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -118,8 +115,9 @@ try
 }
 catch (Exception ex)
 {
-    app.Logger.LogError(ex, "Failed to connect to the database. Application will exit.");
-    throw; // This will cause the application to exit
+    app.Logger.LogError(ex, "Failed to connect to the database. This might be due to Azure AD authentication not being configured. Application will continue without database access.");
+    // Don't throw - let the application start without database access
+    // This allows the app to start and you can configure the database later
 }
 
 
