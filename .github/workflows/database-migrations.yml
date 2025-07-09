@@ -7,11 +7,13 @@ on:
       - main
     paths:
       - "MakeScheduleBE/MakerSchedule.Infrastructure/Migrations/**"
-  pull_request:
+      - ".github/workflows/database-migrations.yml"
+ pull_request:
     branches:
       - main
     paths:
       - "MakeScheduleBE/MakerSchedule.Infrastructure/Migrations/**"
+      - ".github/workflows/database-migrations.yml"
 
 jobs:
   migrate:
@@ -29,18 +31,12 @@ jobs:
         with:
           dotnet-version: "8.0"
 
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_68F52280DCDD4A01BA7C692AFFD0CEB4 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BCBE5C55F4A84AC69B721BAAF5B359CA }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_90F0CCE009DC47FC9F98584F08230502 }}
-
       - name: Apply Database Migrations
         run: |
           cd MakeScheduleBE/MakerSchedule.API
           dotnet tool install --global dotnet-ef
           export ASPNETCORE_ENVIRONMENT="Production"
+          export ConnectionStrings__DefaultConnection="Server=tcp:makerschedule.database.windows.net,1433;Initial Catalog=makerschedule-db;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;User ID=${{ secrets.DB_USERNAME }};Password=${{ secrets.DB_PASSWORD }};"
           # Wait for database to wake up (free tier auto-pauses)
           echo "Waiting for database to wake up..."
           sleep 60
