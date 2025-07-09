@@ -1,0 +1,49 @@
+name: Database Migrations
+
+on:
+  workflow_dispatch: # Manual trigger
+  push:
+    branches:
+      - main
+    paths:
+      - "MakeScheduleBE/MakerSchedule.Infrastructure/Migrations/**"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "MakeScheduleBE/MakerSchedule.Infrastructure/Migrations/**"
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0"
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_68F52280DCDD4A01BA7C692AFFD0CEB4 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_BCBE5C55F4A84AC69B721BAAF5B359CA }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_90F0CCE009DC47FC9F98584F08230502 }}
+
+      - name: Apply Database Migrations
+        run: |
+          cd MakeScheduleBE/MakerSchedule.API
+          dotnet tool install --global dotnet-ef
+          export ASPNETCORE_ENVIRONMENT="Production"
+          dotnet ef database update --verbose
+
+      - name: Verify Migration Status
+        run: |
+          cd MakeScheduleBE/MakerSchedule.API
+          dotnet ef migrations list
