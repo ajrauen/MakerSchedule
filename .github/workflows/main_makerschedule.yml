@@ -67,6 +67,9 @@ jobs:
           slot-name: "Production"
           package: .
 
+      - name: Checkout source code for migrations
+        uses: actions/checkout@v4
+
       - name: Apply Database Migrations
         run: |
           cd MakeScheduleBE/MakerSchedule.API
