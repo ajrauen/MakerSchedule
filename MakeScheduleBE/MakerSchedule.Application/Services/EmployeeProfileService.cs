@@ -2,13 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Infrastructure.Data;
-using MakerSchedule.Application.Services;
+
 using MakerSchedule.Application.DTOs.Employee;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
-using MakerSchedule.Application.DTOs.User;
 using MakerSchedule.Domain.Enums;
 
 namespace MakerSchedule.Application.Services;
@@ -17,11 +15,11 @@ public class EmployeeProfileService : IEmployeeProfileService
 {
     private readonly IUserService _userService;
     private readonly IEmployeeService _employeeService; // Assume this only updates Employee-specific fields now
-    private readonly ApplicationDbContext _context; // It needs the DbContext to manage the transaction
+    private readonly IApplicationDbContext _context; // It needs the DbContext to manage the transaction
     private readonly UserManager<User> _userManager;
     private readonly ILogger<EmployeeProfileService> _logger;
 
-    public EmployeeProfileService(IUserService userService, IEmployeeService employeeService, ApplicationDbContext context, UserManager<User> userManager, ILogger<EmployeeProfileService> logger)
+    public EmployeeProfileService(IUserService userService, IEmployeeService employeeService, IApplicationDbContext context, UserManager<User> userManager, ILogger<EmployeeProfileService> logger)
     {
         _userService = userService;
         _employeeService = employeeService;
@@ -34,77 +32,48 @@ public class EmployeeProfileService : IEmployeeProfileService
     {
         _logger.LogInformation("Attempting to create employee with email: {Email}", dto.Email);
 
-        using (var transaction = await _context.Database.BeginTransactionAsync())
+        // Create the User
+        var user = new User
         {
-            try
-            {
-                // Create the User
-                var user = new User
-                {
-                    UserName = dto.Email,
-                    Email = dto.Email,
-                    FirstName = dto.FirstName,
-                    LastName = dto.LastName,
-                    PhoneNumber = dto.PhoneNumber,
-                    Address = dto.Address,
-                    CreatedAt = DateTime.UtcNow,
-                    IsActive = true,
-                    UserType = UserType.Employee
-                };
+            UserName = dto.Email,
+            Email = dto.Email,
+            FirstName = dto.FirstName,
+            LastName = dto.LastName,
+            PhoneNumber = dto.PhoneNumber,
+            Address = dto.Address,
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true,
+            UserType = UserType.Employee
+        };
 
-                var userResult = await _userManager.CreateAsync(user, dto.Password);
-                if (!userResult.Succeeded)
-                {
-                    var errors = userResult.Errors.Select(e => e.Description);
-                    
-                    // Check for email already taken error
-                    if (errors.Any(e => e.Contains("already taken") || e.Contains("duplicate") || e.Contains("Email")))
-                    {
-                        throw new EmailAlreadyExistsException(dto.Email);
-                    }
-                    
-                    // Handle other validation errors
-                    _logger.LogError("Failed to create user: {Errors}", string.Join(", ", errors));
-                    throw new InvalidOperationException($"Failed to create user: {string.Join(", ", errors)}");
-                }
+        var userResult = await _userManager.CreateAsync(user, dto.Password);
+        if (!userResult.Succeeded)
+        {
+            var errors = userResult.Errors.Select(e => e.Description);
 
-                // Create the Employee
-                var employee = new Employee
-                {
-                    UserId = user.Id,
-                    EmployeeNumber = dto.EmployeeNumber,
-                    Department = dto.Department,
-                    Position = dto.Position,
-                    HireDate = dto.HireDate
-                };
+            if (errors.Any(e => e.Contains("already taken") || e.Contains("duplicate") || e.Contains("Email")))
+                throw new EmailAlreadyExistsException(dto.Email);
 
-                _context.Employees.Add(employee);
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
-
-                _logger.LogInformation("Successfully created employee with ID: {EmployeeId}", employee.Id);
-
-                // Return the employee ID
-                return employee.Id;
-            }
-            catch (BaseException)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-            catch (InvalidOperationException)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-            catch (Exception ex)
-            {
-                await transaction.RollbackAsync();
-                _logger.LogError(ex, "Unexpected error creating employee");
-                throw new InvalidOperationException("An unexpected error occurred while creating the employee", ex);
-            }
+            _logger.LogError("Failed to create user: {Errors}", string.Join(", ", errors));
+            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", errors)}");
         }
+
+        // Create the Employee
+        var employee = new Employee
+        {
+            UserId = user.Id,
+            EmployeeNumber = dto.EmployeeNumber,
+            Department = dto.Department,
+            Position = dto.Position,
+            HireDate = dto.HireDate
+        };
+
+        _context.Employees.Add(employee);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Successfully created employee with ID: {EmployeeId}", employee.Id);
+
+        return employee.Id;
     }
 
     private string GenerateEmployeeNumber()
@@ -118,7 +87,6 @@ public class EmployeeProfileService : IEmployeeProfileService
         _logger.LogInformation("Attempting to update profile for UserId: {UserId}. Received FirstName: {FirstName}", id, dto.FirstName);
 
         // Step 1: Find the User by their primary key from the URL.
-  
         // Step 2: Find the associated Employee record using the UserId.
         var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
         if (employee == null)
@@ -134,32 +102,18 @@ public class EmployeeProfileService : IEmployeeProfileService
             return false;
         }
 
+        bool userWasUpdated = UserProfileUpdater.UpdateUserFields(user, dto, _userManager);
 
+        bool employeeWasUpdated = false;
+        if (dto.Department != null) { employee.Department = dto.Department; employeeWasUpdated = true; }
+        if (dto.Position != null) { employee.Position = dto.Position; employeeWasUpdated = true; }
+        if (dto.HireDate.HasValue) { employee.HireDate = dto.HireDate.Value; employeeWasUpdated = true; }
 
-        using (var transaction = await _context.Database.BeginTransactionAsync())
+        if (employeeWasUpdated)
         {
-            try
-            {
-                bool userWasUpdated = UserProfileUpdater.UpdateUserFields(user, dto, _userManager);
-
-                bool employeeWasUpdated = false;
-                if (dto.Department != null) { employee.Department = dto.Department; employeeWasUpdated = true; }
-                if (dto.Position != null) { employee.Position = dto.Position; employeeWasUpdated = true; }
-                if (dto.HireDate.HasValue) { employee.HireDate = dto.HireDate.Value; employeeWasUpdated = true; }
-
-                if (employeeWasUpdated)
-                {
-                    await _context.SaveChangesAsync();
-                }
-
-                await transaction.CommitAsync();
-                return true;
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            await _context.SaveChangesAsync();
         }
+
+        return true;
     }
 }

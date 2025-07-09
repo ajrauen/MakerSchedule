@@ -4,10 +4,16 @@ on:
   push:
     branches:
       - main
+    paths:
+      - "MakerScheduleFE/**"
+      - ".github/workflows/azure-static-web-apps-mango-water-01fdd2010.yml"
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
       - main
+    paths:
+      - "MakerScheduleFE/**"
+      - ".github/workflows/azure-static-web-apps-mango-water-01fdd2010.yml"
 
 jobs:
   build_and_deploy_job:

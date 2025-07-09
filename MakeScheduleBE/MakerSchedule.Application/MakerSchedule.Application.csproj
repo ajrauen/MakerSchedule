@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MakerSchedule.Domain\MakerSchedule.Domain.csproj" />
-    <ProjectReference Include="..\MakerSchedule.Infrastructure\MakerSchedule.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

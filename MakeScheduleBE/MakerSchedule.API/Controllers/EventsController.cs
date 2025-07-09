@@ -35,7 +35,8 @@ public class EventsController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateEvent([FromBody] CreateEventDTO dto)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> CreateEvent([FromForm] CreateEventDTO dto)
     {
         var eventId = await _eventService.CreateEventAsync(dto);
         return Ok(eventId);

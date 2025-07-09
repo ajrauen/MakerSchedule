@@ -1,6 +1,8 @@
 namespace MakerSchedule.API.Extensions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Services;
+using MakerSchedule.Infrastructure.Data;
+using MakerSchedule.Infrastructure.Services.Storage;
 
 public static class MakerScheduleExtensions
 {
@@ -16,6 +18,9 @@ public static class MakerScheduleExtensions
         services.AddScoped<ICustomerProfileService, CustomerProfileService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IOccurrenceService, OccurrenceService>();
+        services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+        services.AddScoped<IImageStorageService, LocalImageStorageService>();
+
         return services;
     }
 

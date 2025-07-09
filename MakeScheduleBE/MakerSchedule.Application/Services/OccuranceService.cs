@@ -2,7 +2,6 @@ using MakerSchedule.Application.DTOs.Occurence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Entities;
-using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -11,10 +10,10 @@ namespace MakerSchedule.Application.Services;
 
 public class OccurrenceService : IOccurrenceService
 {
-    private readonly ApplicationDbContext _dbContext;
+    private readonly IApplicationDbContext _dbContext;
     private readonly ILogger<OccurrenceService> _logger;
 
-    public OccurrenceService(ApplicationDbContext context, ILogger<OccurrenceService> logger)
+    public OccurrenceService(IApplicationDbContext context, ILogger<OccurrenceService> logger)
     {
         _dbContext = context;
         _logger = logger;
@@ -23,7 +22,7 @@ public class OccurrenceService : IOccurrenceService
     public async Task<OccurenceDTO> GetOccurrenceByIdAsync(int id)
     {
 
-        var occurence = await _dbContext.Occurences.Where(occurance => occurance.Id == id).FirstOrDefaultAsync();
+        var occurence = await _dbContext.Occurrences.Where(occurance => occurance.Id == id).FirstOrDefaultAsync();
         if (occurence == null) throw new NotFoundException("Occurence with ${OccurenceId} was not found", id);
 
         return new OccurenceDTO()
@@ -38,7 +37,7 @@ public class OccurrenceService : IOccurrenceService
 
     public async Task<IEnumerable<OccurenceListDTO>> GetAllOccurrencesAsync()
     {
-        return await _dbContext.Occurences.Select(o => new OccurenceListDTO
+        return await _dbContext.Occurrences.Select(o => new OccurenceListDTO
         {
             Id = o.Id,
         }).ToListAsync();
@@ -60,7 +59,7 @@ public class OccurrenceService : IOccurrenceService
             EventId = occurenceDTO.EventId,
             Duration = occurenceDTO.Duration,
         };
-        _dbContext.Occurences.Add(newOccurence);
+        _dbContext.Occurrences.Add(newOccurence);
         await _dbContext.SaveChangesAsync();
         _logger.LogInformation("Successfully created event with ${OccurenceId}", newOccurence.Id);
         return newOccurence.Id;

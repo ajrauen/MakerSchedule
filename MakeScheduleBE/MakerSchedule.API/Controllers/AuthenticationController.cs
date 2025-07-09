@@ -2,8 +2,7 @@ using MakerSchedule.Application.DTOs;
 using MakerSchedule.Application.DTOs.Authentication; // <-- This is the missing line
 using MakerSchedule.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 

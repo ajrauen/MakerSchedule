@@ -67,3 +67,6 @@ cert/localhost-key.pem
 makerschedule.db
 makerschedule.db-shm
 makerschedule.db-wal 
+
+# dev images
+MakeScheduleBE/MakerSchedule.API/wwwroot/*

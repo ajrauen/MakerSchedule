@@ -12,7 +12,7 @@ public class Event
     [Required]
     public required string Description { get; set; }
     public EventTypeEnum EventType { get; set; }
-    public int Duration { get; set; } // Default duration in minutes (or ms)
-    // Navigation property for Occurrences
+    public int Duration { get; set; } 
     public ICollection<Occurrence> Occurrences { get; set; } = new List<Occurrence>();
+    public string? FileUrl { get; set; }
 }

@@ -133,6 +133,7 @@ app.Use(async (context, next) =>
 });
 
 app.UseHttpsRedirection();
+app.UseStaticFiles(); // Enable static file serving from wwwroot
 app.UseRouting();
 app.UseCors("AllowAll");
 app.UseAuthorization();

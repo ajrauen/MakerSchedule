@@ -2,8 +2,8 @@ using AutoMapper;
 
 using MakerSchedule.Application.DTOs.Employee;
 using MakerSchedule.Application.Exceptions;
+using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Entities;
-using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,13 +13,13 @@ namespace MakerSchedule.Application.Services;
 
 public class EmployeeService : IEmployeeService
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IApplicationDbContext _context;
     private readonly ILogger<EmployeeService> _logger;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
 
     public EmployeeService(
-        ApplicationDbContext context,
+        IApplicationDbContext context,
         ILogger<EmployeeService> logger,
         UserManager<User> userManager,
         IMapper mapper)
@@ -115,7 +115,8 @@ public class EmployeeService : IEmployeeService
         }
     }
 
-    public async Task DeleteEmployeeByIdAsync(int id)
+
+   public async Task DeleteEmployeeByIdAsync(int id)
     {
         var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == id);
         if (employee == null)
@@ -130,29 +131,17 @@ public class EmployeeService : IEmployeeService
             throw new NotFoundException("User not found", employee.UserId); 
         }
 
-        using (var transaction = await _context.Database.BeginTransactionAsync())
+        _context.Employees.Remove(employee);
+        var result = await _userManager.DeleteAsync(user);
+        if (!result.Succeeded)
         {
-            try
-            {
-                _context.Employees.Remove(employee);
-                var result = await _userManager.DeleteAsync(user);
-                if (!result.Succeeded)
-                {
-                    throw new BaseException(
-                                message: $"Failed to delete user '{user.Id}'.",
-                                errorCode: "USER_DELETION_FAILED",
-                                statusCode: 500 // Or another appropriate status code like 400 Bad Request
-                            );
-                }
-
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            throw new BaseException(
+                        message: $"Failed to delete user '{user.Id}'.",
+                        errorCode: "USER_DELETION_FAILED",
+                        statusCode: 500 // Or another appropriate status code like 400 Bad Request
+                    );
         }
+
+        await _context.SaveChangesAsync();
     }
 }

@@ -3,7 +3,6 @@ using AutoMapper;
 using MakerSchedule.Application.DTOs.Employee;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Entities;
-using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +16,7 @@ public class EmployeeRegistrationService : IEmployeeRegistrationService
     private readonly SignInManager<User> _signInManager;
     private readonly ILogger<EmployeeRegistrationService> _logger;
     private readonly IMapper _mapper;
-    private readonly ApplicationDbContext _context;
+    private readonly IApplicationDbContext _context;
     private const string EmployeePrefix = "EP";
 
     public EmployeeRegistrationService(
@@ -25,7 +24,7 @@ public class EmployeeRegistrationService : IEmployeeRegistrationService
         SignInManager<User> signInManager,
         ILogger<EmployeeRegistrationService> logger,
         IMapper mapper,
-        ApplicationDbContext context)
+        IApplicationDbContext context)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
@@ -73,8 +72,6 @@ public class EmployeeRegistrationService : IEmployeeRegistrationService
                     }
                     catch (DbUpdateException dbEx) when (dbEx.InnerException?.Message.Contains("UNIQUE") == true)
                     {
-                        // Unique constraint violation, try again
-                        _context.Entry(employee).State = EntityState.Detached;
                         if (attempt == maxRetries - 1)
                         {
                             _logger.LogError(dbEx, "Failed to register employee after multiple attempts due to duplicate EmployeeNumber.");

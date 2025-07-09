@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
 
 namespace MakerSchedule.Infrastructure.Data;
-
-public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string>
+using MakerSchedule.Application.Interfaces;
+public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -48,7 +48,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                     v => JsonSerializer.Deserialize<ICollection<int>>(v, (JsonSerializerOptions?)null) ?? new List<int>())
-                .HasColumnType("nvarchar(max)")
                 .Metadata.SetValueComparer(new ValueComparer<ICollection<int>>(
                     (c1, c2) => c1.SequenceEqual(c2),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
@@ -59,7 +58,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                     v => JsonSerializer.Deserialize<ICollection<int>>(v, (JsonSerializerOptions?)null) ?? new List<int>())
-                .HasColumnType("nvarchar(max)")
                 .Metadata.SetValueComparer(new ValueComparer<ICollection<int>>(
                     (c1, c2) => c1.SequenceEqual(c2),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
@@ -74,5 +72,5 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
     public DbSet<Employee> Employees { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Event> Events { get; set; }
-    public DbSet<Occurrence> Occurences { get; set; }
+    public DbSet<Occurrence> Occurrences { get; set; }
 }

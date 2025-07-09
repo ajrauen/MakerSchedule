@@ -3,7 +3,6 @@ using AutoMapper;
 using MakerSchedule.Application.DTOs.CustomerRegistration;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Entities;
-using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -16,14 +15,14 @@ public class CustomerRegistrationService : ICustomerRegistrationService
     private readonly SignInManager<User> _signInManager;
     private readonly ILogger<CustomerRegistrationService> _logger;
     private readonly IMapper _mapper;
-    private readonly ApplicationDbContext _context;
+    private readonly IApplicationDbContext _context;
 
     public CustomerRegistrationService(
         UserManager<User> userManager,
         SignInManager<User> signInManager,
         ILogger<CustomerRegistrationService> logger,
         IMapper mapper,
-        ApplicationDbContext context)
+        IApplicationDbContext context)
     {
         _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
         _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));

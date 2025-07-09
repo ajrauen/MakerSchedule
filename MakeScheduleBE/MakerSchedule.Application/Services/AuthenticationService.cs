@@ -2,7 +2,6 @@ using MakerSchedule.Application.DTOs;
 using MakerSchedule.Application.DTOs.Authentication;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Entities;
-using MakerSchedule.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,9 +11,9 @@ public class AuthenticationService : IAuthenticationService
 {
     private readonly UserManager<User> _userManager;
     private readonly JwtService _jwtService;
-    private readonly ApplicationDbContext _context;
+    private readonly IApplicationDbContext _context;
 
-    public AuthenticationService(UserManager<User> userManager, JwtService jwtService, ApplicationDbContext context)
+    public AuthenticationService(UserManager<User> userManager, JwtService jwtService, IApplicationDbContext context)
     {
         _userManager = userManager;
         _jwtService = jwtService;

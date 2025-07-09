@@ -3,7 +3,6 @@ using System;
 using MakerSchedule.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -16,35 +15,29 @@ namespace MakerSchedule.Infrastructure.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.6")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.6");
 
             modelBuilder.Entity("MakerSchedule.Domain.Entities.Customer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("CustomerNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Notes")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PreferredContactMethod")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -58,28 +51,26 @@ namespace MakerSchedule.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Department")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("EmployeeNumber")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("HireDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Position")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -96,29 +87,30 @@ namespace MakerSchedule.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("CustomerId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Duration")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("EmployeeId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("EventName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("EventType")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("FileUrl")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -175,23 +167,21 @@ namespace MakerSchedule.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Attendees")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("Duration")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("EventId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Leaders")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ScheduleStart")
                         .HasColumnType("datetime2");
@@ -200,7 +190,7 @@ namespace MakerSchedule.Infrastructure.Migrations
 
                     b.HasIndex("EventId");
 
-                    b.ToTable("Occurences");
+                    b.ToTable("Occurrences");
 
                     b.HasData(
                         new
@@ -210,7 +200,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 90,
                             EventId = 1,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 20, 8, 6, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 21, 8, 15, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -219,7 +209,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 105,
                             EventId = 1,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 23, 11, 24, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 24, 11, 33, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -228,7 +218,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 120,
                             EventId = 1,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 8, 23, 9, 16, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 8, 24, 9, 25, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -237,7 +227,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 90,
                             EventId = 1,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 29, 11, 16, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 30, 11, 25, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -246,7 +236,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 60,
                             EventId = 1,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 8, 5, 14, 14, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 8, 6, 14, 23, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -255,7 +245,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 120,
                             EventId = 1,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 8, 23, 5, 56, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 8, 24, 6, 5, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -264,7 +254,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 30,
                             EventId = 2,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 8, 12, 8, 45, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 8, 13, 8, 54, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -273,7 +263,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 90,
                             EventId = 2,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 9, 10, 0, 41, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 9, 11, 0, 50, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -282,7 +272,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 45,
                             EventId = 2,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 11, 22, 10, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 12, 22, 19, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -291,7 +281,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 90,
                             EventId = 2,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 9, 27, 21, 43, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 9, 28, 21, 52, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -300,7 +290,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 60,
                             EventId = 2,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 24, 6, 5, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 25, 6, 14, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -309,7 +299,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 90,
                             EventId = 3,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 9, 19, 5, 11, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 9, 20, 5, 20, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -318,7 +308,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 75,
                             EventId = 3,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 9, 18, 23, 3, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 9, 19, 23, 12, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -327,7 +317,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 30,
                             EventId = 3,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 21, 5, 43, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 22, 5, 52, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -336,7 +326,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 30,
                             EventId = 3,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 9, 16, 20, 8, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 9, 17, 20, 17, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -345,7 +335,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 60,
                             EventId = 3,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 30, 23, 38, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 31, 23, 47, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -354,7 +344,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 90,
                             EventId = 4,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 20, 6, 10, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 21, 6, 19, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -363,7 +353,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 75,
                             EventId = 4,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 8, 23, 6, 19, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 8, 24, 6, 28, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -372,7 +362,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 45,
                             EventId = 4,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 9, 9, 20, 10, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 9, 10, 20, 19, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -381,7 +371,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 60,
                             EventId = 4,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 9, 13, 51, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 10, 14, 0, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -390,7 +380,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 30,
                             EventId = 4,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 14, 22, 20, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 15, 22, 29, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -399,7 +389,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 120,
                             EventId = 4,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 8, 18, 5, 23, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 8, 19, 5, 32, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -408,7 +398,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 30,
                             EventId = 5,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 8, 23, 17, 5, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 8, 24, 17, 14, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -417,7 +407,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 30,
                             EventId = 5,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 9, 20, 5, 24, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 9, 21, 5, 33, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -426,7 +416,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 30,
                             EventId = 5,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 7, 13, 20, 47, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 7, 14, 20, 56, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -435,7 +425,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 75,
                             EventId = 5,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 9, 29, 3, 23, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 9, 30, 3, 32, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         },
                         new
                         {
@@ -444,91 +434,91 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Duration = 30,
                             EventId = 5,
                             Leaders = "[]",
-                            ScheduleStart = new DateTime(2025, 8, 10, 19, 53, 17, 436, DateTimeKind.Utc).AddTicks(4894)
+                            ScheduleStart = new DateTime(2025, 8, 11, 20, 2, 7, 975, DateTimeKind.Utc).AddTicks(1945)
                         });
                 });
 
             modelBuilder.Entity("MakerSchedule.Domain.Entities.User", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("RefreshToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("RefreshTokenExpiryTime")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("UserType")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -537,8 +527,7 @@ namespace MakerSchedule.Infrastructure.Migrations
 
                     b.HasIndex("NormalizedUserName")
                         .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+                        .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
                 });
@@ -546,26 +535,25 @@ namespace MakerSchedule.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedName")
                         .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedName")
                         .IsUnique()
-                        .HasDatabaseName("RoleNameIndex")
-                        .HasFilter("[NormalizedName] IS NOT NULL");
+                        .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
                 });
@@ -574,19 +562,17 @@ namespace MakerSchedule.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RoleId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -599,19 +585,17 @@ namespace MakerSchedule.Infrastructure.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ClaimValue")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -623,17 +607,17 @@ namespace MakerSchedule.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -645,10 +629,10 @@ namespace MakerSchedule.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -660,16 +644,16 @@ namespace MakerSchedule.Infrastructure.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
