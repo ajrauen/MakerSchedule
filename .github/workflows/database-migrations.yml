@@ -37,10 +37,8 @@ jobs:
           dotnet tool install --global dotnet-ef
           export ASPNETCORE_ENVIRONMENT="Production"
           export ConnectionStrings__DefaultConnection="Server=tcp:makerschedule.database.windows.net,1433;Initial Catalog=makerschedule-db;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;User ID=${{ secrets.DB_USERNAME }};Password=${{ secrets.DB_PASSWORD }};"
-          # Wait for database to wake up (free tier auto-pauses)
-          echo "Waiting for database to wake up..."
-          sleep 60
-          echo "Running database migrations..."
+          echo "Waiting for Azure SQL to wake up..."
+          sleep 180
           dotnet ef database update --verbose
 
       - name: Verify Migration Status
