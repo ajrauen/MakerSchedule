@@ -8,7 +8,7 @@ on:
     paths:
       - "MakeScheduleBE/MakerSchedule.Infrastructure/Migrations/**"
       - ".github/workflows/database-migrations.yml"
- pull_request:
+  pull_request:
     branches:
       - main
     paths:
