@@ -38,7 +38,7 @@ jobs:
           export ASPNETCORE_ENVIRONMENT="Production"
           export ConnectionStrings__DefaultConnection="Server=tcp:makerschedule.database.windows.net,1433;Initial Catalog=makerschedule-db;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;User ID=${{ secrets.DB_USERNAME }};Password=${{ secrets.DB_PASSWORD }};"
           echo "Waiting for Azure SQL to wake up..."
-          sleep 180
+          sleep 30
           dotnet ef database update --verbose
 
       - name: Verify Migration Status
