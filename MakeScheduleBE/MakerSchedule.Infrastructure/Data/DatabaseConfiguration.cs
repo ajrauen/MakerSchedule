@@ -23,7 +23,13 @@ public static class DatabaseConfiguration
             {
                 // Use SQL Server for Azure
                 Console.WriteLine("Using SQL Server provider");
-                options.UseSqlServer(connectionString);
+                options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5,
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                });
             }
             else
             {
