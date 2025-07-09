@@ -112,12 +112,20 @@ try
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await dbContext.Database.CanConnectAsync();
     app.Logger.LogInformation("Successfully connected to the database.");
+
+    //Apply migration
+    if (app.Environment.IsDevelopment())
+    {
+        app.Logger.LogInformation("Applying database migrations...");
+        await dbContext.Database.MigrateAsync();
+        app.Logger.LogInformation("Database migrations completed successfully.");
+  }
+
 }
 catch (Exception ex)
 {
-    app.Logger.LogError(ex, "Failed to connect to the database. This might be due to Azure AD authentication not being configured. Application will continue without database access.");
-    // Don't throw - let the application start without database access
-    // This allows the app to start and you can configure the database later
+    app.Logger.LogError(ex, "Failed to connect to the database. Application cannot start without database access.");
+    throw;
 }
 
 // Configure the HTTP request pipeline.

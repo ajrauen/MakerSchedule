@@ -66,3 +66,9 @@ jobs:
           app-name: "makerSchedule"
           slot-name: "Production"
           package: .
+
+      - name: Apply Database Migrations
+        run: |
+          cd MakeScheduleBE/MakerSchedule.API
+          dotnet tool install --global dotnet-ef
+          dotnet ef database update --connection "Server=tcp:makerschedule.database.windows.net,1433;Initial Catalog=makerschedule-db;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=Active Directory Default;"
