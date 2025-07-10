@@ -1,5 +1,4 @@
 using MakerSchedule.Application.DTOs.Employee;
-using System.Threading.Tasks;
 
 namespace MakerSchedule.Application.Interfaces;
 

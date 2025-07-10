@@ -3,7 +3,8 @@ using AutoMapper;
 using MakerSchedule.Application.DTOs.Employee;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Aggregates.Employee;
+using MakerSchedule.Domain.Aggregates.User;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

@@ -1,5 +1,4 @@
 using MakerSchedule.Application.DTOs;
-using MakerSchedule.Application.DTOs.Authentication;
 
 namespace MakerSchedule.Application.Interfaces;
 

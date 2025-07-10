@@ -1,5 +1,5 @@
 using MakerSchedule.Application.DTOs.Customer;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Aggregates.Customer;
 
 namespace MakerSchedule.Application.Services;
 

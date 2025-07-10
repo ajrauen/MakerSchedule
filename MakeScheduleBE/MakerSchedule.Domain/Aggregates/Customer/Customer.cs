@@ -1,7 +1,10 @@
-namespace MakerSchedule.Domain.Entities;
+namespace MakerSchedule.Domain.Aggregates.Customer;
+
 
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
+using MakerSchedule.Domain.Aggregates.User;
+using MakerSchedule.Domain.Aggregates.Event;
 
 public class Customer
 {

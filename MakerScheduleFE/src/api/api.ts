@@ -1,12 +1,12 @@
 import axios from "axios";
-import { AUTH_URI } from "@ms/common/env-constants";
+import { SERVER_URI } from "@ms/common/env-constants";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
 // import { store } from "@ms/app/store";
 // import { setAccessToken } from "@ms/features/auth/auth.slice";
 
 const AxiosInstance = axios.create({
-  baseURL: AUTH_URI,
+  baseURL: SERVER_URI,
   withCredentials: true, // This is crucial for sending HttpOnly cookies
 });
 

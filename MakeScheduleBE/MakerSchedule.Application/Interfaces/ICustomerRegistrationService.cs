@@ -1,6 +1,5 @@
 using MakerSchedule.Application.DTOs.CustomerRegistration;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
 
 namespace MakerSchedule.Application.Interfaces;
 

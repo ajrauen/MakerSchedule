@@ -4,9 +4,10 @@ using Microsoft.Extensions.Logging;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.DTOs.Customer;
 using MakerSchedule.Application.Exceptions;
-using MakerSchedule.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using MakerSchedule.Domain.Enums;
+using MakerSchedule.Domain.Aggregates.User;
+using MakerSchedule.Domain.Aggregates.Customer;
 
 namespace MakerSchedule.Application.Services;
 

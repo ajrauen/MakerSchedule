@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using MakerSchedule.Domain.Entities;
-
 namespace MakerSchedule.Application.DTOs.Employee;
 
 public class CreateEmployeeDTO

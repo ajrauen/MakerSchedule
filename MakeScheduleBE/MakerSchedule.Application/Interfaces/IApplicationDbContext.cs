@@ -1,5 +1,9 @@
 
-using MakerSchedule.Domain.Entities;
+
+using MakerSchedule.Domain.Aggregates.Customer;
+using MakerSchedule.Domain.Aggregates.Employee;
+using MakerSchedule.Domain.Aggregates.Event;
+using MakerSchedule.Domain.Aggregates.User;
 
 using Microsoft.EntityFrameworkCore;
 

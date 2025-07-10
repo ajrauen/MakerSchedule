@@ -1,5 +1,6 @@
 namespace MakerSchedule.Application.DTOs.Employee;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Aggregates.Employee;
+using MakerSchedule.Domain.Aggregates.User;
 
 public class EmployeeDTO
 {

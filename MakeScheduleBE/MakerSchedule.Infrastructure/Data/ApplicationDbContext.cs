@@ -1,4 +1,3 @@
-using MakerSchedule.Domain.Entities;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -8,6 +7,11 @@ using System.Text.Json;
 
 namespace MakerSchedule.Infrastructure.Data;
 using MakerSchedule.Application.Interfaces;
+using MakerSchedule.Domain.Aggregates.Customer;
+using MakerSchedule.Domain.Aggregates.Employee;
+using MakerSchedule.Domain.Aggregates.Event;
+using MakerSchedule.Domain.Aggregates.User;
+
 public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -49,7 +53,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                     v => JsonSerializer.Deserialize<ICollection<int>>(v, (JsonSerializerOptions?)null) ?? new List<int>())
                 .Metadata.SetValueComparer(new ValueComparer<ICollection<int>>(
-                    (c1, c2) => c1.SequenceEqual(c2),
+                    (c1, c2) => (c1 ?? Array.Empty<int>()).SequenceEqual(c2 ?? Array.Empty<int>()),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                     c => c.ToList()));
 
@@ -59,7 +63,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                     v => JsonSerializer.Deserialize<ICollection<int>>(v, (JsonSerializerOptions?)null) ?? new List<int>())
                 .Metadata.SetValueComparer(new ValueComparer<ICollection<int>>(
-                    (c1, c2) => c1.SequenceEqual(c2),
+                    (c1, c2) => (c1 ?? Array.Empty<int>()).SequenceEqual(c2 ?? Array.Empty<int>()),
                     c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
                     c => c.ToList()));
 
@@ -67,6 +71,21 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
             entity.Property(e => e.ScheduleStart)
                 .HasColumnType("datetime2");
         });
+
+        // Ensure unlimited string columns use TEXT for SQLite
+        if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
+        {
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entity.GetProperties())
+                {
+                    if (property.ClrType == typeof(string) && property.GetMaxLength() == null)
+                    {
+                        property.SetColumnType("TEXT");
+                    }
+                }
+            }
+        }
     }
 
     public DbSet<Employee> Employees { get; set; }

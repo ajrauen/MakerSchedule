@@ -1,8 +1,11 @@
-namespace MakerSchedule.Domain.Entities;
+namespace MakerSchedule.Domain.Aggregates.User;
+
 
 using Microsoft.AspNetCore.Identity;
 using MakerSchedule.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
+using MakerSchedule.Domain.Aggregates.Customer;
+using MakerSchedule.Domain.Aggregates.Employee;
 
 public class User : IdentityUser
 {

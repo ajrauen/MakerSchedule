@@ -1,7 +1,7 @@
 namespace MakerSchedule.Application.Services;
 
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Aggregates.User;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;

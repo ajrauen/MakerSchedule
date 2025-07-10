@@ -1,13 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
-using MakerSchedule.Domain.Entities;
 using MakerSchedule.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
+using MakerSchedule.Domain.Aggregates.Customer;
+using MakerSchedule.Domain.Aggregates.Event;
+using MakerSchedule.Domain.Aggregates.Employee;
+using MakerSchedule.Domain.Aggregates.User;
 
 namespace MakerSchedule.Infrastructure.Data;
 
@@ -97,15 +96,12 @@ public class SeedData
                     var minutesOffset = random.Next(0, 24 * 60);
                     var start = now.AddDays(daysOffset).AddMinutes(minutesOffset);
                     var duration = durationOptions[random.Next(durationOptions.Length)];
-                    occurrences.Add(new Occurrence
+                    var info = new OccurrenceInfo(start, duration, new List<int>(), new List<int>());
+                    var occurrence = new Occurrence(ev.Id, info)
                     {
-                        Id = occurrenceId++,
-                        EventId = ev.Id,
-                        ScheduleStart = start,
-                        Duration = duration,
-                        Attendees = new List<int>(),
-                        Leaders = new List<int>()
-                    });
+                        Id = occurrenceId++
+                    };
+                    occurrences.Add(occurrence);
                 }
             }
             return occurrences;

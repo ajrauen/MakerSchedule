@@ -2,7 +2,8 @@ using AutoMapper;
 
 using MakerSchedule.Application.DTOs.CustomerRegistration;
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Aggregates.Customer;
+using MakerSchedule.Domain.Aggregates.User;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;

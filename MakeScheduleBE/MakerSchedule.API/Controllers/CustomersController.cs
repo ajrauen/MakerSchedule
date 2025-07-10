@@ -1,11 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-
 using MakerSchedule.Application.DTOs.Customer;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Services;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Aggregates.Customer;
 
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MakerSchedule.API.Controllers;

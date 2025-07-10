@@ -1,7 +1,7 @@
 using MakerSchedule.Application.DTOs.Occurence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Aggregates.Event;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -45,24 +45,19 @@ public class OccurrenceService : IOccurrenceService
 
     public async Task<int> CreateOccurrenceAsync(CreateOccurenceDTO occurenceDTO)
     {
-
         var attendees = await _dbContext.Customers.Where(customer => occurenceDTO.Attendees.Contains(customer.Id)).Select(customer => customer.Id).ToListAsync();
         var leaders = await _dbContext.Employees.Where(employee => occurenceDTO.Leaders.Contains(employee.Id)).Select(employee => employee.Id).ToListAsync();
-
         var scheduledStart = DateTimeOffset.FromUnixTimeMilliseconds(occurenceDTO.ScheduleStart).UtcDateTime;
 
-        var newOccurence = new Occurrence()
-        {
-            Attendees = attendees,
-            Leaders = leaders,
-            ScheduleStart = scheduledStart,
-            EventId = occurenceDTO.EventId,
-            Duration = occurenceDTO.Duration,
-        };
-        _dbContext.Occurrences.Add(newOccurence);
+        // Load the Event aggregate root
+        var eventEntity = await _dbContext.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurenceDTO.EventId);
+        if (eventEntity == null)
+            throw new NotFoundException($"Event with id {occurenceDTO.EventId} not found", occurenceDTO.EventId);
+
+        var info = new OccurrenceInfo(scheduledStart, occurenceDTO.Duration, attendees, leaders);
+        var newOccurrence = eventEntity.AddOccurrence(info);
         await _dbContext.SaveChangesAsync();
-        _logger.LogInformation("Successfully created event with ${OccurenceId}", newOccurence.Id);
-        return newOccurence.Id;
-        
+        _logger.LogInformation("Successfully created occurrence with {OccurrenceId}", newOccurrence.Id);
+        return newOccurrence.Id;
     }
 }

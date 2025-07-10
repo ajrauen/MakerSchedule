@@ -3,11 +3,10 @@ using System.ComponentModel.Design;
 using MakerSchedule.Application.DTOs.Event;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
+using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Entities;
-using MakerSchedule.Domain.Enums;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services;

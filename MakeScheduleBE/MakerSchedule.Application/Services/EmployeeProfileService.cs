@@ -5,9 +5,10 @@ using MakerSchedule.Application.Interfaces;
 
 using MakerSchedule.Application.DTOs.Employee;
 using MakerSchedule.Application.Exceptions;
-using MakerSchedule.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using MakerSchedule.Domain.Enums;
+using MakerSchedule.Domain.Aggregates.User;
+using MakerSchedule.Domain.Aggregates.Employee;
 
 namespace MakerSchedule.Application.Services;
 

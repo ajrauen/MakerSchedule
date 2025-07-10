@@ -1,7 +1,6 @@
 using MakerSchedule.API.Extensions;
 using MakerSchedule.Application.Mappings;
 using MakerSchedule.Application.Services;
-using MakerSchedule.Domain.Entities;
 using MakerSchedule.Infrastructure.Data;
 
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +10,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MakerSchedule.API.Exceptions;
+using MakerSchedule.Domain.Aggregates.User;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
