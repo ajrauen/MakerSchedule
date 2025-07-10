@@ -25,15 +25,14 @@ const ClassCard = ({ event }: ClassCardProps) => {
     }
   };
 
+  console.log(event);
+
   return (
     <Paper className="w-full " elevation={3}>
       <div className="flex lg:flex-row gap-4 bg-gray-100 flex-col w-full">
         <img
           className="h-auto object-fit w-full lg:w-2/4 lg-flex-shrink-0 lg:object-center"
-          src={
-            event.fileUrl ??
-            "https://www.akc.org/wp-content/uploads/2017/11/Pembroke-Welsh-Corgi-standing-outdoors-in-the-fall.jpg"
-          }
+          src={event.fileUrl}
           alt="filter"
         />
         <div className="flex flex-col gap-2 p-4 ">
