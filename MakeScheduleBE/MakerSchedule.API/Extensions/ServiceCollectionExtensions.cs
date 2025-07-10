@@ -19,14 +19,12 @@ public static class MakerScheduleExtensions
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IOccurrenceService, OccurrenceService>();
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-        services.AddScoped<LocalImageStorageService>();
-        services.AddScoped<AzureImageStorageService>();
         services.AddScoped<IImageStorageService>(serviceProvider =>
         {
             var env = serviceProvider.GetService<IWebHostEnvironment>();
             return env?.IsDevelopment() == true
-            ? serviceProvider.GetRequiredService<LocalImageStorageService>()
-            : serviceProvider.GetRequiredService<AzureImageStorageService>();
+            ? new LocalImageStorageService(serviceProvider.GetRequiredService<IHostEnvironment>())
+            : new AzureImageStorageService(serviceProvider.GetRequiredService<IConfiguration>());
         });
 
         return services;
