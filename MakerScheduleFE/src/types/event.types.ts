@@ -16,6 +16,7 @@ interface EventOffering {
   duration?: number;
   price?: number;
   eventType: EventType;
+  fileUrl?: string;
 }
 
 export { type EventOffering, type EventType, EVENT_TYPES };
