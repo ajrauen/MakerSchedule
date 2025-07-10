@@ -41,9 +41,35 @@ public class AzureImageStorageService : IImageStorageService
         var imageBlob = containerClient.GetBlobClient($"eventImages/{fileName}");
         var stream = file.OpenReadStream();
 
-        await imageBlob.UploadAsync(stream, overwrite: true);
+        // Set the content type based on the file extension
+        var contentType = GetContentType(fileName);
+        var options = new Azure.Storage.Blobs.Models.BlobUploadOptions
+        {
+            HttpHeaders = new Azure.Storage.Blobs.Models.BlobHttpHeaders
+            {
+                ContentType = contentType
+            },
+            
+        };
+
+        await imageBlob.UploadAsync(stream, options);
         
         return imageBlob.Uri.ToString();
+    }
+
+    private static string GetContentType(string fileName)
+    {
+        var extension = Path.GetExtension(fileName).ToLowerInvariant();
+        return extension switch
+        {
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            ".gif" => "image/gif",
+            ".bmp" => "image/bmp",
+            ".webp" => "image/webp",
+            ".svg" => "image/svg+xml",
+            _ => "application/octet-stream"
+        };
     }
 }
 
