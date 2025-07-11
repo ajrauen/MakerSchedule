@@ -8,12 +8,15 @@ namespace MakerSchedule.Infrastructure.Services.Storage;
 public class LocalImageStorageService : IImageStorageService
 {
     private readonly IHostEnvironment _env;
-    public LocalImageStorageService(IHostEnvironment env) => _env = env;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    public LocalImageStorageService(IHostEnvironment env, IHttpContextAccessor httpContextAccessor)
+    {
+        _env = env;
+        _httpContextAccessor = httpContextAccessor;
+    }
 
     public async Task<string> SaveImageAsync(IFormFile file, string fileName)
     {
-       
-
         var wwwrootPath = Path.Combine(_env.ContentRootPath, "wwwroot");
         var uploads = Path.Combine(wwwrootPath, "images", "events");
         Directory.CreateDirectory(uploads);
@@ -23,6 +26,8 @@ public class LocalImageStorageService : IImageStorageService
         {
             await file.CopyToAsync(stream);
         }
-        return $"/images/events/{fileName}";
+        var request = _httpContextAccessor.HttpContext?.Request;
+        var baseUrl = request != null ? $"{request.Scheme}://{request.Host}" : "http://localhost:5000";
+        return $"{baseUrl}/images/events/{fileName}";
     }
 }

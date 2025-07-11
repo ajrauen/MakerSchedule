@@ -25,7 +25,7 @@ const Classes = () => {
       price: event.price || 0,
       eventType: event.eventType,
       fileUrl: event.fileUrl
-        ? `${SERVER_URI}/${event.fileUrl}`
+        ? event.fileUrl
         : "https://www.akc.org/wp-content/uploads/2017/11/Pembroke-Welsh-Corgi-standing-outdoors-in-the-fall.jpg",
     })) as EventOffering[];
   }, [eventResponse]);
