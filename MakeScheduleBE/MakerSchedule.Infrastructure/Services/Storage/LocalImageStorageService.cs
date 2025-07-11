@@ -5,16 +5,8 @@ using System.IO;
 
 namespace MakerSchedule.Infrastructure.Services.Storage;
 
-public class LocalImageStorageService : IImageStorageService
+public class LocalImageStorageService(IHostEnvironment _env, IHttpContextAccessor _httpContextAccessor) : IImageStorageService
 {
-    private readonly IHostEnvironment _env;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    public LocalImageStorageService(IHostEnvironment env, IHttpContextAccessor httpContextAccessor)
-    {
-        _env = env;
-        _httpContextAccessor = httpContextAccessor;
-    }
-
     public async Task<string> SaveImageAsync(IFormFile file, string fileName)
     {
         var wwwrootPath = Path.Combine(_env.ContentRootPath, "wwwroot");

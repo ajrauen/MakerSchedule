@@ -5,6 +5,7 @@ using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Entities;
+using MakerSchedule.Domain.Utilties.ImageUtilities;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -16,6 +17,7 @@ public class EventService : IEventService
     private readonly IApplicationDbContext _context;
     private readonly ILogger<EventService> _logger;
     private readonly IImageStorageService _imageStorageService;
+private const double RequiredAspectRatio = 4.0 / 3.0;
 
     public EventService(IApplicationDbContext context, ILogger<EventService> logger, IImageStorageService imageStorageService)
     {
@@ -61,7 +63,8 @@ public class EventService : IEventService
         }
 
 
-      
+       
+
 
         var e = new Event
         {
@@ -78,14 +81,32 @@ public class EventService : IEventService
         string fileUrl;
         try
         {
+
+            using (var stream = dto.FormFile.OpenReadStream())
+            {
+                if (ImageUtilities.IsSvg(stream))
+                {
+                    if (!ImageUtilities.IsSvgAspectRatioValid(stream, RequiredAspectRatio))
+                    {
+                    throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
+                    }
+                }else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
+                {
+                    throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
+                }
+            }
+
             var fileName = $"{dto.EventName}_{e.Id}{Path.GetExtension(dto.FormFile.FileName)}";
             fileUrl = await _imageStorageService.SaveImageAsync(dto.FormFile, fileName);
             e.FileUrl = fileUrl;
             await _context.SaveChangesAsync();
         }
+        catch (InvalidImageAspectRatioException)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
-
             _logger.LogError(ex, "Failed to save image for event {EventName}", dto.EventName);
             _context.Events.Remove(e);
             await _context.SaveChangesAsync();

@@ -1,9 +1,6 @@
 namespace MakerSchedule.Application.Exceptions;
-
-public class EmailAlreadyExistsException : BaseException
+public class EmailAlreadyExistsException(string email) 
+    : BaseException($"Email address '{email}' is already registered", "EMAIL_ALREADY_EXISTS", 400)
 {
-    public EmailAlreadyExistsException(string email) 
-        : base($"Email address '{email}' is already registered", "EMAIL_ALREADY_EXISTS", 400)
-    {
-    }
-} 
+}
+

@@ -9,14 +9,10 @@ using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.API.Exceptions;
 
-public class GlobalExceptionHandler : IExceptionHandler
+public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : IExceptionHandler
 {
-    private readonly ILogger<GlobalExceptionHandler> _logger;
 
-    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
-    {
-        _logger = logger;
-    }
+    
 
     public async ValueTask<bool> TryHandleAsync(
         HttpContext context,
