@@ -1,5 +1,4 @@
 import { getEvents } from "@ms/api/event.api";
-import { SERVER_URI } from "@ms/common/env-constants";
 import { ClassCard } from "@ms/Pages/Classes/ClassCard/ClassCard";
 import { type EventOffering } from "@ms/types/event.types";
 import { useQuery } from "@tanstack/react-query";
