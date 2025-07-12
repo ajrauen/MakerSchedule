@@ -1,4 +1,4 @@
-using MakerSchedule.Application.DTOs.Occurence;
+using MakerSchedule.Application.DTO.Occurence;
 using MakerSchedule.Application.Interfaces;
 
 using Microsoft.AspNetCore.Mvc;

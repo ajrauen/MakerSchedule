@@ -1,5 +1,4 @@
 using MakerSchedule.API.Extensions;
-using MakerSchedule.Application.Mappings;
 using MakerSchedule.Application.Services;
 using MakerSchedule.Infrastructure.Data;
 
@@ -63,8 +62,6 @@ services.ConfigureApplicationCookie(options =>
         return Task.CompletedTask;
     };
 });
-// Add AutoMapper
-services.AddAutoMapper(typeof(EmployeeMappingProfile));
 
 // Add Swagger/OpenAPI
 services.AddEndpointsApiExplorer();
@@ -114,12 +111,15 @@ try
     app.Logger.LogInformation("Successfully connected to the database.");
 
     //Apply migration
-    if (app.Environment.IsDevelopment())
-    {
         app.Logger.LogInformation("Applying database migrations...");
         await dbContext.Database.MigrateAsync();
         app.Logger.LogInformation("Database migrations completed successfully.");
-  }
+    
+    // Seed the database (run in all environments for now)
+    app.Logger.LogInformation("Seeding database...");
+    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+    await seeder.SeedAsync();
+    app.Logger.LogInformation("Database seeding completed successfully.");
 
 }
 catch (Exception ex)

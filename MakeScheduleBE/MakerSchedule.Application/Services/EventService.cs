@@ -1,10 +1,9 @@
 using System.ComponentModel.Design;
 
-using MakerSchedule.Application.DTOs.Event;
+using MakerSchedule.Application.DTO.Event;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.Event;
-using MakerSchedule.Domain.Entities;
 using MakerSchedule.Domain.Utilties.ImageUtilities;
 
 using Microsoft.EntityFrameworkCore;
@@ -12,19 +11,14 @@ using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services;
 
-public class EventService : IEventService
+public class EventService(IApplicationDbContext context, ILogger<EventService> logger, IImageStorageService imageStorageService): IEventService
 {
-    private readonly IApplicationDbContext _context;
-    private readonly ILogger<EventService> _logger;
-    private readonly IImageStorageService _imageStorageService;
-private const double RequiredAspectRatio = 4.0 / 3.0;
+    private readonly IApplicationDbContext _context = context;
+    private readonly ILogger<EventService> _logger = logger;
+    private readonly IImageStorageService _imageStorageService = imageStorageService;
+    private const double RequiredAspectRatio = 4.0 / 3.0;
 
-    public EventService(IApplicationDbContext context, ILogger<EventService> logger, IImageStorageService imageStorageService)
-    {
-        _context = context;
-        _logger = logger;
-        _imageStorageService = imageStorageService;
-    }
+  
 
     public async Task<IEnumerable<EventListDTO>> GetAllEventsAsync()
     {
@@ -59,12 +53,8 @@ private const double RequiredAspectRatio = 4.0 / 3.0;
 
         if (dto.FormFile == null || dto.FormFile.Length == 0)
         {
-        throw new ArgumentException("Image file is required for event creation", nameof(dto.FormFile));
+            throw new ArgumentException("Image file is required for event creation", nameof(dto.FormFile));
         }
-
-
-       
-
 
         var e = new Event
         {

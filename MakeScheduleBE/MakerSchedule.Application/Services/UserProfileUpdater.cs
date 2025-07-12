@@ -1,4 +1,4 @@
-using MakerSchedule.Application.DTOs.User;
+using MakerSchedule.Application.DTO.User;
 using MakerSchedule.Domain.Aggregates.User;
 
 using Microsoft.AspNetCore.Identity;

@@ -11,8 +11,10 @@ public class Occurrence
     public Event Event { get; set; } = null!;
     public DateTime ScheduleStart { get; set; }
     public int? Duration { get; set; }
-    public ICollection<int> Attendees { get; set; } = Array.Empty<int>();
-    public ICollection<int> Leaders { get; set; } = Array.Empty<int>();
+
+    // Navigation properties for many-to-many relationships
+    public ICollection<OccurrenceAttendee> Attendees { get; set; } = new List<OccurrenceAttendee>();
+    public ICollection<OccurrenceLeader> Leaders { get; set; } = new List<OccurrenceLeader>();
 
     public Occurrence() { }
 
@@ -21,7 +23,6 @@ public class Occurrence
         EventId = eventId;
         ScheduleStart = info.ScheduleStart;
         Duration = info.Duration;
-        Attendees = info.Attendees;
-        Leaders = info.Leaders;
+        // Note: Attendees and Leaders will be managed through the join entities
     }
 } 

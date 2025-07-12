@@ -1,5 +1,5 @@
-using MakerSchedule.Application.DTOs;
-using MakerSchedule.Application.DTOs.Authentication; // <-- This is the missing line
+using MakerSchedule.Application.DTO;
+using MakerSchedule.Application.DTO.Authentication; // <-- This is the missing line
 using MakerSchedule.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

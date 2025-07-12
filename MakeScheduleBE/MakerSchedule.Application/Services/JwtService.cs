@@ -8,13 +8,9 @@ using MakerSchedule.Domain.Aggregates.User;
 
 namespace MakerSchedule.Application.Services;
 
-public class JwtService
+public class JwtService(IConfiguration config)
 {
-    private readonly IConfiguration _config;
-    public JwtService(IConfiguration config)
-    {
-        _config = config;
-    }
+    private readonly IConfiguration _config = config;
 
     public string GenerateToken(User user)
     {

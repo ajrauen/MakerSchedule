@@ -2,10 +2,8 @@ namespace MakerSchedule.Domain.Aggregates.User;
 
 
 using Microsoft.AspNetCore.Identity;
-using MakerSchedule.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
-using MakerSchedule.Domain.Aggregates.Customer;
-using MakerSchedule.Domain.Aggregates.Employee;
+using MakerSchedule.Domain.Aggregates.DomainUser;
 
 public class User : IdentityUser
 {
@@ -17,11 +15,9 @@ public class User : IdentityUser
     public DateTime CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public bool IsActive { get; set; }
-    public UserType UserType { get; set; }
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiryTime { get; set; }
 
     // Navigation properties
-    public Employee? Employee { get; set; }
-    public Customer? Customer { get; set; }
+    public DomainUser? DomainUser { get; set; }
 }

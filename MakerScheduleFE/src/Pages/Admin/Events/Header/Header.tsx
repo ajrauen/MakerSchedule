@@ -13,6 +13,7 @@ const EventsHeader = () => {
       <Button
         onClick={() => setIsCreateEventFormOpen(true)}
         startIcon={<AddIcon />}
+        variant="text"
       >
         Create Event
       </Button>

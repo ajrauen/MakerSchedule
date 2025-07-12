@@ -1,4 +1,4 @@
-using MakerSchedule.Application.DTOs.Occurence;
+using MakerSchedule.Application.DTO.Occurence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.Event;
@@ -8,30 +8,30 @@ using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services;
 
-public class OccurrenceService : IOccurrenceService
+public class OccurrenceService(IApplicationDbContext context, ILogger<OccurrenceService> logger) : IOccurrenceService
 {
-    private readonly IApplicationDbContext _dbContext;
-    private readonly ILogger<OccurrenceService> _logger;
-
-    public OccurrenceService(IApplicationDbContext context, ILogger<OccurrenceService> logger)
-    {
-        _dbContext = context;
-        _logger = logger;
-    }
+    private readonly IApplicationDbContext _dbContext = context;
+    private readonly ILogger<OccurrenceService> _logger = logger;
 
     public async Task<OccurenceDTO> GetOccurrenceByIdAsync(int id)
     {
+        var occurrence = await _dbContext.Occurrences
+            .Include(o => o.Leaders)
+                .ThenInclude(ol => ol.User)
+            .Include(o => o.Attendees)
+                .ThenInclude(oa => oa.User)
+            .FirstOrDefaultAsync(o => o.Id == id);
 
-        var occurence = await _dbContext.Occurrences.Where(occurance => occurance.Id == id).FirstOrDefaultAsync();
-        if (occurence == null) throw new NotFoundException("Occurence with ${OccurenceId} was not found", id);
+        if (occurrence == null) 
+            throw new NotFoundException($"Occurrence with id {id} was not found", id);
 
         return new OccurenceDTO()
         {
-            Attendees = occurence.Attendees,
-            Id = occurence.Id,
-            EventId = occurence.EventId,
-            Leaders = occurence.Leaders,
-            Duration = occurence.Duration,
+            Id = occurrence.Id,
+            EventId = occurrence.EventId,
+            Duration = occurrence.Duration,
+            Attendees = occurrence.Attendees.Select(oa => oa.UserId).ToList(),
+            Leaders = occurrence.Leaders.Select(ol => ol.UserId).ToList(),
         };
     }
 
@@ -43,19 +43,50 @@ public class OccurrenceService : IOccurrenceService
         }).ToListAsync();
     }
 
-    public async Task<int> CreateOccurrenceAsync(CreateOccurenceDTO occurenceDTO)
+    public async Task<int> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO)
     {
-        var attendees = await _dbContext.Customers.Where(customer => occurenceDTO.Attendees.Contains(customer.Id)).Select(customer => customer.Id).ToListAsync();
-        var leaders = await _dbContext.Employees.Where(employee => occurenceDTO.Leaders.Contains(employee.Id)).Select(employee => employee.Id).ToListAsync();
-        var scheduledStart = DateTimeOffset.FromUnixTimeMilliseconds(occurenceDTO.ScheduleStart).UtcDateTime;
+        var scheduledStart = DateTimeOffset.FromUnixTimeMilliseconds(occurrenceDTO.ScheduleStart).UtcDateTime;
 
         // Load the Event aggregate root
-        var eventEntity = await _dbContext.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurenceDTO.EventId);
+        var eventEntity = await _dbContext.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
         if (eventEntity == null)
-            throw new NotFoundException($"Event with id {occurenceDTO.EventId} not found", occurenceDTO.EventId);
+            throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
 
-        var info = new OccurrenceInfo(scheduledStart, occurenceDTO.Duration, attendees, leaders);
+        var info = new OccurrenceInfo(scheduledStart, occurrenceDTO.Duration);
         var newOccurrence = eventEntity.AddOccurrence(info);
+
+        // Create join entities for leaders
+        foreach (var leaderId in occurrenceDTO.Leaders)
+        {
+            var leader = await _dbContext.DomainUsers.FindAsync(leaderId);
+            if (leader != null)
+            {
+                var occurrenceLeader = new OccurrenceLeader
+                {
+                    OccurrenceId = newOccurrence.Id,
+                    UserId = leaderId,
+                    AssignedAt = DateTime.UtcNow
+                };
+                _dbContext.OccurrenceLeaders.Add(occurrenceLeader);
+            }
+        }
+
+        // Create join entities for attendees
+        foreach (var attendeeId in occurrenceDTO.Attendees)
+        {
+            var attendee = await _dbContext.DomainUsers.FindAsync(attendeeId);
+            if (attendee != null)
+            {
+                var occurrenceAttendee = new OccurrenceAttendee
+                {
+                    OccurrenceId = newOccurrence.Id,
+                    UserId = attendeeId,
+                    RegisteredAt = DateTime.UtcNow
+                };
+                _dbContext.OccurrenceAttendees.Add(occurrenceAttendee);
+            }
+        }
+
         await _dbContext.SaveChangesAsync();
         _logger.LogInformation("Successfully created occurrence with {OccurrenceId}", newOccurrence.Id);
         return newOccurrence.Id;

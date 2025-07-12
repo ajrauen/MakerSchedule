@@ -3,19 +3,17 @@ using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Services;
 using MakerSchedule.Infrastructure.Data;
 using MakerSchedule.Infrastructure.Services.Storage;
+using AutoMapper;
 
 public static class MakerScheduleExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        services.AddScoped<IEmployeeService, EmployeeService>();
-        services.AddScoped<ICustomerService, CustomerService>();
-        services.AddScoped<ICustomerRegistrationService, CustomerRegistrationService>();
-        services.AddScoped<IEmployeeRegistrationService, EmployeeRegistrationService>();
+        // Add AutoMapper
+        services.AddAutoMapper(typeof(MakerScheduleExtensions).Assembly);
+
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IEmployeeProfileService, EmployeeProfileService>();
-        services.AddScoped<ICustomerProfileService, CustomerProfileService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IOccurrenceService, OccurrenceService>();
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
@@ -28,6 +26,12 @@ public static class MakerScheduleExtensions
                 serviceProvider.GetRequiredService<IHttpContextAccessor>())
             : new AzureImageStorageService(serviceProvider.GetRequiredService<IConfiguration>());
         });
+
+        services.AddScoped<IDomainUserProfileService, DomainUserProfileService>();
+        services.AddScoped<IDomainUserService, DomainUserService>();
+        
+        // Register the database seeder
+        services.AddScoped<DatabaseSeeder>();
 
         return services;
     }

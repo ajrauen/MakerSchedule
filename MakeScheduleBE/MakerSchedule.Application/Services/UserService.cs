@@ -6,23 +6,14 @@ using MakerSchedule.Domain.Aggregates.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-public class UserService: IUserService
+public class UserService(UserManager<User> userManager, ILogger<UserService> logger) : IUserService
 {
-    private readonly UserManager<User> _userManager;
-    private readonly ILogger<UserService> _logger;
-    public UserService(UserManager<User> userManager, ILogger<UserService> logger)
-    {
-
-        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-        _logger = logger;
-    }
+    private readonly UserManager<User> _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+    private readonly ILogger<UserService> _logger = logger;
 
     public async Task<IdentityResult> UpdateUserAsync(User user)
     {
-        if (user == null)
-        {
-            throw new ArgumentNullException(nameof(user));
-        }
+        ArgumentNullException.ThrowIfNull(user);
 
         var existingUser = await _userManager.FindByIdAsync(user.Id);
 

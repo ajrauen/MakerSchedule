@@ -3,10 +3,9 @@ using MakerSchedule.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
-using MakerSchedule.Domain.Aggregates.Customer;
 using MakerSchedule.Domain.Aggregates.Event;
-using MakerSchedule.Domain.Aggregates.Employee;
 using MakerSchedule.Domain.Aggregates.User;
+using MakerSchedule.Domain.Aggregates.DomainUser;
 
 namespace MakerSchedule.Infrastructure.Data;
 
@@ -15,23 +14,17 @@ public class SeedData
     // Remove SeedUsers since we'll create users through UserManager
     // public static List<User> SeedUsers => new List<User> { ... };
 
-    public static List<Employee> SeedEmployees => new List<Employee>
+    public static List<DomainUser> SeedEmployees => new List<DomainUser>
     {
-        new Employee
+        new DomainUser
         {
             Id = 1,
             UserId = "11111111-1111-1111-1111-111111111111",
-            EmployeeNumber = "EMP001",
-            Department = "Administration",
-            Position = "Administrator",
-            HireDate = new DateTime(2020, 1, 15)
+            // Add other required DomainUser properties if needed
         }
     };
 
-    public static List<Customer> SeedCustomers => new List<Customer>
-    {
-        // No customers in seed data for now
-    };
+    // Removed SeedCustomers
 
     public static List<Event> SeedEvents => new List<Event>
     {
@@ -96,7 +89,7 @@ public class SeedData
                     var minutesOffset = random.Next(0, 24 * 60);
                     var start = now.AddDays(daysOffset).AddMinutes(minutesOffset);
                     var duration = durationOptions[random.Next(durationOptions.Length)];
-                    var info = new OccurrenceInfo(start, duration, new List<int>(), new List<int>());
+                    var info = new OccurrenceInfo(start, duration);
                     var occurrence = new Occurrence(ev.Id, info)
                     {
                         Id = occurrenceId++
@@ -130,13 +123,26 @@ public class DatabaseSeeder
         try
         {
             _logger.LogInformation("Starting database seeding process...");
+            _logger.LogInformation("Current environment: {Environment}", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
+            
+            // Check if we can access the database
+            var canConnect = await _context.Database.CanConnectAsync();
+            _logger.LogInformation("Database connection test: {CanConnect}", canConnect);
+            
+            // Check current data in tables
+            var userCount = await _context.Users.CountAsync();
+            var domainUserCount = await _context.DomainUsers.CountAsync();
+            var eventCount = await _context.Events.CountAsync();
+            _logger.LogInformation("Current table counts - Users: {UserCount}, DomainUsers: {DomainUserCount}, Events: {EventCount}", 
+                userCount, domainUserCount, eventCount);
+            
             await SeedAdminUserAsync();
             _logger.LogInformation("Database seeding process completed.");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred during database seeding");
-            // Don't re-throw - let the application continue
+            throw; // Re-throw to see the actual error
         }
     }
 
@@ -172,11 +178,12 @@ public class DatabaseSeeder
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
                     IsActive = true,
-                    UserType = UserType.Employee,
+                    // UserType = UserType.Employee, // Remove or comment out if not present
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true
                 };
 
+                _logger.LogInformation("About to create user with UserManager...");
                 var result = await _userManager.CreateAsync(adminUser, adminPassword);
                 if (result.Succeeded)
                 {
@@ -192,27 +199,47 @@ public class DatabaseSeeder
                 }
             }
 
-            // Ensure associated Employee exists
-            _logger.LogInformation("Checking for admin employee record...");
-            var adminEmployee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == adminUser.Id);
-            if (adminEmployee == null)
+            // Ensure associated DomainUser exists
+            _logger.LogInformation("Checking for admin domain user record...");
+            var adminDomainUser = await _context.DomainUsers.FirstOrDefaultAsync(e => e.UserId == adminUser.Id);
+            if (adminDomainUser == null)
             {
-                _logger.LogInformation("Creating admin employee record...");
-                var employee = new Employee
+                _logger.LogInformation("Creating admin domain user record...");
+                try
                 {
-                    UserId = adminUser.Id,
-                    EmployeeNumber = "EMP001",
-                    Department = "Administration",
-                    Position = "Administrator",
-                    HireDate = new DateTime(2020, 1, 15)
-                };
-                _context.Employees.Add(employee);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation("Admin employee record created for user: {Email}", adminEmail);
+                    var domainUser = new DomainUser
+                    {
+                        UserId = adminUser.Id,
+                        PreferredContactMethod = "Email"
+                    };
+                    _logger.LogInformation("DomainUser object created with UserId: {UserId}", domainUser.UserId);
+                    
+                    _context.DomainUsers.Add(domainUser);
+                    _logger.LogInformation("DomainUser added to context");
+                    
+                    var saveResult = await _context.SaveChangesAsync();
+                    _logger.LogInformation("Admin domain user record created for user: {Email}. SaveChanges result: {SaveResult}", adminEmail, saveResult);
+                    
+                    // Verify the record was actually saved
+                    var verifyUser = await _context.DomainUsers.FirstOrDefaultAsync(e => e.UserId == adminUser.Id);
+                    if (verifyUser != null)
+                    {
+                        _logger.LogInformation("Verified: DomainUser record exists with ID: {DomainUserId}", verifyUser.Id);
+                    }
+                    else
+                    {
+                        _logger.LogError("Failed to verify DomainUser record was saved!");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Exception occurred while creating DomainUser record");
+                    throw; // Re-throw to see the actual error
+                }
             }
             else
             {
-                _logger.LogInformation("Admin employee record already exists for user: {Email}", adminEmail);
+                _logger.LogInformation("Admin domain user record already exists for user: {Email} with ID: {DomainUserId}", adminEmail, adminDomainUser.Id);
             }
 
             _logger.LogInformation("Admin user seeding completed successfully.");
@@ -220,7 +247,7 @@ public class DatabaseSeeder
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error occurred during admin user seeding");
-            // Don't re-throw - let the application continue
+            throw; // Re-throw to see the actual error
         }
     }
 }

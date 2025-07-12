@@ -1,17 +1,7 @@
-namespace MakerSchedule.Domain.Aggregates.Event;
-
-public class OccurrenceInfo
+public class OccurrenceInfo(DateTime scheduleStart, int? duration)
 {
-    public DateTime ScheduleStart { get; }
-    public int? Duration { get; }
-    public ICollection<int> Attendees { get; }
-    public ICollection<int> Leaders { get; }
-
-    public OccurrenceInfo(DateTime scheduleStart, int? duration, ICollection<int>? attendees, ICollection<int>? leaders)
-    {
-        ScheduleStart = scheduleStart;
-        Duration = duration;
-        Attendees = attendees ?? new List<int>();
-        Leaders = leaders ?? new List<int>();
-    }
-} 
+    public DateTime ScheduleStart { get; } = scheduleStart;
+    public int? Duration { get; } = duration;
+    // Note: Leaders and Attendees are now managed through join entities
+    // and will be set up after the Occurrence is created
+}

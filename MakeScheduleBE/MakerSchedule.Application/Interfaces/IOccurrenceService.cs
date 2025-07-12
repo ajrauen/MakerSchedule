@@ -1,5 +1,4 @@
-using MakerSchedule.Application.DTOs.Occurence;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Application.DTO.Occurence;
 
 namespace MakerSchedule.Application.Interfaces;
 
@@ -10,6 +9,4 @@ public interface IOccurrenceService
     Task<int> CreateOccurrenceAsync(CreateOccurenceDTO occurance);
 
   
-    // Task<bool> UpdateOccurrenceAsync(Occurrence occurance);
-    // Task<bool> DeleteOccurrenceAsync(int id);
 } 

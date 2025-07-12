@@ -1,7 +1,6 @@
-using MakerSchedule.Application.DTOs.Event;
-using MakerSchedule.Domain.Entities;
+using MakerSchedule.Application.DTO.Event;
 
-namespace MakerSchedule.Application.Services;
+namespace MakerSchedule.Application.Interfaces;
 
 public interface IEventService
 {

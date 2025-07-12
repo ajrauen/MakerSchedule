@@ -1,7 +1,7 @@
-using MakerSchedule.Domain.Entities;
-using MakerSchedule.Application.Services;
+
 using Microsoft.AspNetCore.Mvc;
-using MakerSchedule.Application.DTOs.Event;
+using MakerSchedule.Application.DTO.Event;
+using MakerSchedule.Application.Interfaces;
 
 namespace MakerSchedule.API.Controllers;
 

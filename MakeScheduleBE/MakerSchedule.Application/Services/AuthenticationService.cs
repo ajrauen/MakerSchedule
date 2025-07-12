@@ -1,4 +1,4 @@
-using MakerSchedule.Application.DTOs;
+using MakerSchedule.Application.DTO.Authentication;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.User;
 
@@ -7,18 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MakerSchedule.Application.Services;
 
-public class AuthenticationService : IAuthenticationService
+public class AuthenticationService(UserManager<User> userManager, JwtService jwtService, IApplicationDbContext context) : IAuthenticationService
 {
-    private readonly UserManager<User> _userManager;
-    private readonly JwtService _jwtService;
-    private readonly IApplicationDbContext _context;
-
-    public AuthenticationService(UserManager<User> userManager, JwtService jwtService, IApplicationDbContext context)
-    {
-        _userManager = userManager;
-        _jwtService = jwtService;
-        _context = context;
-    }
+    private readonly UserManager<User> _userManager = userManager;
+    private readonly JwtService _jwtService = jwtService;
+    private readonly IApplicationDbContext _context = context;
 
     public async Task<(string AccessToken, string RefreshToken)?> LoginAsync(LoginDTO login)
     {
@@ -40,7 +33,9 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<(string AccessToken, string RefreshToken)?> RefreshAsync(string refreshToken)
     {
-        var user = await _context.Users.SingleOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        // Use UserManager to find user by refresh token to avoid tracking conflicts
+        var users = await _userManager.Users.Where(u => u.RefreshToken == refreshToken).ToListAsync();
+        var user = users.FirstOrDefault();
 
         if (user == null) {
             // To prevent token reuse, you might want to invalidate the user's session here

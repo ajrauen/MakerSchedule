@@ -1,6 +1,6 @@
 import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import { AdminEvents } from "@ms/Pages/Admin/Events/Events";
-import { Box, Paper, Tab, Tabs } from "@mui/material";
+import { Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 
 const Admin = () => {

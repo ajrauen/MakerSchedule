@@ -7,8 +7,7 @@ using System.Text.Json;
 
 namespace MakerSchedule.Infrastructure.Data;
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Domain.Aggregates.Customer;
-using MakerSchedule.Domain.Aggregates.Employee;
+using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Aggregates.User;
 
@@ -23,20 +22,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
     {
         base.OnModelCreating(modelBuilder);
 
-        // Configure AspNetUsers table to include UserType
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.Property(u => u.UserType).IsRequired();
-            // Remove HasData for users since we'll create them through UserManager
-        });
-
-        modelBuilder.Entity<Customer>().HasData(SeedData.SeedCustomers.ToArray());
         modelBuilder.Entity<Event>().HasData(SeedData.SeedEvents.ToArray());
         modelBuilder.Entity<Occurrence>().HasData(SeedData.SeedOccurrences.ToArray());
-
-        modelBuilder.Entity<Employee>()
-            .HasIndex(e => e.EmployeeNumber)
-            .IsUnique();
 
         // Configure Event entity to include EventType
         modelBuilder.Entity<Event>(entity =>
@@ -44,35 +31,47 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
             entity.Property(e => e.EventType).IsRequired();
         });
 
-        // Configure Occurrence entity to handle collections properly
+        // Configure Occurrence entity
         modelBuilder.Entity<Occurrence>(entity =>
         {
-            // Configure Attendees collection to be stored as JSON
-            entity.Property(e => e.Attendees)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                    v => JsonSerializer.Deserialize<ICollection<int>>(v, (JsonSerializerOptions?)null) ?? new List<int>())
-                .Metadata.SetValueComparer(new ValueComparer<ICollection<int>>(
-                    (c1, c2) => (c1 ?? Array.Empty<int>()).SequenceEqual(c2 ?? Array.Empty<int>()),
-                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    c => c.ToList()));
-
-            // Configure Leaders collection to be stored as JSON
-            entity.Property(e => e.Leaders)
-                .HasConversion(
-                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
-                    v => JsonSerializer.Deserialize<ICollection<int>>(v, (JsonSerializerOptions?)null) ?? new List<int>())
-                .Metadata.SetValueComparer(new ValueComparer<ICollection<int>>(
-                    (c1, c2) => (c1 ?? Array.Empty<int>()).SequenceEqual(c2 ?? Array.Empty<int>()),
-                    c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
-                    c => c.ToList()));
-
             // Ensure ScheduleStart is properly configured for SQL Server
             entity.Property(e => e.ScheduleStart)
                 .HasColumnType("datetime2");
         });
 
-        // Ensure unlimited string columns use TEXT for SQLite
+        // Configure many-to-many: Users lead Occurrences
+        modelBuilder.Entity<OccurrenceLeader>(entity =>
+        {
+            entity.HasKey(ol => ol.Id);
+            
+            entity.HasOne(ol => ol.Occurrence)
+                .WithMany(o => o.Leaders)
+                .HasForeignKey(ol => ol.OccurrenceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(ol => ol.User)
+                .WithMany(u => u.OccurrencesLed)
+                .HasForeignKey(ol => ol.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Configure many-to-many: Users attend Occurrences
+        modelBuilder.Entity<OccurrenceAttendee>(entity =>
+        {
+            entity.HasKey(oa => oa.Id);
+            
+            entity.HasOne(oa => oa.Occurrence)
+                .WithMany(o => o.Attendees)
+                .HasForeignKey(oa => oa.OccurrenceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(oa => oa.User)
+                .WithMany(u => u.OccurrencesAttended)
+                .HasForeignKey(oa => oa.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // Only for SQLite, set string columns to TEXT
         if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
         {
             foreach (var entity in modelBuilder.Model.GetEntityTypes())
@@ -88,8 +87,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
         }
     }
 
-    public DbSet<Employee> Employees { get; set; }
-    public DbSet<Customer> Customers { get; set; }
+    public DbSet<DomainUser> DomainUsers { get; set; }
     public DbSet<Event> Events { get; set; }
     public DbSet<Occurrence> Occurrences { get; set; }
+    public DbSet<OccurrenceLeader> OccurrenceLeaders { get; set; }
+    public DbSet<OccurrenceAttendee> OccurrenceAttendees { get; set; }
 }

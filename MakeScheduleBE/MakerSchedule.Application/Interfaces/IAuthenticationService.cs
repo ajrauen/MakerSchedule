@@ -1,4 +1,4 @@
-using MakerSchedule.Application.DTOs;
+using MakerSchedule.Application.DTO.Authentication;
 
 namespace MakerSchedule.Application.Interfaces;
 

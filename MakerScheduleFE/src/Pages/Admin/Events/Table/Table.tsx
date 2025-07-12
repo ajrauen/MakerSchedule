@@ -42,7 +42,10 @@ const AdminEventsTable = ({ events = [] }: AdminEventTableProps) => {
               <TableCell>{row.duration}</TableCell>
               <TableCell>
                 <img
-                  src={row.fileUrl}
+                  src={
+                    row.fileUrl ??
+                    "https://t3.ftcdn.net/jpg/03/37/46/98/360_F_337469861_iFRwd4Ia15Ihuwfa8fEDA9OKPhIVsgZR.jpg"
+                  }
                   alt={row.eventName}
                   width={80}
                   height={60}
