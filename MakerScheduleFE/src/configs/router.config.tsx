@@ -27,11 +27,6 @@ const getRouterTree = () => {
     path: "/",
     component: Home,
   });
-  const aboutRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: "/about",
-    component: CreateEvent,
-  });
 
   const ClassRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -46,12 +41,7 @@ const getRouterTree = () => {
   });
 
   // Build the route tree
-  const routeTree = rootRoute.addChildren([
-    homeRoute,
-    aboutRoute,
-    ClassRoute,
-    AdminRoute,
-  ]);
+  const routeTree = rootRoute.addChildren([homeRoute, ClassRoute, AdminRoute]);
 
   // Create the router
   const router = createRouter({

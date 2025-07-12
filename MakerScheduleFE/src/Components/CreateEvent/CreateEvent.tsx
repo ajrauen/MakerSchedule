@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { createEvent } from "@ms/api/event.api";
-import type { CreateEventOffering, EventOffering } from "@ms/types/event.types";
+import type { CreateEventOffering } from "@ms/types/event.types";
 import { FormDateTime } from "@ms/Components/FormComponents/FormDateTime/FormDateTime";
 import { FormDialog } from "@ms/Components/FormComponents/FormDialog";
 import { ImageUpload } from "@ms/Components/CreateEvent/ImageUpload/ImageUpload";
