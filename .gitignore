@@ -60,13 +60,10 @@ msbuild.wrn
 cert/localhost.pem
 cert/localhost-key.pem
 
-# SQLite database files
+# Database files
 *.db
 *.db-shm
-*.db-wal
-makerschedule.db
-makerschedule.db-shm
-makerschedule.db-wal 
+*.db-wal 
 
 # dev images
 MakeScheduleBE/MakerSchedule.API/wwwroot/*

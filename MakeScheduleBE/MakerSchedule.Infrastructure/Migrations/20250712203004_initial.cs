@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace MakerSchedule.Infrastructure.MigrationsSqlServer
+namespace MakerSchedule.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class initial : Migration
@@ -299,33 +299,33 @@ namespace MakerSchedule.Infrastructure.MigrationsSqlServer
                 columns: new[] { "Id", "Duration", "EventId", "ScheduleStart" },
                 values: new object[,]
                 {
-                    { 1, 90, 1, new DateTime(2025, 7, 24, 10, 28, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 2, 105, 1, new DateTime(2025, 7, 27, 13, 46, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 3, 120, 1, new DateTime(2025, 8, 27, 11, 38, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 4, 90, 1, new DateTime(2025, 8, 2, 13, 38, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 5, 60, 1, new DateTime(2025, 8, 9, 16, 36, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 6, 120, 1, new DateTime(2025, 8, 27, 8, 18, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 7, 30, 2, new DateTime(2025, 8, 16, 11, 7, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 8, 90, 2, new DateTime(2025, 9, 14, 3, 3, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 9, 45, 2, new DateTime(2025, 7, 16, 0, 32, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 10, 90, 2, new DateTime(2025, 10, 2, 0, 5, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 11, 60, 2, new DateTime(2025, 7, 28, 8, 27, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 12, 90, 3, new DateTime(2025, 9, 23, 7, 33, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 13, 75, 3, new DateTime(2025, 9, 23, 1, 25, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 14, 30, 3, new DateTime(2025, 7, 25, 8, 5, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 15, 30, 3, new DateTime(2025, 9, 20, 22, 30, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 16, 60, 3, new DateTime(2025, 8, 4, 2, 0, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 17, 90, 4, new DateTime(2025, 7, 24, 8, 32, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 18, 75, 4, new DateTime(2025, 8, 27, 8, 41, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 19, 45, 4, new DateTime(2025, 9, 13, 22, 32, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 20, 60, 4, new DateTime(2025, 7, 13, 16, 13, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 21, 30, 4, new DateTime(2025, 7, 19, 0, 42, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 22, 120, 4, new DateTime(2025, 8, 22, 7, 45, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 23, 30, 5, new DateTime(2025, 8, 27, 19, 27, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 24, 30, 5, new DateTime(2025, 9, 24, 7, 46, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 25, 30, 5, new DateTime(2025, 7, 17, 23, 9, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 26, 75, 5, new DateTime(2025, 10, 3, 5, 45, 22, 384, DateTimeKind.Utc).AddTicks(2798) },
-                    { 27, 30, 5, new DateTime(2025, 8, 14, 22, 15, 22, 384, DateTimeKind.Utc).AddTicks(2798) }
+                    { 1, 90, 1, new DateTime(2025, 7, 24, 23, 30, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 2, 105, 1, new DateTime(2025, 7, 28, 2, 48, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 3, 120, 1, new DateTime(2025, 8, 28, 0, 40, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 4, 90, 1, new DateTime(2025, 8, 3, 2, 40, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 5, 60, 1, new DateTime(2025, 8, 10, 5, 38, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 6, 120, 1, new DateTime(2025, 8, 27, 21, 20, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 7, 30, 2, new DateTime(2025, 8, 17, 0, 9, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 8, 90, 2, new DateTime(2025, 9, 14, 16, 5, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 9, 45, 2, new DateTime(2025, 7, 16, 13, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 10, 90, 2, new DateTime(2025, 10, 2, 13, 7, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 11, 60, 2, new DateTime(2025, 7, 28, 21, 29, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 12, 90, 3, new DateTime(2025, 9, 23, 20, 35, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 13, 75, 3, new DateTime(2025, 9, 23, 14, 27, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 14, 30, 3, new DateTime(2025, 7, 25, 21, 7, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 15, 30, 3, new DateTime(2025, 9, 21, 11, 32, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 16, 60, 3, new DateTime(2025, 8, 4, 15, 2, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 17, 90, 4, new DateTime(2025, 7, 24, 21, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 18, 75, 4, new DateTime(2025, 8, 27, 21, 43, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 19, 45, 4, new DateTime(2025, 9, 14, 11, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 20, 60, 4, new DateTime(2025, 7, 14, 5, 15, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 21, 30, 4, new DateTime(2025, 7, 19, 13, 44, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 22, 120, 4, new DateTime(2025, 8, 22, 20, 47, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 23, 30, 5, new DateTime(2025, 8, 28, 8, 29, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 24, 30, 5, new DateTime(2025, 9, 24, 20, 48, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 25, 30, 5, new DateTime(2025, 7, 18, 12, 11, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 26, 75, 5, new DateTime(2025, 10, 3, 18, 47, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
+                    { 27, 30, 5, new DateTime(2025, 8, 15, 11, 17, 4, 398, DateTimeKind.Utc).AddTicks(7056) }
                 });
 
             migrationBuilder.CreateIndex(

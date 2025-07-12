@@ -17,26 +17,15 @@ public static class DatabaseConfiguration
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            // Check if connection string contains SQL Server indicators
-            if (connectionString?.Contains("Server=") == true || 
-                (connectionString?.Contains("Data Source=") == true && connectionString.Contains("Initial Catalog=")))
+            // Always use SQL Server
+            Console.WriteLine("Using SQL Server provider");
+            options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions =>
             {
-                // Use SQL Server for Azure
-                Console.WriteLine("Using SQL Server provider");
-                options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions =>
-                {
-                    sqlOptions.EnableRetryOnFailure(
-                        maxRetryCount: 5,
-                        maxRetryDelay: TimeSpan.FromSeconds(30),
-                        errorNumbersToAdd: null);
-                });
-            }
-            else
-            {
-                // Use SQLite for local development
-                Console.WriteLine("Using SQLite provider");
-                options.UseSqlite(connectionString);
-            }
+                sqlOptions.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+            });
         });
 
         return services;

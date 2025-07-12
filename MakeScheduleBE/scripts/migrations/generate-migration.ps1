@@ -1,11 +1,10 @@
 param(
-    [Parameter(Mandatory=$true)][string]$MigrationName,
-    [Parameter(Mandatory=$true)][int]$Env
+    [Parameter(Mandatory=$true)][string]$MigrationName
 )
 
 # Usage info
-if ($PSBoundParameters.Count -ne 2 -or ($Env -ne 0 -and $Env -ne 1)) {
-    Write-Host "Usage: ./generate-migration.ps1 -MigrationName <Name> -Env 0^|1"
+if ($PSBoundParameters.Count -ne 1) {
+    Write-Host "Usage: ./generate-migration.ps1 -MigrationName <Name>"
     exit 1
 }
 
@@ -14,21 +13,10 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 Set-Location (Join-Path $scriptDir ../..)
 Write-Host "Now in: $(Get-Location)"
 
-if ($Env -eq 0) {
-    $env:ASPNETCORE_ENVIRONMENT = "Development"
-    $migrationsDir = "Migrations-Sqlite"
-    Write-Host "Generating SQLite (dev) migration: $MigrationName"
-} else {
-    $env:ASPNETCORE_ENVIRONMENT = "Production"
-    $migrationsDir = "Migrations-SqlServer"
-    Write-Host "Generating SQL Server (prod) migration: $MigrationName"
-}
+# Use Development environment for migration generation (doesn't matter for SQL Server)
+$env:ASPNETCORE_ENVIRONMENT = "Development"
+Write-Host "Generating SQL Server migration: $MigrationName"
 
-Write-Host "Will create migration in: $(Get-Location)/$migrationsDir"
-if (-not (Test-Path $migrationsDir)) {
-    New-Item -ItemType Directory -Path $migrationsDir | Out-Null
-}
-
-dotnet ef migrations add $MigrationName --output-dir $migrationsDir --project MakerSchedule.Infrastructure --startup-project MakerSchedule.API 
+dotnet ef migrations add $MigrationName --project MakerSchedule.Infrastructure --startup-project MakerSchedule.API 
 
 cd ./scripts/migrations

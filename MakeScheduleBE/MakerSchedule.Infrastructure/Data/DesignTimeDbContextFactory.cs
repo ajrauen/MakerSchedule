@@ -19,14 +19,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
         var connectionString = config.GetConnectionString("DefaultConnection");
 
-        if (env == "Development")
-        {
-            optionsBuilder.UseSqlite(connectionString);
-        }
-        else
-        {
-            optionsBuilder.UseSqlServer(connectionString);
-        }
+        optionsBuilder.UseSqlServer(connectionString);
 
         return new ApplicationDbContext(optionsBuilder.Options);
     }

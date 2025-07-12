@@ -4,13 +4,8 @@ echo Resetting Database and Migrations
 echo ========================================
 
 echo.
-echo Step 1: Deleting current database file...
-if exist "..\MakerSchedule.Infrastructure\makerschedule.db" (
-    del "..\MakerSchedule.Infrastructure\makerschedule.db"
-    echo Database file deleted.
-) else (
-    echo Database file not found, continuing...
-)
+echo Step 1: Skipping database file deletion (using SQL Server)...
+echo Database file deletion not needed for SQL Server.
 
 echo.
 echo Step 2: Deleting existing migrations...

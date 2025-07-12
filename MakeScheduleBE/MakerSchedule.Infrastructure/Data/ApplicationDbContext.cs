@@ -70,21 +70,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
                 .HasForeignKey(oa => oa.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
-
-        // Only for SQLite, set string columns to TEXT
-        if (Database.ProviderName == "Microsoft.EntityFrameworkCore.Sqlite")
-        {
-            foreach (var entity in modelBuilder.Model.GetEntityTypes())
-            {
-                foreach (var property in entity.GetProperties())
-                {
-                    if (property.ClrType == typeof(string) && property.GetMaxLength() == null)
-                    {
-                        property.SetColumnType("TEXT");
-                    }
-                }
-            }
-        }
     }
 
     public DbSet<DomainUser> DomainUsers { get; set; }
