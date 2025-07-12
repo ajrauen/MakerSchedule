@@ -110,10 +110,13 @@ try
     await dbContext.Database.CanConnectAsync();
     app.Logger.LogInformation("Successfully connected to the database.");
 
-    //Apply migration
+    //Apply migration (only in development)
+    if (app.Environment.IsDevelopment())
+    {
         app.Logger.LogInformation("Applying database migrations...");
         await dbContext.Database.MigrateAsync();
         app.Logger.LogInformation("Database migrations completed successfully.");
+    }
     
     // Seed the database (run in all environments for now)
     app.Logger.LogInformation("Seeding database...");
