@@ -1,4 +1,3 @@
-import { CreateEvent } from "@ms/Components/CreateEvent/CreateEvent";
 import { Admin } from "@ms/Pages/Admin/Admin";
 import { Classes } from "@ms/Pages/Classes/Classes";
 import { Home } from "@ms/Pages/Home/Home";
