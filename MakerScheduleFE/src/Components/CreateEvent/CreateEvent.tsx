@@ -5,14 +5,20 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import { Button } from "@mui/material";
 import { createEvent } from "@ms/api/event.api";
-import type { EventOffering } from "@ms/types/event.types";
+import type { CreateEventOffering, EventOffering } from "@ms/types/event.types";
 import { FormDateTime } from "@ms/Components/FormComponents/FormDateTime/FormDateTime";
+import { FormDialog } from "@ms/Components/FormComponents/FormDialog";
+import { ImageUpload } from "@ms/Components/CreateEvent/ImageUpload/ImageUpload";
+import { createSaveForm } from "@ms/Components/CreateEvent/create-event.utils";
 
 const createEventvalidationSchema = z.object({
-  eventName: z.string().min(3),
-  description: z.string().min(3),
+  eventName: z
+    .string()
+    .min(3, { error: "Event name must be at least 3 characters" }),
+  description: z
+    .string()
+    .min(3, { error: "Description must be at least 3 characters" }),
   scheduleStart: z
     .date()
     .optional()
@@ -24,11 +30,12 @@ const createEventvalidationSchema = z.object({
         return true;
       },
       {
-        message: "Date must be in the future",
+        error: "Date must be in the future",
       }
     ),
   leaders: z.any(),
   duration: z.number().optional(),
+  imageFile: z.instanceof(File, { error: "Event Image is required" }),
 });
 
 type CreateEventFormData = z.infer<typeof createEventvalidationSchema>;
@@ -39,7 +46,12 @@ const createEventInitialFormData = {
   leaders: [],
 };
 
-const CreateEvent = () => {
+interface CreateFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const CreateEvent = ({ isOpen, onClose }: CreateFormProps) => {
   const durationOptions = [
     // 15-minute intervals: 15, 30, ..., 120
     ...Array.from({ length: 8 }, (_, i) => {
@@ -58,7 +70,6 @@ const CreateEvent = () => {
         value: minutes * 60 * 1000,
       };
     }),
-    // 30-minute intervals: 150, 180, 210, 240
     ...Array.from({ length: 4 }, (_, i) => {
       const minutes = 120 + (i + 1) * 30;
       const hours = Math.floor(minutes / 60);
@@ -77,10 +88,21 @@ const CreateEvent = () => {
     }),
   ];
 
-  const { getValues, control, handleSubmit } = useForm<CreateEventFormData>({
+  const {
+    getValues,
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm<CreateEventFormData>({
     resolver: zodResolver(createEventvalidationSchema),
     defaultValues: createEventInitialFormData,
   });
+
+  const handleOnClose = () => {
+    reset(createEventInitialFormData);
+    onClose();
+  };
 
   const { data: employeeListData } = useQuery({
     queryKey: ["employeeList"],
@@ -90,56 +112,81 @@ const CreateEvent = () => {
   const { mutate: saveEvent } = useMutation({
     mutationKey: ["createClient"],
     mutationFn: createEvent,
+    onSuccess: handleOnClose,
   });
 
   const handleSave = () => {
-    const { description, eventName, leaders, scheduleStart, duration } =
-      getValues();
+    const {
+      description,
+      eventName,
+      leaders,
+      scheduleStart,
+      duration,
+      imageFile,
+    } = getValues();
     const startDate = scheduleStart?.getTime();
 
-    const eventOffering: EventOffering = {
+    const eventOffering: CreateEventOffering = {
       description,
       eventName,
       leaders: [leaders],
       scheduleStart: startDate,
       duration: duration,
       eventType: 1,
+      imageFile,
     };
-
-    saveEvent(eventOffering);
+    const formEvent = createSaveForm(eventOffering);
+    saveEvent(formEvent);
   };
 
   return (
-    <div>
-      <div>
-        <FormTextField name="eventName" label="Name" control={control} />
-        <FormTextField
-          name="description"
-          label="Description"
-          control={control}
-        />
-        <FormSelect
-          name="leaders"
-          control={control}
-          options={
-            employeeListData?.data?.map((e) => ({
-              label: e.firstName + " " + e.lastName,
-              value: e.id,
-              ...e,
-            })) ?? []
-          }
-        />
-        <FormDateTime control={control} name="scheduleStart" />
-        <FormSelect
-          name="duration"
-          control={control}
-          options={durationOptions}
-        />
+    <FormDialog
+      open={isOpen}
+      onClose={handleOnClose}
+      onSubmit={handleSubmit(handleSave)}
+      maxWidth="lg"
+      title="Create Event"
+    >
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-row gap-3">
+          <div className="flex flex-col gap-3">
+            <FormTextField name="eventName" label="Name" control={control} />
+            <FormTextField
+              name="description"
+              label="Description"
+              control={control}
+            />
+            <FormSelect
+              name="leaders"
+              control={control}
+              label="Leander/s"
+              options={
+                employeeListData?.data?.map((e) => ({
+                  label: e.firstName + " " + e.lastName,
+                  value: e.id,
+                  ...e,
+                })) ?? []
+              }
+            />
+          </div>
+          <div className="flex flex-col gap-3">
+            <FormDateTime control={control} name="scheduleStart" />
+            <FormSelect
+              name="duration"
+              control={control}
+              options={durationOptions}
+            />
+          </div>
+        </div>
+        <div>
+          <ImageUpload
+            control={control}
+            name="imageFile"
+            error={errors.imageFile?.message}
+          />
+        </div>
       </div>
-      <div>
-        <Button onClick={handleSubmit(handleSave)}>Save</Button>
-      </div>
-    </div>
+    </FormDialog>
   );
 };
 

@@ -4,7 +4,7 @@ import type { AxiosRequestConfig } from "axios";
 
 const BASE_EVENT_ENDPOINT = "api/events";
 
-const createEvent = async (event: EventOffering) => {
+const createEvent = async (event: FormData) => {
   const req: AxiosRequestConfig = {
     method: "POST",
     url: `${BASE_EVENT_ENDPOINT}`,
@@ -12,7 +12,6 @@ const createEvent = async (event: EventOffering) => {
     data: event,
   };
   const response = await sendRequest<number>(req);
-  console.log(response.data);
 
   return response;
 };

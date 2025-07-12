@@ -33,7 +33,6 @@ const Classes = () => {
     <div className="flex flex-row gap-4 bg-[#F2F4EF] justify-center w-full min-h-screen">
       <div className="w-1/6">filter</div>
       <div className="flex flex-col gap-4  lg:max-w-[880px] w-full mx-auto lg:p-6">
-        {/* <ClassCard event={dummyEvents[0]} /> */}
         {eventData.map((event, index) => (
           <ClassCard key={index} event={event} />
         ))}

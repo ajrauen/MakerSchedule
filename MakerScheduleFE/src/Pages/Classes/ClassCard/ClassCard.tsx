@@ -42,9 +42,7 @@ const ClassCard = ({ event }: ClassCardProps) => {
             </h3>
             <div className="ml-auto">{getEventIcon(event.eventType)}</div>
           </div>
-          <p className="line-clamp-3 lg:line-clamp-5 md:line-clamp-3 overflow-hidden">
-            {event.description}
-          </p>
+          <p className="line-clamp-3 overflow-hidden">{event.description}</p>
           <p className="flex flex-row mt-auto">
             Price:{" "}
             {event?.price?.toLocaleString("us-US", {

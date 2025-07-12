@@ -19,4 +19,13 @@ interface EventOffering {
   fileUrl?: string;
 }
 
-export { type EventOffering, type EventType, EVENT_TYPES };
+type CreateEventOffering = Omit<EventOffering, "fileUrl"> & {
+  imageFile: File;
+};
+
+export {
+  type EventOffering,
+  type CreateEventOffering,
+  type EventType,
+  EVENT_TYPES,
+};

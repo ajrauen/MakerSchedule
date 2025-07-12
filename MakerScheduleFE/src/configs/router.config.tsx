@@ -1,4 +1,5 @@
 import { CreateEvent } from "@ms/Components/CreateEvent/CreateEvent";
+import { Admin } from "@ms/Pages/Admin/Admin";
 import { Classes } from "@ms/Pages/Classes/Classes";
 import { Home } from "@ms/Pages/Home/Home";
 import {
@@ -38,8 +39,19 @@ const getRouterTree = () => {
     component: Classes,
   });
 
+  const AdminRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/admin",
+    component: Admin,
+  });
+
   // Build the route tree
-  const routeTree = rootRoute.addChildren([homeRoute, aboutRoute, ClassRoute]);
+  const routeTree = rootRoute.addChildren([
+    homeRoute,
+    aboutRoute,
+    ClassRoute,
+    AdminRoute,
+  ]);
 
   // Create the router
   const router = createRouter({

@@ -8,7 +8,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 
 type FormDialogProps = DialogProps & {
   onSubmit: () => void;
-  onClose: () => void;
+  onClose?: () => void;
   title?: string;
   description?: string;
   children: React.ReactNode;
@@ -30,16 +30,19 @@ const FormDialog = ({
 }: FormDialogProps) => {
   return (
     <Dialog open={open} {...props}>
-      <form onSubmit={onSubmit} style={{ margin: 0 }}>
+      <DialogTitle>{title}</DialogTitle>
+      <form onSubmit={onSubmit}>
         {title ? <DialogTitle>{title}</DialogTitle> : null}
-        <DialogContent sx={{ paddingBottom: 0 }}>
+        <DialogContent>
           {description ? (
             <DialogContentText>{description}</DialogContentText>
           ) : null}
           {children}
           <DialogActions>
-            <Button onClick={onClose}>{closeText}</Button>
-            <Button type="submit">{submitText}</Button>
+            {onClose && <Button onClick={onClose}>{closeText}</Button>}
+            <Button variant="contained" type="submit">
+              {submitText}
+            </Button>
           </DialogActions>
         </DialogContent>
       </form>
