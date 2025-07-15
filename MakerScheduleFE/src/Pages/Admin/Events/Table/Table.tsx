@@ -6,16 +6,25 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
-import type { EventOffering } from "@ms/types/event.types";
+import type { EventOffering, EventType } from "@ms/types/event.types";
+import { durationMap } from "@ms/Pages/Admin/Events/utils/event.utils";
 
 interface AdminEventTableProps {
-  events?: EventOffering[];
+  events: EventOffering[];
+  eventTypes: EventType;
+  onEdit: (event: EventOffering) => void;
+  selectedEvent?: EventOffering;
 }
 
-const AdminEventsTable = ({ events = [] }: AdminEventTableProps) => {
+const AdminEventsTable = ({
+  eventTypes,
+  onEdit,
+  selectedEvent,
+  events = [],
+}: AdminEventTableProps) => {
   return (
     <TableContainer component={Paper}>
-      <Table>
+      <Table stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
             <TableCell>Event Name</TableCell>
@@ -28,7 +37,14 @@ const AdminEventsTable = ({ events = [] }: AdminEventTableProps) => {
         </TableHead>
         <TableBody>
           {events.map((row, idx) => (
-            <TableRow key={idx}>
+            <TableRow
+              key={idx}
+              hover
+              selected={selectedEvent?.id == row.id}
+              onClick={() => {
+                onEdit(row);
+              }}
+            >
               <TableCell>{row.eventName}</TableCell>
               <TableCell className="w-2/5">
                 <div
@@ -38,8 +54,8 @@ const AdminEventsTable = ({ events = [] }: AdminEventTableProps) => {
                   {row.description}
                 </div>
               </TableCell>
-              <TableCell>{row.eventType}</TableCell>
-              <TableCell>{row.duration}</TableCell>
+              <TableCell>{eventTypes[row.eventType]}</TableCell>
+              <TableCell>{row.duration && durationMap[row.duration]}</TableCell>
               <TableCell>
                 <img
                   src={
@@ -53,9 +69,6 @@ const AdminEventsTable = ({ events = [] }: AdminEventTableProps) => {
                 />
               </TableCell>
               <TableCell>
-                <Button variant="contained" color="primary" size="small">
-                  Edit
-                </Button>
                 <Button
                   variant="outlined"
                   color="secondary"

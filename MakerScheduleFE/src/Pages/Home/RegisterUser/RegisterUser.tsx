@@ -7,13 +7,13 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { FormDialog } from "@ms/Components/FormComponents/FormDialog";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import type { RegisterCustomerRequest } from "@ms/types/customer.types";
-import { registerNewCustomerUser } from "@ms/api/customer.api";
+import type { RegisterDomainUserRequest } from "@ms/types/domain-user.types";
 import { login } from "@ms/api/authentication.api";
 import type { AxiosError } from "axios";
 import type { RequestError } from "@ms/types/request-error.types";
+import { registerNewDomainUser } from "@ms/api/domain-user.api";
 
-const registerInitialFormData: RegisterCustomerRequest = {
+const registerInitialFormData: RegisterDomainUserRequest = {
   email: "",
   password: "",
   firstName: "",
@@ -21,7 +21,6 @@ const registerInitialFormData: RegisterCustomerRequest = {
   phoneNumber: "",
   address: "",
   preferredContactMethod: "Phone",
-  notes: "",
 };
 
 const registerValidationSchema = z.object({
@@ -42,14 +41,13 @@ const registerValidationSchema = z.object({
   preferredContactMethod: z.enum(["Phone", "Email"], {
     message: "Preferred contact method is required",
   }),
-  notes: z.string().optional(),
 });
 
 const RegisterUser = () => {
   const [isRegisterFormOpen, setIsRegisterFormOpen] = useState(false);
   const [errorCode, setErrorCode] = useState<string | undefined>();
 
-  const { control, handleSubmit, reset } = useForm<RegisterCustomerRequest>({
+  const { control, handleSubmit, reset } = useForm<RegisterDomainUserRequest>({
     resolver: zodResolver(registerValidationSchema),
     defaultValues: registerInitialFormData,
   });
@@ -67,7 +65,7 @@ const RegisterUser = () => {
 
   const { mutate: doRegister } = useMutation({
     mutationKey: ["registerUser"],
-    mutationFn: registerNewCustomerUser,
+    mutationFn: registerNewDomainUser,
     onSuccess: (_, variables) => {
       doLogin({
         creds: { email: variables.email, password: variables.password },
@@ -78,7 +76,7 @@ const RegisterUser = () => {
     },
   });
 
-  const submit = (data: RegisterCustomerRequest) => {
+  const submit = (data: RegisterDomainUserRequest) => {
     doRegister(data);
     reset(undefined, { keepValues: true });
   };
@@ -130,7 +128,6 @@ const RegisterUser = () => {
               { label: "Email", value: "Email" },
             ]}
           />
-          <FormTextField label="Notes" control={control} name="notes" />
 
           {errorCode && (
             <FormHelperText error={true}>{errorCode}</FormHelperText>

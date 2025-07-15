@@ -15,7 +15,6 @@ const useHasAccessToken = () => {
     // Listen for changes in other tabs
     const onStorage = (e: StorageEvent) => {
       if (e.key === "accessToken") {
-        console.log("asdf");
         setHasAccessToken(getHasAccessToken());
       }
     };

@@ -21,3 +21,7 @@ h1 {
   letter-spacing: -1px;
   line-height: 1.1;
 }
+
+:root {
+  --create-drawer-width: 600px;
+}

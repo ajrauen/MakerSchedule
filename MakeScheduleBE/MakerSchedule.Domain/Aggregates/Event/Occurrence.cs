@@ -2,6 +2,8 @@ namespace MakerSchedule.Domain.Aggregates.Event;
 
 using System.ComponentModel.DataAnnotations;
 
+using MakerSchedule.Domain.ValueObjects;
+
 public class Occurrence
 {
     [Key]
@@ -9,7 +11,7 @@ public class Occurrence
     [Required]
     public int EventId { get; set; }
     public Event Event { get; set; } = null!;
-    public DateTime ScheduleStart { get; set; }
+    public ScheduleStart? ScheduleStart { get; set; }
     public int? Duration { get; set; }
 
     // Navigation properties for many-to-many relationships
@@ -21,7 +23,7 @@ public class Occurrence
     public Occurrence(int eventId, OccurrenceInfo info)
     {
         EventId = eventId;
-        ScheduleStart = info.ScheduleStart;
+        ScheduleStart = new ScheduleStart(info.ScheduleStart);
         Duration = info.Duration;
         // Note: Attendees and Leaders will be managed through the join entities
     }

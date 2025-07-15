@@ -1,7 +1,7 @@
-export default async function getCroppedImg(
+const getCroppedImg = async (
   imageSrc: string,
   crop: { x: number; y: number; width: number; height: number }
-) {
+) => {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -32,9 +32,9 @@ export default async function getCroppedImg(
       }
     }, "image/jpeg");
   });
-}
+};
 
-function createImage(url: string): Promise<HTMLImageElement> {
+const createImage = (url: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
     const image = new window.Image();
     image.addEventListener("load", () => resolve(image));
@@ -42,4 +42,6 @@ function createImage(url: string): Promise<HTMLImageElement> {
     image.setAttribute("crossOrigin", "anonymous");
     image.src = url;
   });
-}
+};
+
+export { getCroppedImg };

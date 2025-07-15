@@ -32,8 +32,9 @@ const FormSelect = <T extends FieldValues, C>({
           id="outlined-select-currency"
           select
           label="Select"
-          {...props}
           {...field}
+          {...props}
+          value={field.value === undefined ? "" : field.value}
           error={!!fieldState.error}
           helperText={fieldState.error?.message}
         >

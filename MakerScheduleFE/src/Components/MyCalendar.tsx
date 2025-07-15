@@ -63,8 +63,6 @@ export default function MyCalendar() {
     }
   }, [eventResponse]);
 
-  console.log(eventResponse);
-
   return (
     <>
       <Calendar

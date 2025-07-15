@@ -1,26 +1,16 @@
-import { CreateEvent } from "@ms/Components/CreateEvent/CreateEvent";
 import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
-import { useState } from "react";
 
-const EventsHeader = () => {
-  const [isCreateEventFormOpen, setIsCreateEventFormOpen] = useState(false);
+interface EventsHeaderProps {
+  onOpenDrawer: () => void;
+}
 
-  const handleCloseCraeteEventForm = () => setIsCreateEventFormOpen(false);
-
+const EventsHeader = ({ onOpenDrawer }: EventsHeaderProps) => {
   return (
     <div>
-      <Button
-        onClick={() => setIsCreateEventFormOpen(true)}
-        startIcon={<AddIcon />}
-        variant="text"
-      >
+      <Button onClick={onOpenDrawer} startIcon={<AddIcon />} variant="text">
         Create Event
       </Button>
-      <CreateEvent
-        isOpen={isCreateEventFormOpen}
-        onClose={handleCloseCraeteEventForm}
-      />
     </div>
   );
 };

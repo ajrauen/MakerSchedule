@@ -10,6 +10,7 @@ using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Aggregates.User;
+using MakerSchedule.Domain.ValueObjects;
 
 public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string>, IApplicationDbContext
 {
@@ -29,13 +30,26 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
         modelBuilder.Entity<Event>(entity =>
         {
             entity.Property(e => e.EventType).IsRequired();
+            
+       
+            // Configure Duration value object to be stored as int
+            entity.Property(e => e.Duration)
+                .HasConversion(Duration.Converter)
+                .HasColumnType("int");
+            
+            // Configure EventName value object to be stored as string
+            entity.Property(e => e.EventName)
+                .HasConversion(
+                    eventName => eventName.ToString(),
+                    value => new EventName(value))
+                .HasColumnType("nvarchar(max)");
         });
 
         // Configure Occurrence entity
         modelBuilder.Entity<Occurrence>(entity =>
         {
-            // Ensure ScheduleStart is properly configured for SQL Server
-            entity.Property(e => e.ScheduleStart)
+             entity.Property(e => e.ScheduleStart)
+                .HasConversion(ScheduleStart.Converter)
                 .HasColumnType("datetime2");
         });
 

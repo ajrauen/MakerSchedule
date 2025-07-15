@@ -6,8 +6,6 @@ interface CalendarEventProps {
 }
 
 const CalendarEvent = ({ event, title }: CalendarEventProps) => {
-  console.log(event, title);
-
   return (
     <div
       style={{

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakerSchedule.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250712203004_initial")]
+    [Migration("20250713053511_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -61,7 +61,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Duration")
+                    b.Property<int?>("Duration")
                         .HasColumnType("int");
 
                     b.Property<string>("EventName")
@@ -135,7 +135,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.Property<int>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ScheduleStart")
+                    b.Property<DateTime?>("ScheduleStart")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -150,189 +150,189 @@ namespace MakerSchedule.Infrastructure.Migrations
                             Id = 1,
                             Duration = 90,
                             EventId = 1,
-                            ScheduleStart = new DateTime(2025, 7, 24, 23, 30, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 25, 8, 35, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 2,
                             Duration = 105,
                             EventId = 1,
-                            ScheduleStart = new DateTime(2025, 7, 28, 2, 48, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 28, 11, 53, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 3,
                             Duration = 120,
                             EventId = 1,
-                            ScheduleStart = new DateTime(2025, 8, 28, 0, 40, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 28, 9, 45, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 4,
                             Duration = 90,
                             EventId = 1,
-                            ScheduleStart = new DateTime(2025, 8, 3, 2, 40, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 3, 11, 45, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 5,
                             Duration = 60,
                             EventId = 1,
-                            ScheduleStart = new DateTime(2025, 8, 10, 5, 38, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 10, 14, 43, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 6,
                             Duration = 120,
                             EventId = 1,
-                            ScheduleStart = new DateTime(2025, 8, 27, 21, 20, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 28, 6, 25, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 7,
                             Duration = 30,
                             EventId = 2,
-                            ScheduleStart = new DateTime(2025, 8, 17, 0, 9, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 17, 9, 14, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 8,
                             Duration = 90,
                             EventId = 2,
-                            ScheduleStart = new DateTime(2025, 9, 14, 16, 5, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 9, 15, 1, 10, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 9,
                             Duration = 45,
                             EventId = 2,
-                            ScheduleStart = new DateTime(2025, 7, 16, 13, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 16, 22, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 10,
                             Duration = 90,
                             EventId = 2,
-                            ScheduleStart = new DateTime(2025, 10, 2, 13, 7, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 10, 2, 22, 12, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 11,
                             Duration = 60,
                             EventId = 2,
-                            ScheduleStart = new DateTime(2025, 7, 28, 21, 29, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 29, 6, 34, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 12,
                             Duration = 90,
                             EventId = 3,
-                            ScheduleStart = new DateTime(2025, 9, 23, 20, 35, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 9, 24, 5, 40, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 13,
                             Duration = 75,
                             EventId = 3,
-                            ScheduleStart = new DateTime(2025, 9, 23, 14, 27, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 9, 23, 23, 32, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 14,
                             Duration = 30,
                             EventId = 3,
-                            ScheduleStart = new DateTime(2025, 7, 25, 21, 7, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 26, 6, 12, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 15,
                             Duration = 30,
                             EventId = 3,
-                            ScheduleStart = new DateTime(2025, 9, 21, 11, 32, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 9, 21, 20, 37, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 16,
                             Duration = 60,
                             EventId = 3,
-                            ScheduleStart = new DateTime(2025, 8, 4, 15, 2, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 5, 0, 7, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 17,
                             Duration = 90,
                             EventId = 4,
-                            ScheduleStart = new DateTime(2025, 7, 24, 21, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 25, 6, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 18,
                             Duration = 75,
                             EventId = 4,
-                            ScheduleStart = new DateTime(2025, 8, 27, 21, 43, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 28, 6, 48, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 19,
                             Duration = 45,
                             EventId = 4,
-                            ScheduleStart = new DateTime(2025, 9, 14, 11, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 9, 14, 20, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 20,
                             Duration = 60,
                             EventId = 4,
-                            ScheduleStart = new DateTime(2025, 7, 14, 5, 15, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 14, 14, 20, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 21,
                             Duration = 30,
                             EventId = 4,
-                            ScheduleStart = new DateTime(2025, 7, 19, 13, 44, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 19, 22, 49, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 22,
                             Duration = 120,
                             EventId = 4,
-                            ScheduleStart = new DateTime(2025, 8, 22, 20, 47, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 23, 5, 52, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 23,
                             Duration = 30,
                             EventId = 5,
-                            ScheduleStart = new DateTime(2025, 8, 28, 8, 29, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 28, 17, 34, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 24,
                             Duration = 30,
                             EventId = 5,
-                            ScheduleStart = new DateTime(2025, 9, 24, 20, 48, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 9, 25, 5, 53, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 25,
                             Duration = 30,
                             EventId = 5,
-                            ScheduleStart = new DateTime(2025, 7, 18, 12, 11, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 7, 18, 21, 16, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 26,
                             Duration = 75,
                             EventId = 5,
-                            ScheduleStart = new DateTime(2025, 10, 3, 18, 47, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 10, 4, 3, 52, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         },
                         new
                         {
                             Id = 27,
                             Duration = 30,
                             EventId = 5,
-                            ScheduleStart = new DateTime(2025, 8, 15, 11, 17, 4, 398, DateTimeKind.Utc).AddTicks(7056)
+                            ScheduleStart = new DateTime(2025, 8, 15, 20, 22, 11, 478, DateTimeKind.Utc).AddTicks(4452)
                         });
                 });
 

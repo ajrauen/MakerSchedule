@@ -69,7 +69,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                     EventName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     EventType = table.Column<int>(type: "int", nullable: false),
-                    Duration = table.Column<int>(type: "int", nullable: false),
+                    Duration = table.Column<int>(type: "int", nullable: true),
                     FileUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -210,7 +210,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     EventId = table.Column<int>(type: "int", nullable: false),
-                    ScheduleStart = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ScheduleStart = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Duration = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -299,33 +299,33 @@ namespace MakerSchedule.Infrastructure.Migrations
                 columns: new[] { "Id", "Duration", "EventId", "ScheduleStart" },
                 values: new object[,]
                 {
-                    { 1, 90, 1, new DateTime(2025, 7, 24, 23, 30, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 2, 105, 1, new DateTime(2025, 7, 28, 2, 48, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 3, 120, 1, new DateTime(2025, 8, 28, 0, 40, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 4, 90, 1, new DateTime(2025, 8, 3, 2, 40, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 5, 60, 1, new DateTime(2025, 8, 10, 5, 38, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 6, 120, 1, new DateTime(2025, 8, 27, 21, 20, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 7, 30, 2, new DateTime(2025, 8, 17, 0, 9, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 8, 90, 2, new DateTime(2025, 9, 14, 16, 5, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 9, 45, 2, new DateTime(2025, 7, 16, 13, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 10, 90, 2, new DateTime(2025, 10, 2, 13, 7, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 11, 60, 2, new DateTime(2025, 7, 28, 21, 29, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 12, 90, 3, new DateTime(2025, 9, 23, 20, 35, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 13, 75, 3, new DateTime(2025, 9, 23, 14, 27, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 14, 30, 3, new DateTime(2025, 7, 25, 21, 7, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 15, 30, 3, new DateTime(2025, 9, 21, 11, 32, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 16, 60, 3, new DateTime(2025, 8, 4, 15, 2, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 17, 90, 4, new DateTime(2025, 7, 24, 21, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 18, 75, 4, new DateTime(2025, 8, 27, 21, 43, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 19, 45, 4, new DateTime(2025, 9, 14, 11, 34, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 20, 60, 4, new DateTime(2025, 7, 14, 5, 15, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 21, 30, 4, new DateTime(2025, 7, 19, 13, 44, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 22, 120, 4, new DateTime(2025, 8, 22, 20, 47, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 23, 30, 5, new DateTime(2025, 8, 28, 8, 29, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 24, 30, 5, new DateTime(2025, 9, 24, 20, 48, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 25, 30, 5, new DateTime(2025, 7, 18, 12, 11, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 26, 75, 5, new DateTime(2025, 10, 3, 18, 47, 4, 398, DateTimeKind.Utc).AddTicks(7056) },
-                    { 27, 30, 5, new DateTime(2025, 8, 15, 11, 17, 4, 398, DateTimeKind.Utc).AddTicks(7056) }
+                    { 1, 90, 1, new DateTime(2025, 7, 25, 8, 35, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 2, 105, 1, new DateTime(2025, 7, 28, 11, 53, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 3, 120, 1, new DateTime(2025, 8, 28, 9, 45, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 4, 90, 1, new DateTime(2025, 8, 3, 11, 45, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 5, 60, 1, new DateTime(2025, 8, 10, 14, 43, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 6, 120, 1, new DateTime(2025, 8, 28, 6, 25, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 7, 30, 2, new DateTime(2025, 8, 17, 9, 14, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 8, 90, 2, new DateTime(2025, 9, 15, 1, 10, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 9, 45, 2, new DateTime(2025, 7, 16, 22, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 10, 90, 2, new DateTime(2025, 10, 2, 22, 12, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 11, 60, 2, new DateTime(2025, 7, 29, 6, 34, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 12, 90, 3, new DateTime(2025, 9, 24, 5, 40, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 13, 75, 3, new DateTime(2025, 9, 23, 23, 32, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 14, 30, 3, new DateTime(2025, 7, 26, 6, 12, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 15, 30, 3, new DateTime(2025, 9, 21, 20, 37, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 16, 60, 3, new DateTime(2025, 8, 5, 0, 7, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 17, 90, 4, new DateTime(2025, 7, 25, 6, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 18, 75, 4, new DateTime(2025, 8, 28, 6, 48, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 19, 45, 4, new DateTime(2025, 9, 14, 20, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 20, 60, 4, new DateTime(2025, 7, 14, 14, 20, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 21, 30, 4, new DateTime(2025, 7, 19, 22, 49, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 22, 120, 4, new DateTime(2025, 8, 23, 5, 52, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 23, 30, 5, new DateTime(2025, 8, 28, 17, 34, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 24, 30, 5, new DateTime(2025, 9, 25, 5, 53, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 25, 30, 5, new DateTime(2025, 7, 18, 21, 16, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 26, 75, 5, new DateTime(2025, 10, 4, 3, 52, 11, 478, DateTimeKind.Utc).AddTicks(4452) },
+                    { 27, 30, 5, new DateTime(2025, 8, 15, 20, 22, 11, 478, DateTimeKind.Utc).AddTicks(4452) }
                 });
 
             migrationBuilder.CreateIndex(

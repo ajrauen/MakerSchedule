@@ -1,9 +1,9 @@
 namespace MakerSchedule.Domain.Aggregates.Event;
 
 using MakerSchedule.Domain.Enums;
-using System.Collections.ObjectModel;
-using MakerSchedule.Domain.Aggregates.Event;
+
 using System.ComponentModel.DataAnnotations;
+using MakerSchedule.Domain.ValueObjects;
 
 /// <summary>
 /// Aggregate root for the Event aggregate.
@@ -12,12 +12,11 @@ public class Event
 {
     [Key]
     public int Id { get; set; }
-    [Required]
-    public required string EventName { get; set; }
+    public EventName EventName { get; set; } = null!;
     [Required]
     public required string Description { get; set; }
     public EventTypeEnum EventType { get; set; }
-    public int Duration { get; set; }
+    public Duration? Duration { get; set; }
     private readonly List<Occurrence> _occurrences = new();
     public IReadOnlyCollection<Occurrence> Occurrences => _occurrences.AsReadOnly();
     public string? FileUrl { get; set; }

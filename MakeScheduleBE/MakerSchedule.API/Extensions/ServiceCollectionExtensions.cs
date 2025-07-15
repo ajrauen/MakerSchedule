@@ -3,7 +3,6 @@ using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Services;
 using MakerSchedule.Infrastructure.Data;
 using MakerSchedule.Infrastructure.Services.Storage;
-using AutoMapper;
 
 public static class MakerScheduleExtensions
 {
@@ -17,6 +16,8 @@ public static class MakerScheduleExtensions
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IOccurrenceService, OccurrenceService>();
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+        services.AddScoped<IMetadataService, MetadataService>();
+
         services.AddScoped<IImageStorageService>(serviceProvider =>
         {
             var env = serviceProvider.GetService<IWebHostEnvironment>();

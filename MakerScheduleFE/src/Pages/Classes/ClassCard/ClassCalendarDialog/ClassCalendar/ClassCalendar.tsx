@@ -23,8 +23,6 @@ export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
     return d;
   }, [event]);
 
-  console.log(eventDate);
-
   const [selectedDate, setSelectedDate] = useState<Date | null>(
     eventDate ?? null
   );

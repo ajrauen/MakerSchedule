@@ -2,8 +2,8 @@ import { RouterProvider } from "@tanstack/react-router";
 
 import "./App.css";
 import { getRouterTree } from "@ms/configs/router.config";
-import { useAppBootStrap } from "@ms/hooks/useAppBootStrap";
-import { createTheme, ThemeProvider } from "@mui/material";
+import { CircularProgress, createTheme, ThemeProvider } from "@mui/material";
+import { useApplicationData } from "@ms/hooks/useApplicationData";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -34,11 +34,17 @@ const App = () => {
     },
   });
 
-  useAppBootStrap();
+  const { isLoading } = useApplicationData();
 
   return (
     <ThemeProvider theme={theme}>
-      <RouterProvider router={getRouterTree()} />
+      {isLoading ? (
+        <div className="flex">
+          <CircularProgress size={"6rem"} className="mx-auto mt-[20%]" />
+        </div>
+      ) : (
+        <RouterProvider router={getRouterTree()} />
+      )}
     </ThemeProvider>
   );
 };

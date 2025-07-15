@@ -23,7 +23,6 @@ const getEvents = async () => {
     withCredentials: true,
   };
   const response = await sendRequest<EventOffering[]>(req);
-  console.log(response.data);
 
   return response;
 };
@@ -35,7 +34,6 @@ const getEvent = async (eventId: string) => {
     withCredentials: true,
   };
   const response = await sendRequest<EventOffering>(req);
-  console.log(response.data);
 
   return response;
 };

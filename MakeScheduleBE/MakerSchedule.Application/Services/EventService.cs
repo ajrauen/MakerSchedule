@@ -5,6 +5,7 @@ using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Utilties.ImageUtilities;
+using MakerSchedule.Domain.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return await _context.Events.Select(e => new EventListDTO
         {
             Id = e.Id,
-            EventName = e.EventName,
+            EventName = e.EventName.ToString(),
             Description = e.Description,
             EventType = e.EventType,
             Duration = e.Duration,
@@ -40,7 +41,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return new EventDTO
         {
             Id = e.Id,
-            EventName = e.EventName,
+            EventName = e.EventName.ToString(),
             Description = e.Description,
             EventType = e.EventType,
             Duration = e.Duration,
@@ -58,10 +59,10 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
         var e = new Event
         {
-            EventName = dto.EventName,
+            EventName = new EventName(dto.EventName),
             Description = dto.Description,
             EventType = dto.EventType,
-            Duration = dto.Duration,
+            Duration = dto.Duration > 0 ? new Duration(dto.Duration) : null,
             
         };
         _context.Events.Add(e);

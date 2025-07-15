@@ -1,9 +1,9 @@
 import type { EventOffering } from "@ms/types/event.types";
 import { Button, Paper } from "@mui/material";
 import { Construction, Circle, ContentCut } from "@mui/icons-material";
-import { EVENT_TYPES } from "@ms/types/event.types";
 import { ClassCalendarDialog } from "@ms/Pages/Classes/ClassCard/ClassCalendarDialog/ClassCalendarDialog";
 import { useState } from "react";
+import { useApplicationData } from "@ms/hooks/useApplicationData";
 
 interface ClassCardProps {
   event: EventOffering;
@@ -11,21 +11,20 @@ interface ClassCardProps {
 
 const ClassCard = ({ event }: ClassCardProps) => {
   const [isScheduleCardOpen, setIsScheduleCardOpen] = useState(false);
+  const { appMetaData } = useApplicationData();
 
   const getEventIcon = (eventType: number) => {
     switch (eventType) {
-      case EVENT_TYPES.WOODWORKING:
-        return <Construction sx={{ fontSize: 32, color: "#8B4513" }} />;
-      case EVENT_TYPES.POTTERY:
-        return <Circle sx={{ fontSize: 32, color: "#D2691E" }} />;
-      case EVENT_TYPES.SEWING:
-        return <ContentCut sx={{ fontSize: 32, color: "#FF69B4" }} />;
+      // case EVENT_TYPES.WOODWORKING:
+      //   return <Construction sx={{ fontSize: 32, color: "#8B4513" }} />;
+      // case EVENT_TYPES.POTTERY:
+      //   return <Circle sx={{ fontSize: 32, color: "#D2691E" }} />;
+      // case EVENT_TYPES.SEWING:
+      //   return <ContentCut sx={{ fontSize: 32, color: "#FF69B4" }} />;
       default:
         return <Construction sx={{ fontSize: 32, color: "#666" }} />;
     }
   };
-
-  console.log(event);
 
   return (
     <Paper className="w-full " elevation={3}>
