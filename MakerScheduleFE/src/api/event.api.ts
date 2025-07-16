@@ -11,9 +11,8 @@ const createEvent = async (event: FormData) => {
     withCredentials: true,
     data: event,
   };
-  const response = await sendRequest<number>(req);
 
-  return response;
+  return await sendRequest<number>(req);
 };
 
 const getEvents = async () => {
@@ -22,20 +21,18 @@ const getEvents = async () => {
     url: `${BASE_EVENT_ENDPOINT}`,
     withCredentials: true,
   };
-  const response = await sendRequest<EventOffering[]>(req);
 
-  return response;
+  return await sendRequest<EventOffering[]>(req);
 };
 
-const getEvent = async (eventId: string) => {
+const getEvent = async (eventId: number) => {
   const req: AxiosRequestConfig = {
     method: "GET",
     url: `${BASE_EVENT_ENDPOINT}/${eventId}`,
     withCredentials: true,
   };
-  const response = await sendRequest<EventOffering>(req);
 
-  return response;
+  return await sendRequest<EventOffering>(req);
 };
 
 export { createEvent, getEvents, getEvent };

@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+
+using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Domain.Enums;
 
 namespace MakerSchedule.Application.DTO.Event;
@@ -17,4 +19,8 @@ public class EventDTO
 
     public int? Duration { get; set; }
     public string? FileUrl { get; set; }
-}
+    public IEnumerable<OccurenceDTO> Occurences { get; set; } = new List<OccurenceDTO>();
+
+} 
+
+

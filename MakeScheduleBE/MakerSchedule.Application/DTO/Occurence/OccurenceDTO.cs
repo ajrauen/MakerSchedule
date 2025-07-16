@@ -1,7 +1,7 @@
 
 using MakerSchedule.Application.DTO.Event;
 
-namespace MakerSchedule.Application.DTO.Occurence;
+namespace MakerSchedule.Application.DTO.Occurrence;
 
 public class OccurenceDTO
 {

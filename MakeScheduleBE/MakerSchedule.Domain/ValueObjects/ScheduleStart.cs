@@ -1,3 +1,5 @@
+using MakerSchedule.Domain.Exceptions;
+
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace MakerSchedule.Domain.ValueObjects;
@@ -10,7 +12,7 @@ public record ScheduleStart
     {
         if (date <= DateTime.UtcNow)
         {
-            throw new ArgumentException("Schedule start must be in the future");
+            throw new ScheduleDateOutOfBoundsException("Schedule start must be in the future");
         }
         Value = date;
     }

@@ -1,6 +1,7 @@
 using System.ComponentModel.Design;
 
 using MakerSchedule.Application.DTO.Event;
+using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.Event;
@@ -23,6 +24,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
     public async Task<IEnumerable<EventListDTO>> GetAllEventsAsync()
     {
+
         return await _context.Events.Select(e => new EventListDTO
         {
             Id = e.Id,
@@ -36,7 +38,13 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
     public async Task<EventDTO> GetEventAsync(int id)
     {
-        var e = await _context.Events.FindAsync(id);
+        var e = await _context.Events
+        .Include(ev => ev.Occurrences)
+            .ThenInclude(ev => ev.Attendees)
+        .Include(ev => ev.Occurrences)
+            .ThenInclude(ev => ev.Leaders)
+        .FirstOrDefaultAsync(ev => ev.Id == id);
+        
         if (e == null) throw new NotFoundException("Event", id);
         return new EventDTO
         {
@@ -46,6 +54,14 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             EventType = e.EventType,
             Duration = e.Duration,
             FileUrl = e.FileUrl,
+            Occurences = e.Occurrences.Select(o => new OccurenceDTO
+            {
+                Id = o.Id,
+                Attendees = o.Attendees.Select(a => a.Id).ToList(),
+                Duration = o.Duration,
+                EventId = o.EventId,
+                Leaders = o.Leaders.Select(a => a.Id).ToList(),
+            })
         };
     }
 

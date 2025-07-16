@@ -17,6 +17,5 @@ public class OccurrenceAttendee
     // Optional metadata
     public DateTime RegisteredAt { get; set; } = DateTime.UtcNow;
     public bool Attended { get; set; } = false;
-    public DateTime? CheckedInAt { get; set; }
-    public DateTime? CheckedOutAt { get; set; }
+
 } 

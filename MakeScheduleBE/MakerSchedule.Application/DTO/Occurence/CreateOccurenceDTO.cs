@@ -1,5 +1,5 @@
 
-namespace MakerSchedule.Application.DTO.Occurence;
+namespace MakerSchedule.Application.DTO.Occurrence;
 
 public class CreateOccurenceDTO
 {

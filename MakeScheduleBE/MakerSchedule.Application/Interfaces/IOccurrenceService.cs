@@ -1,4 +1,4 @@
-using MakerSchedule.Application.DTO.Occurence;
+using MakerSchedule.Application.DTO.Occurrence;
 
 namespace MakerSchedule.Application.Interfaces;
 

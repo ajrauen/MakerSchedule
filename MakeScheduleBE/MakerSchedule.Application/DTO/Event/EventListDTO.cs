@@ -9,5 +9,5 @@ public class EventListDTO
     public string Description { get; set; } = "";
     public EventTypeEnum EventType { get; set; }
     public int? Duration { get; set; }
-    public  string? FileUrl { get; set; }
+    public string? FileUrl { get; set; }
 }

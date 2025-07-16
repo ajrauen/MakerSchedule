@@ -1,3 +1,5 @@
+import type { Occurrence } from "@ms/types/Occurrence.types";
+
 type EventType = Record<number, string>;
 
 interface EventOffering {
@@ -11,9 +13,13 @@ interface EventOffering {
   price?: number;
   eventType: number;
   fileUrl?: string;
+  occurences?: Occurrence[];
 }
 
-type CreateEventOffering = Omit<EventOffering, "id" | "fileUrl"> & {
+type CreateEventOffering = Omit<
+  EventOffering,
+  "id" | "fileUrl | occurences"
+> & {
   imageFile: File;
 };
 

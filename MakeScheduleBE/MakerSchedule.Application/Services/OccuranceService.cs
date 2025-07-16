@@ -1,7 +1,8 @@
-using MakerSchedule.Application.DTO.Occurence;
+using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.Event;
+using MakerSchedule.Domain.Exceptions;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -52,10 +53,20 @@ public class OccurrenceService(IApplicationDbContext context, ILogger<Occurrence
         if (eventEntity == null)
             throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
 
-        var info = new OccurrenceInfo(scheduledStart, occurrenceDTO.Duration);
-        var newOccurrence = eventEntity.AddOccurrence(info);
+        OccurrenceInfo info;
+        Occurrence newOccurrence;
+        try
+        {
+            info = new OccurrenceInfo(scheduledStart, occurrenceDTO.Duration);
+             newOccurrence = eventEntity.AddOccurrence(info);
+        }
+        catch (ScheduleDateOutOfBoundsException ex)
+        {
+            _logger.LogError("Exception type: {Type}, message: {Message}", ex.GetType().FullName, ex.Message);
+            throw new BaseException(ex.Message, "SCHEDULE_START_INVALID", 400);
+        }
+        
 
-        // Create join entities for leaders
         foreach (var leaderId in occurrenceDTO.Leaders)
         {
             var leader = await _dbContext.DomainUsers.FindAsync(leaderId);
@@ -71,7 +82,6 @@ public class OccurrenceService(IApplicationDbContext context, ILogger<Occurrence
             }
         }
 
-        // Create join entities for attendees
         foreach (var attendeeId in occurrenceDTO.Attendees)
         {
             var attendee = await _dbContext.DomainUsers.FindAsync(attendeeId);

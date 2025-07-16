@@ -67,8 +67,7 @@ const AdminEvents = () => {
         }}
         onTransitionEnd={handlePanelTransitionEnd}
       >
-        {/* Place CreateEvent form here */}
-        <div className="p-6">
+        <div className="p-6 h-full">
           <EventDetails
             onClose={handleDrawerClose}
             selectedEvent={selectedEvent}
