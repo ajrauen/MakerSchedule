@@ -5,7 +5,7 @@ import type { AxiosRequestConfig } from "axios";
 
 const BASE_Occurence_ENDPOINT = "api/ccurrences";
 
-const createOccurence = async (event: FormData) => {
+const createOccurrence = async (event: FormData) => {
   const req: AxiosRequestConfig = {
     method: "POST",
     url: `${BASE_Occurence_ENDPOINT}`,
@@ -36,4 +36,4 @@ const getOccurence = async (occurrenceId: number) => {
   return await sendRequest<Occurrence>(req);
 };
 
-export { createOccurence, getOccurences, getOccurence };
+export { createOccurrence, getOccurences, getOccurence };

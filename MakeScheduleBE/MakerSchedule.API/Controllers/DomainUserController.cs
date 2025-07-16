@@ -21,21 +21,21 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<DomainUserDTO>> GetById(int id)
+    public async Task<ActionResult<DomainUserDTO>> GetById(string id)
     {
         var user = await domainUserService.GetDomainUserByIdAsync(id);
         return Ok(user);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteDomainUserByIdAsync(int id)
+    public async Task<IActionResult> DeleteDomainUserByIdAsync(string id)
     {
         await domainUserService.DeleteDomainUserByIdAsync(id);
         return NoContent();
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateDomainUserProfile(int id, [FromBody] UpdateUserProfileDTO dto)
+    public async Task<IActionResult> UpdateDomainUserProfile(string id, [FromBody] UpdateUserProfileDTO dto)
     {
         var success = await domainUserProfileService.UpdateUserProfileAsync(id, dto);
         if (success)
@@ -49,7 +49,7 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     public async Task<IActionResult> CreateDomainUserProfile([FromBody] CreateDomainUserDTO domainUserDTO)
     {
         var newUserId = await domainUserProfileService.CreateDomainUserAsync(domainUserDTO);
-        if (newUserId > 0)
+        if (!string.IsNullOrEmpty(newUserId))
         {
             return CreatedAtAction(nameof(GetById), new { id = newUserId }, new { id = newUserId });
         }

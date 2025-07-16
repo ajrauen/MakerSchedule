@@ -1,4 +1,4 @@
-import type { Occurrence } from "@ms/types/Occurrence.types";
+import type { Occurrence } from "@ms/types/occurrence.types";
 
 type EventType = Record<number, string>;
 

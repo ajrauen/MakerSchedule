@@ -1,7 +1,7 @@
 import { OccurencesList } from "@ms/Pages/Admin/Events/EventDetails/EventOccurences/OccurencesList/OccurencesList";
 import { OccurenceDetails } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceDetails/OccurenceDetails";
 import type { EventOffering } from "@ms/types/event.types";
-import type { Occurrence } from "@ms/types/occurrence.types";
+import type { CreateOccurrence, Occurrence } from "@ms/types/occurrence.types";
 import { useState } from "react";
 
 const mockOccurences: Occurrence[] = [
@@ -114,13 +114,33 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
   const [selectedOccurrence, setSelectedOccurrence] = useState<
     Occurrence | undefined
   >();
+
   const [animating, setAnimating] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
   const handleOccurrenceSelection = (occ: Occurrence) => {
+    handleViewChange(setSelectedOccurrence(occ));
+  };
+
+  const handleOccurrenceCreate = () => {
+    const newOccurrence = {
+      eventId: selectedEvent.id,
+      id: 10,
+      scheduleStart: 0,
+      attendees: [],
+      leaders: [],
+      meta: {
+        isNew: true,
+      },
+    };
+
+    handleViewChange(setSelectedOccurrence(newOccurrence));
+  };
+
+  const handleViewChange = (callback: any) => {
     setAnimating(true);
     setTimeout(() => {
-      setSelectedOccurrence(occ);
+      callback;
       setShowDetails(true);
       setAnimating(false);
     }, 200);
@@ -145,6 +165,7 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
         <OccurencesList
           occurences={mockOccurences}
           onOccurenceSelect={handleOccurrenceSelection}
+          onOccurenceCreate={handleOccurrenceCreate}
           selectedEvent={selectedEvent}
         />
       </div>

@@ -15,12 +15,14 @@ import type { EventOffering } from "@ms/types/event.types";
 interface OccurencesListProps {
   occurences?: Occurrence[];
   onOccurenceSelect: (occurrence: Occurrence) => void;
+  onOccurenceCreate: () => void;
   selectedEvent: EventOffering;
 }
 
 const OccurencesList = ({
   occurences = [],
   onOccurenceSelect,
+  onOccurenceCreate,
   selectedEvent,
 }: OccurencesListProps) => {
   const today = startOfDay(new Date());
@@ -39,15 +41,7 @@ const OccurencesList = ({
   }, [selectedDate]);
 
   const handleAddOccurrenceClick = () => {
-    const newOccurrence = {
-      eventId: selectedEvent.id,
-      id: 10,
-      scheduleStart: 0,
-      attendees: [],
-      leaders: [],
-    };
-
-    onOccurenceSelect(newOccurrence);
+    onOccurenceCreate();
   };
 
   return (

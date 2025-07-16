@@ -36,7 +36,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         }).ToListAsync();
     }
 
-    public async Task<EventDTO> GetEventAsync(int id)
+    public async Task<EventDTO> GetEventAsync(string id)
     {
         var e = await _context.Events
         .Include(ev => ev.Occurrences)
@@ -65,7 +65,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         };
     }
 
-    public async Task<int> CreateEventAsync(CreateEventDTO dto)
+    public async Task<string> CreateEventAsync(CreateEventDTO dto)
     {
 
         if (dto.FormFile == null || dto.FormFile.Length == 0)
@@ -123,7 +123,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return e.Id;
     }
 
-    public async Task<bool> DeleteEventAsync(int id)
+    public async Task<bool> DeleteEventAsync(string id)
     {
         var e = await _context.Events.FindAsync(id);
         if (e == null) return false;

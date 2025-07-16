@@ -7,9 +7,9 @@ using MakerSchedule.Domain.ValueObjects;
 public class Occurrence
 {
     [Key]
-    public int Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     [Required]
-    public int EventId { get; set; }
+    public string EventId { get; set; } = string.Empty;
     public Event Event { get; set; } = null!;
     public ScheduleStart? ScheduleStart { get; set; }
     public int? Duration { get; set; }
@@ -20,7 +20,7 @@ public class Occurrence
 
     public Occurrence() { }
 
-    public Occurrence(int eventId, OccurrenceInfo info)
+    public Occurrence(string eventId, OccurrenceInfo info)
     {
         EventId = eventId;
         ScheduleStart = new ScheduleStart(info.ScheduleStart);

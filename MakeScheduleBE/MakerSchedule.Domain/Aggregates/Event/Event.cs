@@ -11,7 +11,7 @@ using MakerSchedule.Domain.ValueObjects;
 public class Event
 {
     [Key]
-    public int Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     public EventName EventName { get; set; } = null!;
     [Required]
     public required string Description { get; set; }
@@ -29,7 +29,7 @@ public class Event
     }
 
     // Remove an occurrence by ID
-    public void RemoveOccurrence(int occurrenceId)
+    public void RemoveOccurrence(string occurrenceId)
     {
         var occ = _occurrences.Find(o => o.Id == occurrenceId);
         if (occ != null)

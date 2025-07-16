@@ -7,6 +7,6 @@ public interface IDomainUserService
 {
     Task<IEnumerable<DomainUser>> GetAllDomainUsersWithDetailsAsync();
     Task<IEnumerable<DomainUserListDTO>> GetAllDomainUsersAsync();
-    Task<DomainUserDTO> GetDomainUserByIdAsync(int id);
-    Task DeleteDomainUserByIdAsync(int itd);
+    Task<DomainUserDTO> GetDomainUserByIdAsync(string id);
+    Task DeleteDomainUserByIdAsync(string id);
 }

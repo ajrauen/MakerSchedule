@@ -63,7 +63,7 @@ public class DomainUserService(
         }
     }
 
-    public async Task<DomainUserDTO> GetDomainUserByIdAsync(int id)
+    public async Task<DomainUserDTO> GetDomainUserByIdAsync(string id)
     {
         try
         {
@@ -101,7 +101,7 @@ public class DomainUserService(
     }
 
 
-   public async Task DeleteDomainUserByIdAsync(int id)
+   public async Task DeleteDomainUserByIdAsync(string id)
     {
         var DomainUser = await _context.DomainUsers.FirstOrDefaultAsync(e => e.Id == id);
         if (DomainUser == null)

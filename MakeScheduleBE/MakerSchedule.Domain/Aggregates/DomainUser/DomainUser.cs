@@ -8,7 +8,7 @@ using MakerSchedule.Domain.Aggregates.Event;
 public class DomainUser
 {
     [Key]
-    public int Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     [Required]
     public string UserId { get; set; } = string.Empty;
     public User User { get; set; } = null!;

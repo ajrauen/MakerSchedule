@@ -19,7 +19,7 @@ public class DomainUserProfileService(IUserService userService, IDomainUserServi
     private readonly UserManager<User> _userManager = userManager;
     private readonly ILogger<DomainUserProfileService> _logger = logger;
 
-    public async Task<int> CreateDomainUserAsync(CreateDomainUserDTO dto)
+    public async Task<string> CreateDomainUserAsync(CreateDomainUserDTO dto)
     {
         _logger.LogInformation("Attempting to create user with email: {Email}", dto.Email);
 
@@ -126,7 +126,7 @@ public class DomainUserProfileService(IUserService userService, IDomainUserServi
         return await RegisterDomainUserAsync(createDto);
     }
 
-    public async Task<bool> UpdateUserProfileAsync(int id, UpdateUserProfileDTO dto)
+    public async Task<bool> UpdateUserProfileAsync(string id, UpdateUserProfileDTO dto)
     {
         var domainUser = await _context.DomainUsers.FindAsync(id);
         if (domainUser == null)

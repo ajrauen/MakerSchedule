@@ -8,9 +8,6 @@ namespace MakerSchedule.Application.Services;
 
 public class MetadataService(ILogger<MetadataService> logger): IMetadataService
 {
-    private readonly ILogger<MetadataService> _logger;
-
-
     private static readonly Dictionary<int, string> Durations = new()
     {
         {15 * 60 * 1000, "15 minutes" },

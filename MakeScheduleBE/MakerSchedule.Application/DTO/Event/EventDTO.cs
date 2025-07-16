@@ -8,7 +8,7 @@ namespace MakerSchedule.Application.DTO.Event;
 public class EventDTO
 {
     [Required]
-    public int Id { get; set; }
+    public string Id { get; set; } = string.Empty;
     [Required]
     public required string EventName { get; set; }
 

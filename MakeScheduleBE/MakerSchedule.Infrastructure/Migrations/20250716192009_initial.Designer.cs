@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakerSchedule.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250713053511_initial")]
+    [Migration("20250716192009_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -27,11 +27,8 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("MakerSchedule.Domain.Aggregates.DomainUser.DomainUser", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PreferredContactMethod")
                         .IsRequired()
@@ -51,11 +48,8 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("MakerSchedule.Domain.Aggregates.Event.Event", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -81,7 +75,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = "224de1c5-f778-4118-b64f-dbea23c9a0d4",
                             Description = "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.",
                             Duration = 7200000,
                             EventName = "Advanced Pottery",
@@ -89,7 +83,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = 2,
+                            Id = "d2272a69-1840-46da-815f-3a92262126e5",
                             Description = "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.",
                             Duration = 10800000,
                             EventName = "Woodworking Workshop",
@@ -97,7 +91,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = 3,
+                            Id = "56ec6462-3307-4567-b97b-4a0a7aed5c28",
                             Description = "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.",
                             Duration = 5400000,
                             EventName = "Sewing Basics",
@@ -105,7 +99,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = 4,
+                            Id = "eb0a36c9-eef2-4e3d-9b51-b05b0aa4fdc1",
                             Description = "Introduction to pottery and clay work. Learn basic hand-building techniques. This beginner-friendly class introduces you to the world of ceramics through hand-building methods like pinch pots, coil building, and slab construction. You will learn about different types of clay, basic glazing techniques, and the firing process. The instructor will guide you through creating several small pieces that will be fired and glazed. No prior experience is necessary. All materials and firing fees are included.",
                             Duration = 9000000,
                             EventName = "Pottery for Beginners",
@@ -113,7 +107,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = 5,
+                            Id = "9f5a5299-4cba-4eed-a2c5-0f9f6e4ae43a",
                             Description = "Advanced woodworking techniques for experienced craftsmen. Learn joinery and finishing methods. This advanced workshop focuses on traditional woodworking joinery techniques such as dovetails, mortise and tenon, and finger joints. You will also learn advanced finishing techniques including French polishing, oil finishes, and lacquer application. The class includes safety training for power tools and hand tools. Participants should have basic woodworking experience. Bring your own safety equipment or use ours.",
                             Duration = 14400000,
                             EventName = "Advanced Woodworking",
@@ -123,17 +117,15 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("MakerSchedule.Domain.Aggregates.Event.Occurrence", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("Duration")
                         .HasColumnType("int");
 
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("ScheduleStart")
                         .HasColumnType("datetime2");
@@ -147,220 +139,213 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = "061acfe8-b179-4335-b6c6-327f63eba764",
                             Duration = 90,
-                            EventId = 1,
-                            ScheduleStart = new DateTime(2025, 7, 25, 8, 35, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "224de1c5-f778-4118-b64f-dbea23c9a0d4",
+                            ScheduleStart = new DateTime(2025, 7, 28, 22, 20, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 2,
+                            Id = "30dc2bdf-a4db-4982-91cf-763e7a5c46f2",
                             Duration = 105,
-                            EventId = 1,
-                            ScheduleStart = new DateTime(2025, 7, 28, 11, 53, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "224de1c5-f778-4118-b64f-dbea23c9a0d4",
+                            ScheduleStart = new DateTime(2025, 8, 1, 1, 38, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 3,
+                            Id = "cca7940d-19c0-4ec0-b2da-c4bb1a1f2f57",
                             Duration = 120,
-                            EventId = 1,
-                            ScheduleStart = new DateTime(2025, 8, 28, 9, 45, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "224de1c5-f778-4118-b64f-dbea23c9a0d4",
+                            ScheduleStart = new DateTime(2025, 8, 31, 23, 30, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 4,
+                            Id = "600aae46-934d-4363-a437-0aa68b18f28e",
                             Duration = 90,
-                            EventId = 1,
-                            ScheduleStart = new DateTime(2025, 8, 3, 11, 45, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "224de1c5-f778-4118-b64f-dbea23c9a0d4",
+                            ScheduleStart = new DateTime(2025, 8, 7, 1, 30, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 5,
+                            Id = "af1f5243-faa2-4561-a033-08c5f1e7250e",
                             Duration = 60,
-                            EventId = 1,
-                            ScheduleStart = new DateTime(2025, 8, 10, 14, 43, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "224de1c5-f778-4118-b64f-dbea23c9a0d4",
+                            ScheduleStart = new DateTime(2025, 8, 14, 4, 28, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 6,
+                            Id = "20530845-399b-486b-8671-fcc2d77e4861",
                             Duration = 120,
-                            EventId = 1,
-                            ScheduleStart = new DateTime(2025, 8, 28, 6, 25, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "224de1c5-f778-4118-b64f-dbea23c9a0d4",
+                            ScheduleStart = new DateTime(2025, 8, 31, 20, 10, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 7,
+                            Id = "91ff7406-c301-4172-8328-b5389c19d550",
                             Duration = 30,
-                            EventId = 2,
-                            ScheduleStart = new DateTime(2025, 8, 17, 9, 14, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "d2272a69-1840-46da-815f-3a92262126e5",
+                            ScheduleStart = new DateTime(2025, 8, 20, 22, 59, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 8,
+                            Id = "89f09741-819b-43b6-8446-a0d2051c7a0f",
                             Duration = 90,
-                            EventId = 2,
-                            ScheduleStart = new DateTime(2025, 9, 15, 1, 10, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "d2272a69-1840-46da-815f-3a92262126e5",
+                            ScheduleStart = new DateTime(2025, 9, 18, 14, 55, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 9,
+                            Id = "cca72055-03e8-4ce6-81e7-efe5a14e1e99",
                             Duration = 45,
-                            EventId = 2,
-                            ScheduleStart = new DateTime(2025, 7, 16, 22, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "d2272a69-1840-46da-815f-3a92262126e5",
+                            ScheduleStart = new DateTime(2025, 7, 20, 12, 24, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 10,
+                            Id = "f89d5870-abe9-4fd8-918b-44efe8af8ee4",
                             Duration = 90,
-                            EventId = 2,
-                            ScheduleStart = new DateTime(2025, 10, 2, 22, 12, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "d2272a69-1840-46da-815f-3a92262126e5",
+                            ScheduleStart = new DateTime(2025, 10, 6, 11, 57, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 11,
+                            Id = "709f8e01-2e25-4792-a9a5-96fa6cdcd79c",
                             Duration = 60,
-                            EventId = 2,
-                            ScheduleStart = new DateTime(2025, 7, 29, 6, 34, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "d2272a69-1840-46da-815f-3a92262126e5",
+                            ScheduleStart = new DateTime(2025, 8, 1, 20, 19, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 12,
+                            Id = "b79874bb-9997-456b-bc68-02f29e1f040e",
                             Duration = 90,
-                            EventId = 3,
-                            ScheduleStart = new DateTime(2025, 9, 24, 5, 40, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "56ec6462-3307-4567-b97b-4a0a7aed5c28",
+                            ScheduleStart = new DateTime(2025, 9, 27, 19, 25, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 13,
+                            Id = "6edb31bf-dd31-4da8-8d70-e0b36dc84893",
                             Duration = 75,
-                            EventId = 3,
-                            ScheduleStart = new DateTime(2025, 9, 23, 23, 32, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "56ec6462-3307-4567-b97b-4a0a7aed5c28",
+                            ScheduleStart = new DateTime(2025, 9, 27, 13, 17, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 14,
+                            Id = "f4782594-153a-4319-b33d-f3594f1d3779",
                             Duration = 30,
-                            EventId = 3,
-                            ScheduleStart = new DateTime(2025, 7, 26, 6, 12, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "56ec6462-3307-4567-b97b-4a0a7aed5c28",
+                            ScheduleStart = new DateTime(2025, 7, 29, 19, 57, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 15,
+                            Id = "cc0ba8f8-8c0a-45b2-82ea-4932fcb9e8f1",
                             Duration = 30,
-                            EventId = 3,
-                            ScheduleStart = new DateTime(2025, 9, 21, 20, 37, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "56ec6462-3307-4567-b97b-4a0a7aed5c28",
+                            ScheduleStart = new DateTime(2025, 9, 25, 10, 22, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 16,
+                            Id = "0078edbb-ebbb-43f7-88bc-7a33ab8b820c",
                             Duration = 60,
-                            EventId = 3,
-                            ScheduleStart = new DateTime(2025, 8, 5, 0, 7, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "56ec6462-3307-4567-b97b-4a0a7aed5c28",
+                            ScheduleStart = new DateTime(2025, 8, 8, 13, 52, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 17,
+                            Id = "cfa58e0c-8af7-495a-bc4c-aa645b64fe79",
                             Duration = 90,
-                            EventId = 4,
-                            ScheduleStart = new DateTime(2025, 7, 25, 6, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "eb0a36c9-eef2-4e3d-9b51-b05b0aa4fdc1",
+                            ScheduleStart = new DateTime(2025, 7, 28, 20, 24, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 18,
+                            Id = "d843e224-3f58-48f5-a5ec-a26e1b2b25ca",
                             Duration = 75,
-                            EventId = 4,
-                            ScheduleStart = new DateTime(2025, 8, 28, 6, 48, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "eb0a36c9-eef2-4e3d-9b51-b05b0aa4fdc1",
+                            ScheduleStart = new DateTime(2025, 8, 31, 20, 33, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 19,
+                            Id = "37f3e849-0366-4b3a-9154-c70eacc6d2dd",
                             Duration = 45,
-                            EventId = 4,
-                            ScheduleStart = new DateTime(2025, 9, 14, 20, 39, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "eb0a36c9-eef2-4e3d-9b51-b05b0aa4fdc1",
+                            ScheduleStart = new DateTime(2025, 9, 18, 10, 24, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 20,
+                            Id = "78572e4e-cd51-40ef-9ef3-62758522118a",
                             Duration = 60,
-                            EventId = 4,
-                            ScheduleStart = new DateTime(2025, 7, 14, 14, 20, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "eb0a36c9-eef2-4e3d-9b51-b05b0aa4fdc1",
+                            ScheduleStart = new DateTime(2025, 7, 18, 4, 5, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 21,
+                            Id = "f5e61020-8b26-4888-bf6e-fffe218f3486",
                             Duration = 30,
-                            EventId = 4,
-                            ScheduleStart = new DateTime(2025, 7, 19, 22, 49, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "eb0a36c9-eef2-4e3d-9b51-b05b0aa4fdc1",
+                            ScheduleStart = new DateTime(2025, 7, 23, 12, 34, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 22,
+                            Id = "d7182758-e516-4375-9407-7103a80667c9",
                             Duration = 120,
-                            EventId = 4,
-                            ScheduleStart = new DateTime(2025, 8, 23, 5, 52, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "eb0a36c9-eef2-4e3d-9b51-b05b0aa4fdc1",
+                            ScheduleStart = new DateTime(2025, 8, 26, 19, 37, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 23,
+                            Id = "858fb191-1949-4af9-9bda-31674ab0c459",
                             Duration = 30,
-                            EventId = 5,
-                            ScheduleStart = new DateTime(2025, 8, 28, 17, 34, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "9f5a5299-4cba-4eed-a2c5-0f9f6e4ae43a",
+                            ScheduleStart = new DateTime(2025, 9, 1, 7, 19, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 24,
+                            Id = "802d78f8-6204-4be5-870f-f347706b9bcc",
                             Duration = 30,
-                            EventId = 5,
-                            ScheduleStart = new DateTime(2025, 9, 25, 5, 53, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "9f5a5299-4cba-4eed-a2c5-0f9f6e4ae43a",
+                            ScheduleStart = new DateTime(2025, 9, 28, 19, 38, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 25,
+                            Id = "fe7946b4-2537-48fb-9196-4a4af2665fa2",
                             Duration = 30,
-                            EventId = 5,
-                            ScheduleStart = new DateTime(2025, 7, 18, 21, 16, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "9f5a5299-4cba-4eed-a2c5-0f9f6e4ae43a",
+                            ScheduleStart = new DateTime(2025, 7, 22, 11, 1, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 26,
+                            Id = "9a937e3b-843c-4e43-bc91-da10085cfe57",
                             Duration = 75,
-                            EventId = 5,
-                            ScheduleStart = new DateTime(2025, 10, 4, 3, 52, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "9f5a5299-4cba-4eed-a2c5-0f9f6e4ae43a",
+                            ScheduleStart = new DateTime(2025, 10, 7, 17, 37, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         },
                         new
                         {
-                            Id = 27,
+                            Id = "1c7cadd9-2024-46b8-8a18-dc79d761a474",
                             Duration = 30,
-                            EventId = 5,
-                            ScheduleStart = new DateTime(2025, 8, 15, 20, 22, 11, 478, DateTimeKind.Utc).AddTicks(4452)
+                            EventId = "9f5a5299-4cba-4eed-a2c5-0f9f6e4ae43a",
+                            ScheduleStart = new DateTime(2025, 8, 19, 10, 7, 9, 551, DateTimeKind.Utc).AddTicks(4941)
                         });
                 });
 
             modelBuilder.Entity("MakerSchedule.Domain.Aggregates.Event.OccurrenceAttendee", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("Attended")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime?>("CheckedInAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("CheckedOutAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("OccurrenceId")
-                        .HasColumnType("int");
+                    b.Property<string>("OccurrenceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("RegisteredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
@@ -373,23 +358,22 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("MakerSchedule.Domain.Aggregates.Event.OccurrenceLeader", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("AssignedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("OccurrenceId")
-                        .HasColumnType("int");
+                    b.Property<string>("OccurrenceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Role")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 

@@ -14,7 +14,7 @@ public class OccurrenceService(IApplicationDbContext context, ILogger<Occurrence
     private readonly IApplicationDbContext _dbContext = context;
     private readonly ILogger<OccurrenceService> _logger = logger;
 
-    public async Task<OccurenceDTO> GetOccurrenceByIdAsync(int id)
+    public async Task<OccurenceDTO> GetOccurrenceByIdAsync(string id)
     {
         var occurrence = await _dbContext.Occurrences
             .Include(o => o.Leaders)
@@ -44,7 +44,7 @@ public class OccurrenceService(IApplicationDbContext context, ILogger<Occurrence
         }).ToListAsync();
     }
 
-    public async Task<int> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO)
+    public async Task<string> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO)
     {
         var scheduledStart = DateTimeOffset.FromUnixTimeMilliseconds(occurrenceDTO.ScheduleStart).UtcDateTime;
 

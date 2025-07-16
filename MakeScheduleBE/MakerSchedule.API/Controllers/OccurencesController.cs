@@ -25,14 +25,14 @@ public class OccurrencesController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<OccurenceDTO>> GetOccurrenceByIdAsync(int id)
+    public async Task<ActionResult<OccurenceDTO>> GetOccurrenceByIdAsync(string id)
     {
         var occurences = await _occuranceService.GetOccurrenceByIdAsync(id);
         return Ok(occurences);
     }
 
     [HttpPost]
-    public async Task<ActionResult<int>> CreateOccuranceAsync([FromBody] CreateOccurenceDTO createOccurenceDTO)
+    public async Task<ActionResult<string>> CreateOccuranceAsync([FromBody] CreateOccurenceDTO createOccurenceDTO)
     {
         var occurrence = await _occuranceService.CreateOccurrenceAsync(createOccurenceDTO);
         return Ok(occurrence);
