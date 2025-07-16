@@ -42,7 +42,7 @@ const createEventInitialFormData = {
 
 interface BasicEventDetailsProps {
   onClose: (refreshData: boolean) => void;
-  selectedEvent?: EventOffering;
+  selectedEvent: EventOffering;
   eventTypes: EventType;
 }
 

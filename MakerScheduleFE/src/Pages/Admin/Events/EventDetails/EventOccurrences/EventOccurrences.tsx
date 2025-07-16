@@ -1,10 +1,9 @@
 import { OccurencesList } from "@ms/Pages/Admin/Events/EventDetails/EventOccurences/OccurencesList/OccurencesList";
 import { OccurenceDetails } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceDetails/OccurenceDetails";
+import type { EventOffering } from "@ms/types/event.types";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import { useState } from "react";
 
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-const now = Date.now();
 const mockOccurences: Occurrence[] = [
   // Today
   {
@@ -107,7 +106,11 @@ const mockOccurences: Occurrence[] = [
   },
 ];
 
-const EventOccurrences = () => {
+interface EventOccurrencesProps {
+  selectedEvent: EventOffering;
+}
+
+const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
   const [selectedOccurrence, setSelectedOccurrence] = useState<
     Occurrence | undefined
   >();
@@ -142,6 +145,7 @@ const EventOccurrences = () => {
         <OccurencesList
           occurences={mockOccurences}
           onOccurenceSelect={handleOccurrenceSelection}
+          selectedEvent={selectedEvent}
         />
       </div>
       <div

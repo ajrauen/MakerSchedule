@@ -2,7 +2,7 @@ import type { EventOffering, EventType } from "@ms/types/event.types";
 
 import { BasicEventDetails } from "@ms/Pages/Admin/Events/EventDetails/BasicDetails/BasicEventDetails";
 import { IconButton, Tab, Tabs } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import CloseIcon from "@mui/icons-material/Close";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import { EventOccurrences } from "@ms/Pages/Admin/Events/EventDetails/EventOccur
 
 interface CreateEventProps {
   onClose: (refreshData: boolean) => void;
-  selectedEvent?: EventOffering;
+  selectedEvent: EventOffering;
   eventTypes: EventType;
 }
 
@@ -21,19 +21,27 @@ const EventDetails = ({
   eventTypes,
 }: CreateEventProps) => {
   const [value, setValue] = useState(0);
+  const [event, setEvent] = useState<EventOffering>(selectedEvent);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  useQuery({
+  const { data: eventResponse } = useQuery({
     queryKey: [selectedEvent?.id, "event"],
     queryFn: () => {
       if (!selectedEvent?.id) return;
-      getEvent(selectedEvent.id);
+      return getEvent(selectedEvent.id);
     },
     enabled: !!selectedEvent?.id,
   });
+
+  useEffect(() => {
+    if (eventResponse?.data) {
+      setEvent(eventResponse.data);
+      return;
+    }
+  }, [eventResponse]);
 
   function a11yProps(index: number) {
     return {
@@ -61,11 +69,11 @@ const EventDetails = ({
         <BasicEventDetails
           onClose={onClose}
           eventTypes={eventTypes}
-          selectedEvent={selectedEvent}
+          selectedEvent={event}
         />
       </TabPanel>
       <TabPanel index={1} value={value}>
-        <EventOccurrences />
+        <EventOccurrences selectedEvent={event} />
       </TabPanel>
     </div>
   );

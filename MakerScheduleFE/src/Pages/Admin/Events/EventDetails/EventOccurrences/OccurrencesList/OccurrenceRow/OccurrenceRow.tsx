@@ -9,7 +9,6 @@ interface OccurenceRowProps {
 }
 
 const OccurenceRow = ({ occurrence, onOccurenceSelect }: OccurenceRowProps) => {
-  console.log(occurrence);
   return (
     <li
       key={occurrence.id}

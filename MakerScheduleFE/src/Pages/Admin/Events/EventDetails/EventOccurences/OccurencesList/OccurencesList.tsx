@@ -8,15 +8,20 @@ import { OccurrenceCalendarContext } from "@ms/Pages/Admin/Events/EventDetails/E
 import { OccurenceCalendarDate } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurenceCalendarDate/OccurenceCalendarDate";
 import { OccurenceRow } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrenceRow/OccurrenceRow";
 import type { Occurrence } from "@ms/types/occurrence.types";
+import { IconButton } from "@mui/material";
+import { AddCircle } from "@mui/icons-material";
+import type { EventOffering } from "@ms/types/event.types";
 
 interface OccurencesListProps {
-  occurences: Occurrence[];
+  occurences?: Occurrence[];
   onOccurenceSelect: (occurrence: Occurrence) => void;
+  selectedEvent: EventOffering;
 }
 
 const OccurencesList = ({
-  occurences,
+  occurences = [],
   onOccurenceSelect,
+  selectedEvent,
 }: OccurencesListProps) => {
   const today = startOfDay(new Date());
 
@@ -33,7 +38,17 @@ const OccurencesList = ({
       .sort((a, b) => a.scheduleStart - b.scheduleStart);
   }, [selectedDate]);
 
-  console.log(occurrencesForDay);
+  const handleAddOccurrenceClick = () => {
+    const newOccurrence = {
+      eventId: selectedEvent.id,
+      id: 10,
+      scheduleStart: 0,
+      attendees: [],
+      leaders: [],
+    };
+
+    onOccurenceSelect(newOccurrence);
+  };
 
   return (
     <OccurrenceCalendarContext.Provider
@@ -47,6 +62,13 @@ const OccurencesList = ({
             slots={{ day: OccurenceCalendarDate }}
           />
         </LocalizationProvider>
+        <div className="flex w-full">
+          <div className="ml-auto relative right-7">
+            <IconButton onClick={handleAddOccurrenceClick}>
+              <AddCircle />
+            </IconButton>
+          </div>
+        </div>
         <div className="w-full max-w-md">
           {occurrencesForDay.length > 0 ? (
             <ul className="divide-y divide-gray-200 bg-white rounded shadow">
