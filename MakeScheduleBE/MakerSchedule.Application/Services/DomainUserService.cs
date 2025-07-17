@@ -149,7 +149,7 @@ public class DomainUserService(
     }
 
 
-    public async Task<IEnumerable<LeaderDTO>> GetAvailableOccurrenceLeadersAsync(string occurrenceId)
+    public async Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(string occurrenceId)
     {
         var occurrence = await _context.Occurrences.Include(o => o.Event).FirstOrDefaultAsync(o => o.Id == occurrenceId);
         if (occurrence == null)
@@ -181,7 +181,7 @@ public class DomainUserService(
 
         var availableLeaders = domainUsers.Where(u => !busyLeaders.Contains(u.Id));
 
-        return availableLeaders.Select(l => new LeaderDTO
+        return availableLeaders.Select(l => new DomainUserListDTO
         {
             Id = l.Id,
             FirstName = l.User.FirstName,

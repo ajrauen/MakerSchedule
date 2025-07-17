@@ -60,9 +60,9 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     [HttpGet()]
     // [Authorize(Roles = "Admin")]
     [Route("api/all")]
-        public async Task<ActionResult<IEnumerable<LeaderDTO>>> GetAvailableLeaders([FromQuery] string? occurrenceId = null, [FromQuery] string? role = null)
+        public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromQuery] string? occurrenceId = null, [FromQuery] string? role = null)
     {
-        IEnumerable<LeaderDTO> leaders;
+        IEnumerable<DomainUserListDTO> leaders;
 
 
 

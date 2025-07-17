@@ -14,7 +14,7 @@ public interface IDomainUserService
     Task<DomainUserDTO> GetDomainUserByIdAsync(string id);
     Task DeleteDomainUserByIdAsync(string id);
 
-    Task<IEnumerable<LeaderDTO>> GetAvailableOccurrenceLeadersAsync(string occurrenceId);
+    Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(string occurrenceId);
     Task<IEnumerable<DomainUserListDTO>> GetAllDomainUsersByRoleAsync(string role);
 
 }
