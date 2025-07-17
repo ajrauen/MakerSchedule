@@ -1,10 +1,12 @@
 using AutoMapper;
 
 using MakerSchedule.Application.DTO.DomainUser;
+using MakerSchedule.Application.DTO.User;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.Aggregates.User;
+using MakerSchedule.Domain.Constants;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +23,6 @@ public class DomainUserService(
     private readonly IApplicationDbContext _context = context ?? throw new ArgumentNullException(nameof(context));
     private readonly ILogger<DomainUserService> _logger = logger;
     private readonly IMapper _mapper = mapper;
-    private readonly UserManager<User> _userManager = userManager;
 
     public async Task<IEnumerable<DomainUser>> GetAllDomainUsersWithDetailsAsync()
     {
@@ -69,7 +70,7 @@ public class DomainUserService(
         {
             var DomainUser = await _context.DomainUsers
                 .Include(e => e.User)
-                .Include(e =>e.OccurrencesLed)
+                .Include(e => e.OccurrencesLed)
                 .FirstOrDefaultAsync(e => e.Id == id);
             if (DomainUser == null)
             {
@@ -86,7 +87,7 @@ public class DomainUserService(
                 PhoneNumber = DomainUser.User?.PhoneNumber ?? string.Empty,
                 Address = DomainUser.User?.Address ?? string.Empty,
                 IsActive = DomainUser.User?.IsActive ?? false,
-            
+
             };
         }
         catch (NotFoundException)
@@ -101,23 +102,23 @@ public class DomainUserService(
     }
 
 
-   public async Task DeleteDomainUserByIdAsync(string id)
+    public async Task DeleteDomainUserByIdAsync(string id)
     {
         var DomainUser = await _context.DomainUsers.FirstOrDefaultAsync(e => e.Id == id);
         if (DomainUser == null)
         {
-            throw new NotFoundException("DomainUser", id); 
+            throw new NotFoundException("DomainUser", id);
         }
 
-        var user = await _userManager.FindByIdAsync(DomainUser.UserId);
+        var user = await userManager.FindByIdAsync(DomainUser.UserId);
         if (user == null)
         {
             _logger.LogWarning("User with ID {UserId} not found.", DomainUser.UserId);
-            throw new NotFoundException("User not found", DomainUser.UserId); 
+            throw new NotFoundException("User not found", DomainUser.UserId);
         }
 
         _context.DomainUsers.Remove(DomainUser);
-        var result = await _userManager.DeleteAsync(user);
+        var result = await userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
             throw new BaseException(
@@ -128,5 +129,63 @@ public class DomainUserService(
         }
 
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<DomainUserListDTO>> GetAllDomainUsersByRoleAsync(string role)
+    {
+        var usersInRole = await userManager.GetUsersInRoleAsync(role);
+        var userIds = usersInRole.Select(u => u.Id).ToList();
+
+        var domainUsers = await _context.DomainUsers.Include(du => du.User)
+            .Where(du => userIds.Contains(du.UserId))
+            .ToListAsync();
+
+        return domainUsers.Select(du => new DomainUserListDTO
+        {
+            Id = du.Id,
+            FirstName = du.User?.FirstName ?? string.Empty,
+            LastName = du.User?.LastName ?? string.Empty
+        });
+    }
+
+
+    public async Task<IEnumerable<LeaderDTO>> GetAvailableOccurrenceLeadersAsync(string occurrenceId)
+    {
+        var occurrence = await _context.Occurrences.Include(o => o.Event).FirstOrDefaultAsync(o => o.Id == occurrenceId);
+        if (occurrence == null)
+        {
+            throw new NotFoundException("Occurrence not found", occurrenceId);
+        }
+
+        var occurrenceStart = occurrence.ScheduleStart ?? DateTime.MinValue;
+        var occurrenceEnd = occurrenceStart.Value.AddMinutes(occurrence.Duration ?? 0);
+
+        var leaderUsers = await userManager.GetUsersInRoleAsync(Roles.Leader);
+        var leaderIds = leaderUsers.Select(l => l.Id).ToList();
+
+        var domainUsers = await _context.DomainUsers.Include(du => du.User).Where(du => leaderIds.Contains(du.UserId)).ToListAsync();
+        // Get all occurrence leaders with their occurrences
+        var allLeaders = await _context.OccurrenceLeaders
+            .Include(l => l.Occurrence)
+            .Where(o => o.Occurrence != null)
+            .ToListAsync();
+
+        // Now filter in-memory using C# (not SQL)
+        var busyLeaders = allLeaders
+            .Where(o =>
+                o.Occurrence.ScheduleStart < occurrenceEnd &&
+                o.Occurrence.ScheduleStart.Value.AddMilliseconds(o.Occurrence.Duration ?? 0) > occurrenceStart)
+            .Select(l => l.UserId)
+            .Distinct()
+            .ToList();
+
+        var availableLeaders = domainUsers.Where(u => !busyLeaders.Contains(u.Id));
+
+        return availableLeaders.Select(l => new LeaderDTO
+        {
+            Id = l.Id,
+            FirstName = l.User.FirstName,
+            LastName = l.User.LastName,
+        });
     }
 }

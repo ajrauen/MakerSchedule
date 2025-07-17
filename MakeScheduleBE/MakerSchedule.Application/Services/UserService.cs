@@ -9,7 +9,7 @@ using MakerSchedule.Domain.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-public class UserService(UserManager<User> userManager, ILogger<UserService> logger, IEventService eventService) : IUserService
+public class UserService(UserManager<User> userManager, ILogger<UserService> logger) : IUserService
 {
     private readonly UserManager<User> _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
     private readonly ILogger<UserService> _logger = logger;
@@ -51,19 +51,6 @@ public class UserService(UserManager<User> userManager, ILogger<UserService> log
         return result;
     }
 
-    public async Task<IEnumerable<LeaderDTO>> GetAvailableOccurrenceLeaders(string eventId)
-    {
-        var selectedEvent = await  eventService.GetEventAsync(eventId);
-        if (selectedEvent == null)
-        {
-            throw new NotFoundException("Event not found", eventId);
-        }
-
-
-
-
-        // TODO: Implement actual logic to fetch available leaders
-        return new List<LeaderDTO>();
-    }
+ 
 
 }

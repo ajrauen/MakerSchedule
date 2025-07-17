@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services;
 
-public class MetadataService(ILogger<MetadataService> logger): IMetadataService
+public class MetadataService(): IMetadataService
 {
     private static readonly Dictionary<int, string> Durations = new()
     {

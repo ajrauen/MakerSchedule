@@ -16,5 +16,5 @@ public class OccurrenceLeader
 
     // Optional metadata
     public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
-    public string? Role { get; set; } // e.g., "Lead Instructor", "Assistant", etc.
+    public string? Role { get; set; } 
 } 

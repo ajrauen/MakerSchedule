@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakerSchedule.Domain.ValueObjects;
 public record Duration
 {
-    private int Value { get; init; }
+    public int Value { get; init; }
 
     public Duration(int value)
     {

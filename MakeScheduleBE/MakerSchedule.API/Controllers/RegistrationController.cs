@@ -1,6 +1,8 @@
 using MakerSchedule.Application.DTO.DomainUserRegistration;
 using MakerSchedule.Application.DTO.User;
 using MakerSchedule.Application.Interfaces;
+
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MakerSchedule.API.Controllers;
@@ -8,7 +10,7 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/register")]
 [Produces("application/json")]
-public class RegistrationController(IDomainUserProfileService domainUserProfileService, IUserService userService) : ControllerBase
+public class RegistrationController(IDomainUserProfileService domainUserProfileService, IDomainUserService domainUserService ) : ControllerBase
 {
 
 
@@ -22,13 +24,7 @@ public class RegistrationController(IDomainUserProfileService domainUserProfileS
         }
         return BadRequest("User could not be created.");
     }
-    
-    // [HttpGet()]
-    // [Route("api/Events/leaders")]
-    // public async Task<ActionResult<IEnumerable<LeaderDTO>> GetAvailableLeaders(int id)
-    // {
-    //     var eventItem = await userService.GetAvailableOccurrenceLeaders();
-    //     return Ok(eventItem);
-    // }
+
+ 
 
 }

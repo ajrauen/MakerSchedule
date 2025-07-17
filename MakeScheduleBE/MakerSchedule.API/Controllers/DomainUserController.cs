@@ -3,15 +3,16 @@ using MakerSchedule.Application.DTO.DomainUserRegistration;
 using MakerSchedule.Application.DTO.User;
 using MakerSchedule.Application.Interfaces;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MakerSchedule.API.Controllers;
 
 [ApiController]
 [Route("api/domain-users")]
-[Produces("application/json")] 
+[Produces("application/json")]
 public class DomainUsersController(IDomainUserService domainUserService, IDomainUserProfileService domainUserProfileService, ILogger<DomainUsersController> logger) : ControllerBase
-    {
+{
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAllDomainUsersAsync()
@@ -54,5 +55,26 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
             return CreatedAtAction(nameof(GetById), new { id = newUserId }, new { id = newUserId });
         }
         return BadRequest("User could not be created.");
+    }
+
+    [HttpGet()]
+    // [Authorize(Roles = "Admin")]
+    [Route("api/all")]
+        public async Task<ActionResult<IEnumerable<LeaderDTO>>> GetAvailableLeaders([FromQuery] string? occurrenceId = null, [FromQuery] string? role = null)
+    {
+        IEnumerable<LeaderDTO> leaders;
+
+
+
+        if (string.IsNullOrEmpty(occurrenceId))
+        {
+            leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(occurrenceId);
+        }
+        else
+        {
+            leaders = await domainUserService.GetAllDomainUsersByRoleAsync(role);
+        }
+
+        return Ok(leaders);
     }
 }

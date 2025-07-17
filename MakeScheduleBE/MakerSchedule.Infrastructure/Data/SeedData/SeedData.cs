@@ -164,9 +164,10 @@ public class DatabaseSeeder
         foreach (var (email, firstName, lastName, role) in allUsers)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
+            User user;
             if (existingUser == null)
             {
-                var user = new User
+                user = new User
                 {
                     UserName = email,
                     Email = email,
@@ -183,13 +184,34 @@ public class DatabaseSeeder
                 {
                     await _userManager.AddToRoleAsync(user, role);
                 }
+                else
+                {
+                    // If user creation failed, skip DomainUser creation for this user
+                    continue;
+                }
             }
             else
             {
+                user = existingUser;
                 if (!await _userManager.IsInRoleAsync(existingUser, role))
                 {
                     await _userManager.AddToRoleAsync(existingUser, role);
                 }
+            }
+
+            // Ensure associated DomainUser exists
+            var domainUserExists = await _context.DomainUsers.AnyAsync(d => d.UserId == user.Id);
+            if (!domainUserExists)
+            {
+                var domainUser = new DomainUser
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserId = user.Id,
+                    PreferredContactMethod = "Email"
+                    // Add other properties as needed
+                };
+                _context.DomainUsers.Add(domainUser);
+                await _context.SaveChangesAsync();
             }
         }
     }

@@ -6,7 +6,7 @@ namespace MakerSchedule.Domain.ValueObjects;
 
 public record ScheduleStart
 {
-    private DateTime Value { get; init; }
+    public DateTime Value { get;  }
 
     public ScheduleStart(DateTime date)
     {
