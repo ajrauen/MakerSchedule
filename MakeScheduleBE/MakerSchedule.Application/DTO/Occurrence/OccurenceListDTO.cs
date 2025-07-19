@@ -1,5 +1,7 @@
 namespace MakerSchedule.Application.DTO.Occurrence;
 
-public class OccurenceListDTO {
-    public string Id { get; set; } = string.Empty;
+public class OccurenceListDTO
+{
+    public Guid Id { get; set; } = Guid.NewGuid();
+    public long ScheduleStart { get; set; }
 }

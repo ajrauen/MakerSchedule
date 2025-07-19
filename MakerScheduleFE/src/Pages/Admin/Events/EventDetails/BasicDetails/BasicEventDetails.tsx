@@ -26,7 +26,7 @@ const createEventvalidationSchema = z.object({
     .string()
     .min(3, { error: "Description must be at least 3 characters" }),
 
-  duration: z.number().optional(),
+  duration: z.string().optional(),
   imageFile: z.instanceof(File, { error: "Event Image is required" }),
   eventType: z.string(),
 });
@@ -63,12 +63,17 @@ const BasicEventDetails = ({
   });
 
   useEffect(() => {
+    if (selectedEvent.meta?.isNew) {
+      reset(createEventInitialFormData);
+      return;
+    }
+
     if (selectedEvent) {
       const editEvent: CreateEventFormData = {
         description: selectedEvent.description,
         eventName: selectedEvent.eventName,
         duration: selectedEvent.duration,
-        eventType: selectedEvent.eventType.toString(),
+        eventType: selectedEvent.eventType?.toString() ?? "",
         imageFile: new File([], "tmp"),
       };
 
@@ -144,9 +149,8 @@ const BasicEventDetails = ({
           multiline
           rows={7}
         />
-        {selectedEvent ? (
+        {selectedEvent.fileUrl ? (
           <div>
-            {" "}
             <img
               className="h-auto  object-fit w-full lg:w-1/3 lg-flex-shrink-0 lg:object-contain aspect-4/3 object-cover"
               src={selectedEvent.fileUrl}

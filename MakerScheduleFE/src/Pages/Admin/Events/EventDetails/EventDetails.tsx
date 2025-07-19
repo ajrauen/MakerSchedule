@@ -2,7 +2,7 @@ import type { EventOffering, EventType } from "@ms/types/event.types";
 
 import { BasicEventDetails } from "@ms/Pages/Admin/Events/EventDetails/BasicDetails/BasicEventDetails";
 import { IconButton, Tab, Tabs } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import CloseIcon from "@mui/icons-material/Close";
 import { useQuery } from "@tanstack/react-query";
@@ -21,27 +21,22 @@ const EventDetails = ({
   eventTypes,
 }: CreateEventProps) => {
   const [value, setValue] = useState(0);
-  const [event, setEvent] = useState<EventOffering>(selectedEvent);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
   const { data: eventResponse } = useQuery({
-    queryKey: [selectedEvent?.id, "event"],
-    queryFn: () => {
-      if (!selectedEvent?.id) return;
+    queryKey: ["event", selectedEvent?.id],
+    queryFn: async () => {
+      if (!selectedEvent.id) {
+        throw new Error("Query should not run without userId");
+      }
+
       return getEvent(selectedEvent.id);
     },
-    enabled: !!selectedEvent?.id,
+    enabled: !!selectedEvent?.id || !!selectedEvent.meta?.isNew,
   });
-
-  useEffect(() => {
-    if (eventResponse?.data) {
-      setEvent(eventResponse.data);
-      return;
-    }
-  }, [eventResponse]);
 
   function a11yProps(index: number) {
     return {
@@ -50,9 +45,16 @@ const EventDetails = ({
     };
   }
 
+  const event = useMemo(() => {
+    return {
+      ...selectedEvent,
+      ...eventResponse?.data,
+    };
+  }, [eventResponse?.data, selectedEvent]);
+
   return (
     <div className="flex flex-col h-full w-full">
-      <div className="ml-auto absolute right-2 Z-100">
+      <div className="ml-auto absolute right-2 z-1001">
         <IconButton onClick={() => onClose(false)}>
           <CloseIcon />
         </IconButton>

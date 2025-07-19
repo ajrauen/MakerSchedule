@@ -8,9 +8,9 @@ using MakerSchedule.Domain.Aggregates.Event;
 public class DomainUser
 {
     [Key]
-    public string Id { get; set; } = string.Empty;
+    public Guid Id { get; set; } =  Guid.NewGuid();
     [Required]
-    public string UserId { get; set; } = string.Empty;
+    public Guid UserId { get; set; } =  Guid.NewGuid();
     public User User { get; set; } = null!;
     public string PreferredContactMethod { get; set; } = string.Empty;
 

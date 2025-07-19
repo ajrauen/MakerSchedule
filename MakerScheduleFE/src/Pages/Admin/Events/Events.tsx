@@ -1,9 +1,12 @@
+import { deleteEvent } from "@ms/api/event.api";
+import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmatoin";
 import { useApplicationData } from "@ms/hooks/useApplicationData";
 import { EventDetails } from "@ms/Pages/Admin/Events/EventDetails/EventDetails";
 import { EventsHeader } from "@ms/Pages/Admin/Events/Header/Header";
 import { AdminEventsTable } from "@ms/Pages/Admin/Events/Table/Table";
 import type { EventOffering } from "@ms/types/event.types";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { AxiosResponse } from "axios";
 import { useState, type TransitionEvent } from "react";
 
 const AdminEvents = () => {
@@ -12,9 +15,34 @@ const AdminEvents = () => {
   const [selectedEvent, setSelectedEvent] = useState<EventOffering | undefined>(
     undefined
   );
+  const [eventToDelete, setEventToDelete] = useState<
+    EventOffering | undefined
+  >();
 
   const { events, appMetaData } = useApplicationData();
   const queryClient = useQueryClient();
+
+  const { mutate: deleteEventMutation } = useMutation({
+    mutationKey: ["deleteEvent"],
+    mutationFn: deleteEvent,
+    onSuccess: () => {
+      debugger;
+      if (!eventToDelete) return;
+
+      queryClient.setQueryData(
+        ["events"],
+        (oldEvents: AxiosResponse<EventOffering[]>) => {
+          return oldEvents.data.filter((evt) => evt.id === eventToDelete.id);
+        }
+      );
+
+      if (selectedEvent?.id === eventToDelete.id) {
+        setSelectedEvent(undefined);
+      }
+
+      setEventToDelete(undefined);
+    },
+  });
 
   const handleDrawerClose = (refreshData: boolean) => {
     setRefreshData(refreshData);
@@ -26,6 +54,18 @@ const AdminEvents = () => {
     handleDrawerOpen();
   };
 
+  const handleEventCreate = () => {
+    const newEvent: EventOffering = {
+      description: "",
+      eventName: "",
+
+      meta: {
+        isNew: true,
+      },
+    };
+    setSelectedEvent(newEvent);
+    handleDrawerOpen();
+  };
   const handleDrawerOpen = () => {
     setRefreshData(false);
     setIsDrawerOpen(true);
@@ -43,6 +83,17 @@ const AdminEvents = () => {
     }
   };
 
+  const handleDeletClick = (event: EventOffering) => {
+    setEventToDelete(event);
+  };
+
+  const handleCancelDeleteEvent = () => setEventToDelete(undefined);
+  const handleConfirmDeleteEvent = () => {
+    if (!eventToDelete?.id) return;
+
+    deleteEventMutation(eventToDelete.id);
+  };
+
   return (
     <div className="flex w-full">
       <div
@@ -51,12 +102,13 @@ const AdminEvents = () => {
           marginRight: isDrawerOpen ? "var(--create-drawer-width)" : "",
         }}
       >
-        <EventsHeader onOpenDrawer={handleDrawerOpen} />
+        <EventsHeader onCreateEvent={handleEventCreate} />
         <AdminEventsTable
           events={events}
           onEdit={handleEventEdit}
           eventTypes={appMetaData.eventTypes}
           selectedEvent={selectedEvent}
+          onEventDelete={handleDeletClick}
         />
       </div>
       <div
@@ -68,13 +120,22 @@ const AdminEvents = () => {
         onTransitionEnd={handlePanelTransitionEnd}
       >
         <div className="p-6 h-full">
-          <EventDetails
-            onClose={handleDrawerClose}
-            selectedEvent={selectedEvent}
-            eventTypes={appMetaData.eventTypes}
-          />
+          {selectedEvent && (
+            <EventDetails
+              onClose={handleDrawerClose}
+              selectedEvent={selectedEvent}
+              eventTypes={appMetaData.eventTypes}
+            />
+          )}
         </div>
       </div>
+      <ConfirmationDialog
+        open={!!eventToDelete}
+        onCancel={handleCancelDeleteEvent}
+        onConfirm={handleConfirmDeleteEvent}
+        title="Delete Event"
+        details="You sure? Because you cant come back from this!"
+      />
     </div>
   );
 };

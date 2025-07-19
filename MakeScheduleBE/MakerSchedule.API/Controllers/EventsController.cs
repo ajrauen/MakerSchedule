@@ -28,7 +28,7 @@ public class EventsController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<EventDTO>> GetEvent(string id)
+    public async Task<ActionResult<EventDTO>> GetEvent(Guid id)
     {
         var eventItem = await _eventService.GetEventAsync(id);
         return Ok(eventItem);
@@ -42,8 +42,8 @@ public class EventsController : ControllerBase
         return Ok(eventId);
     }
 
-    [HttpDelete("${eventId}")]
-    public async Task<IActionResult> DeleteEvent(string eventId)
+    [HttpDelete("{eventId}")]
+    public async Task<IActionResult> DeleteEvent(Guid eventId)
     {
         var deleted = await _eventService.DeleteEventAsync(eventId);
         if (deleted)

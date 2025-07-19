@@ -6,12 +6,12 @@ using MakerSchedule.Domain.Aggregates.DomainUser;
 public class OccurrenceAttendee
 {
     [Key]
-    public string Id { get; set; } = string.Empty;
+    public Guid Id { get; set; } =  Guid.NewGuid();
     
-    public string OccurrenceId { get; set; } = string.Empty;
+    public Guid OccurrenceId { get; set; } =  Guid.NewGuid();
     public Occurrence Occurrence { get; set; } = null!;
 
-    public string UserId { get; set; } = string.Empty;
+    public Guid UserId { get; set; } =  Guid.NewGuid();
     public DomainUser User { get; set; } = null!;
 
     // Optional metadata

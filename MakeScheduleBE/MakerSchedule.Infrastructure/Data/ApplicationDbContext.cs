@@ -12,7 +12,7 @@ using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Aggregates.User;
 using MakerSchedule.Domain.ValueObjects;
 
-public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string>, IApplicationDbContext
+public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, Guid>, IApplicationDbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
@@ -84,6 +84,12 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole, string
                 .HasForeignKey(oa => oa.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        // Configure one-to-one relationship between DomainUser and User
+        modelBuilder.Entity<DomainUser>()
+            .HasOne(d => d.User)
+            .WithOne(u => u.DomainUser)
+            .HasForeignKey<DomainUser>(d => d.UserId);
     }
 
     public DbSet<DomainUser> DomainUsers { get; set; }

@@ -5,10 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using MakerSchedule.Domain.Aggregates.DomainUser;
 
-public class User : IdentityUser
+public class User : IdentityUser<Guid>
 {
     [Key]
-    public override string Id { get; set; } = string.Empty;
+    public override Guid Id { get; set; } = Guid.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;

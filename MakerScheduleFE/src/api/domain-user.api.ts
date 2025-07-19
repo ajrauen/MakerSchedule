@@ -30,4 +30,22 @@ const registerNewDomainUser = async (user: RegisterDomainUserRequest) => {
   return response;
 };
 
-export { getDomainUserList, registerNewDomainUser };
+const getAvailableDomainUserLeaders = async (
+  startTime: number,
+  duration: number
+) => {
+  const req: AxiosRequestConfig = {
+    method: "GET",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/available-leaders?startTime=${startTime}&duration=${duration}`,
+    withCredentials: true,
+  };
+  const response = await sendRequest<DomainUser[]>(req);
+
+  return response;
+};
+
+export {
+  getDomainUserList,
+  registerNewDomainUser,
+  getAvailableDomainUserLeaders,
+};

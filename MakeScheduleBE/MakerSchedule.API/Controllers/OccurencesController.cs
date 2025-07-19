@@ -8,35 +8,12 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class OccurrencesController : ControllerBase
+public class OccurrencesController(IEventService eventService) : ControllerBase
 {
-    private readonly IOccurrenceService _occuranceService;
-
-    public OccurrencesController(IOccurrenceService occurrenceService)
-    {
-        _occuranceService = occurrenceService;
-    }
-
-    [HttpGet]
-    public async Task<ActionResult<OccurenceListDTO>> GetAllOccurrencesAsync()
-    {
-        var occurences = await _occuranceService.GetAllOccurrencesAsync();
-        return Ok(occurences);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult<OccurenceDTO>> GetOccurrenceByIdAsync(string id)
-    {
-        var occurences = await _occuranceService.GetOccurrenceByIdAsync(id);
-        return Ok(occurences);
-    }
-
     [HttpPost]
     public async Task<ActionResult<string>> CreateOccuranceAsync([FromBody] CreateOccurenceDTO createOccurenceDTO)
     {
-        var occurrence = await _occuranceService.CreateOccurrenceAsync(createOccurenceDTO);
+        var occurrence = await eventService.CreateOccurrenceAsync(createOccurenceDTO);
         return Ok(occurrence);
     }
-
-
 }

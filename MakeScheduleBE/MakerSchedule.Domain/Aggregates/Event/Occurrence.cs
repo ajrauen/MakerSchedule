@@ -7,9 +7,9 @@ using MakerSchedule.Domain.ValueObjects;
 public class Occurrence
 {
     [Key]
-    public string Id { get; set; } = string.Empty;
+    public Guid Id { get; set; } =  Guid.NewGuid();
     [Required]
-    public string EventId { get; set; } = string.Empty;
+    public Guid EventId { get; set; }
     public Event Event { get; set; } = null!;
     public ScheduleStart? ScheduleStart { get; set; }
     public int? Duration { get; set; }
@@ -20,11 +20,10 @@ public class Occurrence
 
     public Occurrence() { }
 
-    public Occurrence(string eventId, OccurrenceInfo info)
+    public Occurrence(Guid eventId, OccurrenceInfo info)
     {
         EventId = eventId;
         ScheduleStart = new ScheduleStart(info.ScheduleStart);
         Duration = info.Duration;
-        // Note: Attendees and Leaders will be managed through the join entities
     }
 } 

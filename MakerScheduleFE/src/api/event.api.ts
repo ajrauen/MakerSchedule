@@ -2,7 +2,7 @@ import { sendRequest } from "@ms/api/api.utils";
 import type { EventOffering } from "@ms/types/event.types";
 import type { AxiosRequestConfig } from "axios";
 
-const BASE_EVENT_ENDPOINT = "api/events";
+const BASE_EVENT_ENDPOINT = "api/Events";
 
 const createEvent = async (event: FormData) => {
   const req: AxiosRequestConfig = {
@@ -25,7 +25,7 @@ const getEvents = async () => {
   return await sendRequest<EventOffering[]>(req);
 };
 
-const getEvent = async (eventId: number) => {
+const getEvent = async (eventId: string) => {
   const req: AxiosRequestConfig = {
     method: "GET",
     url: `${BASE_EVENT_ENDPOINT}/${eventId}`,
@@ -35,4 +35,14 @@ const getEvent = async (eventId: number) => {
   return await sendRequest<EventOffering>(req);
 };
 
-export { createEvent, getEvents, getEvent };
+const deleteEvent = async (eventId: string) => {
+  const req: AxiosRequestConfig = {
+    method: "DELETE",
+    url: `${BASE_EVENT_ENDPOINT}/${eventId}`,
+    withCredentials: true,
+  };
+
+  return await sendRequest<boolean>(req);
+};
+
+export { createEvent, getEvents, getEvent, deleteEvent };

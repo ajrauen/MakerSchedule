@@ -17,6 +17,14 @@ public record ScheduleStart
         Value = date;
     }
 
+    public static ScheduleStart ForSeeding(DateTime date) => new ScheduleStart(date, skipCheck: true);
+
+    private ScheduleStart(DateTime date, bool skipCheck)
+    {
+        Value = date;
+    }
+
+
     public static ValueConverter<ScheduleStart?, DateTime?> Converter =>
         new ValueConverter<ScheduleStart?, DateTime?>(
             scheduleStart => scheduleStart == null ? (DateTime?)null : scheduleStart.Value,

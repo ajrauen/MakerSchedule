@@ -11,10 +11,10 @@ public interface IDomainUserService
 {
     Task<IEnumerable<DomainUser>> GetAllDomainUsersWithDetailsAsync();
     Task<IEnumerable<DomainUserListDTO>> GetAllDomainUsersAsync();
-    Task<DomainUserDTO> GetDomainUserByIdAsync(string id);
-    Task DeleteDomainUserByIdAsync(string id);
+    Task<DomainUserDTO> GetDomainUserByIdAsync(Guid id);
+    Task DeleteDomainUserByIdAsync(Guid id);
 
-    Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(string occurrenceId);
+    Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(long startTime, long duration);
     Task<IEnumerable<DomainUserListDTO>> GetAllDomainUsersByRoleAsync(string role);
 
 }

@@ -14,7 +14,6 @@ public static class MakerScheduleExtensions
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEventService, EventService>();
-        services.AddScoped<IOccurrenceService, OccurrenceService>();
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
         services.AddScoped<IMetadataService, MetadataService>();
 

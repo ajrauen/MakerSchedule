@@ -11,7 +11,7 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/domain-users")]
 [Produces("application/json")]
-public class DomainUsersController(IDomainUserService domainUserService, IDomainUserProfileService domainUserProfileService, ILogger<DomainUsersController> logger) : ControllerBase
+public class DomainUsersController(IDomainUserService domainUserService, IDomainUserProfileService domainUserProfileService) : ControllerBase
 {
 
     [HttpGet]
@@ -22,14 +22,14 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<DomainUserDTO>> GetById(string id)
+    public async Task<ActionResult<DomainUserDTO>> GetById(Guid id)
     {
         var user = await domainUserService.GetDomainUserByIdAsync(id);
         return Ok(user);
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteDomainUserByIdAsync(string id)
+    public async Task<IActionResult> DeleteDomainUserByIdAsync(Guid id)
     {
         await domainUserService.DeleteDomainUserByIdAsync(id);
         return NoContent();
@@ -50,30 +50,43 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     public async Task<IActionResult> CreateDomainUserProfile([FromBody] CreateDomainUserDTO domainUserDTO)
     {
         var newUserId = await domainUserProfileService.CreateDomainUserAsync(domainUserDTO);
-        if (!string.IsNullOrEmpty(newUserId))
+        if (newUserId != Guid.Empty)
         {
             return CreatedAtAction(nameof(GetById), new { id = newUserId }, new { id = newUserId });
         }
         return BadRequest("User could not be created.");
     }
 
-    [HttpGet()]
+    // [HttpGet()]
+    // // [Authorize(Roles = "Admin")]
+    // [Route("/leaders")]
+    // public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromQuery] string? occurrenceId = null, [FromQuery] string? role = null)
+    // {
+    //     IEnumerable<DomainUserListDTO> leaders;
+
+
+
+    //     if (string.IsNullOrEmpty(occurrenceId))
+    //     {
+    //         leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(occurrenceId);
+    //     }
+    //     else
+    //     {
+    //         leaders = await domainUserService.GetAllDomainUsersByRoleAsync(role);
+    //     }
+
+    //     return Ok(leaders);
+    // }
+
+     [HttpGet()]
     // [Authorize(Roles = "Admin")]
-    [Route("api/all")]
-        public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromQuery] string? occurrenceId = null, [FromQuery] string? role = null)
+    [Route("available-leaders")]
+    public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromQuery] long startTime, [FromQuery] long duration)
     {
         IEnumerable<DomainUserListDTO> leaders;
 
-
-
-        if (string.IsNullOrEmpty(occurrenceId))
-        {
-            leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(occurrenceId);
-        }
-        else
-        {
-            leaders = await domainUserService.GetAllDomainUsersByRoleAsync(role);
-        }
+            leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(startTime, duration);
+      
 
         return Ok(leaders);
     }

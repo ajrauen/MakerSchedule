@@ -7,6 +7,8 @@ using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.Aggregates.User;
 using MakerSchedule.Domain.Constants;
+using MakerSchedule.Domain.Exceptions;
+using MakerSchedule.Domain.ValueObjects;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -64,7 +66,7 @@ public class DomainUserService(
         }
     }
 
-    public async Task<DomainUserDTO> GetDomainUserByIdAsync(string id)
+    public async Task<DomainUserDTO> GetDomainUserByIdAsync(Guid id)
     {
         try
         {
@@ -102,7 +104,7 @@ public class DomainUserService(
     }
 
 
-    public async Task DeleteDomainUserByIdAsync(string id)
+    public async Task DeleteDomainUserByIdAsync(Guid id)
     {
         var DomainUser = await _context.DomainUsers.FirstOrDefaultAsync(e => e.Id == id);
         if (DomainUser == null)
@@ -110,7 +112,7 @@ public class DomainUserService(
             throw new NotFoundException("DomainUser", id);
         }
 
-        var user = await userManager.FindByIdAsync(DomainUser.UserId);
+        var user = await userManager.FindByIdAsync(DomainUser.UserId.ToString());
         if (user == null)
         {
             _logger.LogWarning("User with ID {UserId} not found.", DomainUser.UserId);
@@ -149,35 +151,44 @@ public class DomainUserService(
     }
 
 
-    public async Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(string occurrenceId)
+    public async Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(long startTime, long duration)
     {
-        var occurrence = await _context.Occurrences.Include(o => o.Event).FirstOrDefaultAsync(o => o.Id == occurrenceId);
-        if (occurrence == null)
+         ScheduleStart occurrenceStart;
+        try
         {
-            throw new NotFoundException("Occurrence not found", occurrenceId);
+            var parsedDate = DateTimeOffset.FromUnixTimeMilliseconds(startTime).UtcDateTime;
+            occurrenceStart = new ScheduleStart(parsedDate);
+        }
+        catch (ScheduleDateOutOfBoundsException ex)
+        {
+            throw new BaseException(ex.Message, "@TODO_ERROR_CODE", 400);
         }
 
-        var occurrenceStart = occurrence.ScheduleStart ?? DateTime.MinValue;
-        var occurrenceEnd = occurrenceStart.Value.AddMinutes(occurrence.Duration ?? 0);
+        var occurrenceEnd = occurrenceStart.Value.AddMilliseconds(duration);
 
         var leaderUsers = await userManager.GetUsersInRoleAsync(Roles.Leader);
         var leaderIds = leaderUsers.Select(l => l.Id).ToList();
 
         var domainUsers = await _context.DomainUsers.Include(du => du.User).Where(du => leaderIds.Contains(du.UserId)).ToListAsync();
-        // Get all occurrence leaders with their occurrences
         var allLeaders = await _context.OccurrenceLeaders
             .Include(l => l.Occurrence)
             .Where(o => o.Occurrence != null)
             .ToListAsync();
 
-        // Now filter in-memory using C# (not SQL)
         var busyLeaders = allLeaders
             .Where(o =>
-                o.Occurrence.ScheduleStart < occurrenceEnd &&
-                o.Occurrence.ScheduleStart.Value.AddMilliseconds(o.Occurrence.Duration ?? 0) > occurrenceStart)
+            {
+                var occStart = o.Occurrence.ScheduleStart!.Value;
+                var occEnd = occStart.AddMilliseconds(o.Occurrence.Duration ?? 0);
+                var overlaps = occStart < occurrenceEnd && occEnd > occurrenceStart.Value;
+
+                return overlaps;
+            })
             .Select(l => l.UserId)
             .Distinct()
             .ToList();
+            
+
 
         var availableLeaders = domainUsers.Where(u => !busyLeaders.Contains(u.Id));
 

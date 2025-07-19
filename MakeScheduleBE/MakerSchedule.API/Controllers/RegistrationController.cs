@@ -10,7 +10,7 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/register")]
 [Produces("application/json")]
-public class RegistrationController(IDomainUserProfileService domainUserProfileService, IDomainUserService domainUserService ) : ControllerBase
+public class RegistrationController(IDomainUserProfileService domainUserProfileService ) : ControllerBase
 {
 
 
@@ -18,7 +18,7 @@ public class RegistrationController(IDomainUserProfileService domainUserProfileS
     public async Task<IActionResult> Register(CreateDomainUserDTO dto)
     {
         var newUserId = await domainUserProfileService.CreateDomainUserAsync(dto);
-        if (!string.IsNullOrEmpty(newUserId))
+        if (newUserId != Guid.Empty)
         {
             return Ok(new { id = newUserId });
         }

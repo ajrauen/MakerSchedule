@@ -62,11 +62,12 @@ public class DomainUserServiceTests : IAsyncLifetime
         DbContext!.Events.Add(testEvent);
         await DbContext.SaveChangesAsync();
 
+        var now = DateTime.UtcNow.AddHours(5);
         var testOccurrence = new MakerSchedule.Domain.Aggregates.Event.Occurrence
         {
             Id = "occ1",
             EventId = "event1",
-            ScheduleStart = new MakerSchedule.Domain.ValueObjects.ScheduleStart(DateTime.UtcNow.AddHours(1)),
+            ScheduleStart = new MakerSchedule.Domain.ValueObjects.ScheduleStart(now),
             Duration = 60
         };
         DbContext.Occurrences.Add(testOccurrence);
@@ -84,7 +85,7 @@ public class DomainUserServiceTests : IAsyncLifetime
         {
             Id = "occ2",
             EventId = "event1",
-            ScheduleStart = new MakerSchedule.Domain.ValueObjects.ScheduleStart(DateTime.UtcNow.AddHours(1)), // same as occ1
+            ScheduleStart = new MakerSchedule.Domain.ValueObjects.ScheduleStart(now), // same as occ1
             Duration = 60
         };
         DbContext.Occurrences.Add(overlappingOccurrence);
@@ -119,8 +120,9 @@ public class DomainUserServiceTests : IAsyncLifetime
             mockUserManager.Object,
             mockMapper.Object);
 
-        // Act
-        var result = await service.GetAvailableOccurrenceLeadersAsync("occ1");
+        long startTimeMs = new DateTimeOffset(now).ToUnixTimeMilliseconds();
+        long durationMs = 60 * 60 * 1000; // 1 hour in ms
+        var result = await service.GetAvailableOccurrenceLeadersAsync((long)now.Ticks, 60);
 
         // Assert
         Assert.NotNull(result);
@@ -401,22 +403,5 @@ public class DomainUserServiceTests : IAsyncLifetime
             await service.DeleteDomainUserByIdAsync("domain1"));
     }
 
-    [Fact]
-    public async Task GetAvailableOccurrenceLeadersAsync_ThrowsNotFoundException_WhenOccurrenceNotFound()
-    {
-        // Arrange
-        var store = new Mock<IUserStore<User>>();
-        var mockUserManager = new Mock<UserManager<User>>(store.Object, null, null, null, null, null, null, null, null);
-        var mockLogger = new Mock<ILogger<MakerSchedule.Application.Services.DomainUserService>>();
-        var mockMapper = new Mock<IMapper>();
-        var service = new MakerSchedule.Application.Services.DomainUserService(
-            DbContext!,
-            mockLogger.Object,
-            mockUserManager.Object,
-            mockMapper.Object);
 
-        // Act & Assert
-        await Assert.ThrowsAsync<MakerSchedule.Application.Exceptions.NotFoundException>(async () =>
-            await service.GetAvailableOccurrenceLeadersAsync("doesnotexist"));
-    }
 } 

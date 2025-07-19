@@ -4,7 +4,7 @@ namespace MakerSchedule.Application.DTO.Event;
 
 public class EventListDTO
 {
-    public string Id { get; set; } = string.Empty;
+    public Guid Id { get; set; } =  Guid.NewGuid();
     public required string EventName { get; set; }
     public string Description { get; set; } = "";
     public EventTypeEnum EventType { get; set; }

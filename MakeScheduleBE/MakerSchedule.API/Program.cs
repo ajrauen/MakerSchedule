@@ -23,7 +23,7 @@ services.AddCorsWithOptions();
 services.AddDatabase(configuration);
 
 // Add Identity service with role support for User
-services.AddIdentity<User, IdentityRole>()
+services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 

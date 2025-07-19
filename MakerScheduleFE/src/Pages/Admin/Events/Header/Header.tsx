@@ -2,13 +2,13 @@ import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
 
 interface EventsHeaderProps {
-  onOpenDrawer: () => void;
+  onCreateEvent: () => void;
 }
 
-const EventsHeader = ({ onOpenDrawer }: EventsHeaderProps) => {
+const EventsHeader = ({ onCreateEvent }: EventsHeaderProps) => {
   return (
     <div>
-      <Button onClick={onOpenDrawer} startIcon={<AddIcon />} variant="text">
+      <Button onClick={onCreateEvent} startIcon={<AddIcon />} variant="text">
         Create Event
       </Button>
     </div>

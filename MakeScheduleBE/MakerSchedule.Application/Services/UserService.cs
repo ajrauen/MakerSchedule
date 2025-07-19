@@ -18,7 +18,7 @@ public class UserService(UserManager<User> userManager, ILogger<UserService> log
     {
         ArgumentNullException.ThrowIfNull(user);
 
-        var existingUser = await _userManager.FindByIdAsync(user.Id);
+        var existingUser = await _userManager.FindByIdAsync(user.Id.ToString());
 
         if (existingUser == null)
         {

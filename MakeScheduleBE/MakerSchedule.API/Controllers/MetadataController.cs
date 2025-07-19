@@ -9,7 +9,7 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class MetadataController(IMetadataService metadataService, ILogger<EventService> logger) : ControllerBase
+public class MetadataController(IMetadataService metadataService) : ControllerBase
 {
 
     [HttpGet]

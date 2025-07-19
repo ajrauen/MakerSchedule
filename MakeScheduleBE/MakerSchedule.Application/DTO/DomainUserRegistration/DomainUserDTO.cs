@@ -3,8 +3,8 @@ namespace MakerSchedule.Application.DTO.DomainUser;
 public class DomainUserDTO
 {
     // Employee fields
-    public string Id { get; set; } = string.Empty;
-    public string UserId { get; set; } = string.Empty;
+    public Guid Id { get; set; } =  Guid.NewGuid();
+    public Guid UserId { get; init; } =  Guid.NewGuid();
 
     // User fields
     public string Email { get; set; } = string.Empty;

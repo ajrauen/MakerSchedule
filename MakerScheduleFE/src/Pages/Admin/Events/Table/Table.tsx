@@ -14,14 +14,21 @@ interface AdminEventTableProps {
   eventTypes: EventType;
   onEdit: (event: EventOffering) => void;
   selectedEvent?: EventOffering;
+  onEventDelete: (event: EventOffering) => void;
 }
 
 const AdminEventsTable = ({
   eventTypes,
   onEdit,
   selectedEvent,
+  onEventDelete,
   events = [],
 }: AdminEventTableProps) => {
+  const handleDeletClick = (evt: React.MouseEvent, row: EventOffering) => {
+    evt.stopPropagation();
+    onEventDelete(row);
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table stickyHeader aria-label="sticky table">
@@ -54,7 +61,9 @@ const AdminEventsTable = ({
                   {row.description}
                 </div>
               </TableCell>
-              <TableCell>{eventTypes[row.eventType]}</TableCell>
+              <TableCell>
+                {row.eventType ? eventTypes[row.eventType] : "unknown"}
+              </TableCell>
               <TableCell>{row.duration && durationMap[row.duration]}</TableCell>
               <TableCell>
                 <img
@@ -73,7 +82,8 @@ const AdminEventsTable = ({
                   variant="outlined"
                   color="secondary"
                   size="small"
-                  style={{ marginLeft: 8 }}
+                  className="m-2"
+                  onClick={(evt) => handleDeletClick(evt, row)}
                 >
                   Delete
                 </Button>

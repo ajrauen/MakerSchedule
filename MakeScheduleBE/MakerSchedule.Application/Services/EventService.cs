@@ -5,6 +5,7 @@ using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.Event;
+using MakerSchedule.Domain.Exceptions;
 using MakerSchedule.Domain.Utilties.ImageUtilities;
 using MakerSchedule.Domain.ValueObjects;
 
@@ -13,14 +14,14 @@ using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services;
 
-public class EventService(IApplicationDbContext context, ILogger<EventService> logger, IImageStorageService imageStorageService): IEventService
+public class EventService(IApplicationDbContext context, ILogger<EventService> logger, IImageStorageService imageStorageService) : IEventService
 {
     private readonly IApplicationDbContext _context = context;
     private readonly ILogger<EventService> _logger = logger;
     private readonly IImageStorageService _imageStorageService = imageStorageService;
     private const double RequiredAspectRatio = 4.0 / 3.0;
 
-  
+
 
     public async Task<IEnumerable<EventListDTO>> GetAllEventsAsync()
     {
@@ -36,7 +37,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         }).ToListAsync();
     }
 
-    public async Task<EventDTO> GetEventAsync(string id)
+    public async Task<EventDTO> GetEventAsync(Guid id)
     {
         var e = await _context.Events
         .Include(ev => ev.Occurrences)
@@ -44,7 +45,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         .Include(ev => ev.Occurrences)
             .ThenInclude(ev => ev.Leaders)
         .FirstOrDefaultAsync(ev => ev.Id == id);
-        
+
         if (e == null) throw new NotFoundException("Event", id);
         return new EventDTO
         {
@@ -57,15 +58,16 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Occurences = e.Occurrences.Select(o => new OccurenceDTO
             {
                 Id = o.Id,
-                Attendees = o.Attendees.Select(a => a.Id).ToList(),
+                Attendees = o.Attendees.Select(a => a.Id.ToString()).ToList(),
                 Duration = o.Duration,
                 EventId = o.EventId,
-                Leaders = o.Leaders.Select(a => a.Id).ToList(),
+                Leaders = o.Leaders.Select(a => a.Id.ToString()).ToList(),
+                ScheduleStart = o.ScheduleStart != null ? new DateTimeOffset(o.ScheduleStart.Value).ToUnixTimeMilliseconds() : 0,
             })
         };
     }
 
-    public async Task<string> CreateEventAsync(CreateEventDTO dto)
+    public async Task<Guid> CreateEventAsync(CreateEventDTO dto)
     {
 
         if (dto.FormFile == null || dto.FormFile.Length == 0)
@@ -79,7 +81,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Description = dto.Description,
             EventType = dto.EventType,
             Duration = dto.Duration > 0 ? new Duration(dto.Duration) : null,
-            
+
         };
         _context.Events.Add(e);
         await _context.SaveChangesAsync();
@@ -95,9 +97,10 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 {
                     if (!ImageUtilities.IsSvgAspectRatioValid(stream, RequiredAspectRatio))
                     {
-                    throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
+                        throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
                     }
-                }else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
+                }
+                else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
                 {
                     throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
                 }
@@ -123,7 +126,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return e.Id;
     }
 
-    public async Task<bool> DeleteEventAsync(string id)
+    public async Task<bool> DeleteEventAsync(Guid id)
     {
         var e = await _context.Events.FindAsync(id);
         if (e == null) return false;
@@ -131,4 +134,64 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         await _context.SaveChangesAsync();
         return true;
     }
+    
+    public async Task<Guid> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO)
+    {
+        var scheduledStart = DateTimeOffset.FromUnixTimeMilliseconds(occurrenceDTO.ScheduleStart).UtcDateTime;
+
+        // Load the Event aggregate root
+        var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
+        if (eventEntity == null)
+            throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
+
+        OccurrenceInfo info;
+        Occurrence newOccurrence;
+        try
+        {
+            info = new OccurrenceInfo(scheduledStart, occurrenceDTO.Duration);
+             newOccurrence = eventEntity.AddOccurrence(info);
+        }
+        catch (ScheduleDateOutOfBoundsException ex)
+        {
+            _logger.LogError("Exception type: {Type}, message: {Message}", ex.GetType().FullName, ex.Message);
+            throw new BaseException(ex.Message, "SCHEDULE_START_INVALID", 400);
+        }
+        
+
+        foreach (var leaderId in occurrenceDTO.Leaders)
+        {
+            var leader = await _context.DomainUsers.FindAsync(leaderId);
+            if (leader != null)
+            {
+                var occurrenceLeader = new OccurrenceLeader
+                {
+                    OccurrenceId = newOccurrence.Id,
+                    UserId = leaderId,
+                    AssignedAt = DateTime.UtcNow
+                };
+                _context.OccurrenceLeaders.Add(occurrenceLeader);
+            }
+        }
+
+        foreach (var attendeeId in occurrenceDTO.Attendees)
+        {
+            var attendee = await _context.DomainUsers.FindAsync(attendeeId);
+            if (attendee != null)
+            {
+                var occurrenceAttendee = new OccurrenceAttendee
+                {
+                    OccurrenceId = newOccurrence.Id,
+                    UserId = attendeeId,
+                    RegisteredAt = DateTime.UtcNow
+                };
+                _context.OccurrenceAttendees.Add(occurrenceAttendee);
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        _logger.LogInformation("Successfully created occurrence with {OccurrenceId}", newOccurrence.Id);
+        return newOccurrence.Id;
+    }
+
+
 }

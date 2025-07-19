@@ -1,6 +1,10 @@
 import type { CreateEventOffering } from "@ms/types/event.types";
 
 const createSaveForm = (event: CreateEventOffering) => {
+  if (!event.eventType) {
+    throw new Error("Missing event type");
+  }
+
   const form = new FormData();
   form.append("eventName", event.eventName);
   form.append("description", event.description);

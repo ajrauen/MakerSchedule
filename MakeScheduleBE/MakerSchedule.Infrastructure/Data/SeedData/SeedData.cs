@@ -20,8 +20,8 @@ public class SeedData
     {
         new DomainUser
         {
-            Id = Guid.NewGuid().ToString(),
-            UserId = "11111111-1111-1111-1111-111111111111",
+            Id = Guid.NewGuid(),
+            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
             // Add other required DomainUser properties if needed
         }
     };
@@ -29,11 +29,11 @@ public class SeedData
     // Removed SeedCustomers
 
     // Generate GUIDs for each event and store them for reuse
-    private static readonly string event1Id = Guid.NewGuid().ToString();
-    private static readonly string event2Id = Guid.NewGuid().ToString();
-    private static readonly string event3Id = Guid.NewGuid().ToString();
-    private static readonly string event4Id = Guid.NewGuid().ToString();
-    private static readonly string event5Id = Guid.NewGuid().ToString();
+    private static readonly Guid event1Id = Guid.NewGuid();
+    private static readonly Guid event2Id = Guid.NewGuid();
+    private static readonly Guid event3Id = Guid.NewGuid();
+    private static readonly Guid event4Id = Guid.NewGuid();
+    private static readonly Guid event5Id = Guid.NewGuid();
 
     public static List<Event> SeedEvents => new List<Event>
     {
@@ -85,7 +85,6 @@ public class SeedData
         {
             var occurrences = new List<Occurrence>();
             var random = new Random(42); // deterministic for repeatability
-            int occurrenceId = 1;
             var now = DateTime.UtcNow;
             var durationOptions = Enumerable.Range(2, 8).Select(i => i * 15).ToArray(); // 30, 45, ..., 120
 
@@ -99,11 +98,15 @@ public class SeedData
                     var daysOffset = random.Next(0, 90);
                     var minutesOffset = random.Next(0, 24 * 60);
                     var start = now.AddDays(daysOffset).AddMinutes(minutesOffset);
-                    var duration = durationOptions[random.Next(durationOptions.Length)];
-                    var info = new OccurrenceInfo(start, duration);
-                    var occurrence = new Occurrence(eventId, info)
+                    var duration = durationOptions[random.Next(durationOptions.Length) ] * 60 * 1000;
+                    
+                    // Create occurrence directly with ScheduleStart.ForSeeding to bypass future date validation
+                    var occurrence = new Occurrence
                     {
-                        Id = Guid.NewGuid().ToString()
+                        Id = Guid.NewGuid(),
+                        EventId = eventId,
+                        ScheduleStart = ScheduleStart.ForSeeding(start),
+                        Duration = duration
                     };
                     occurrences.Add(occurrence);
                 }
@@ -142,12 +145,12 @@ public class DatabaseSeeder
     private readonly UserManager<User> _userManager;
     private readonly ApplicationDbContext _context;
     private readonly ILogger<DatabaseSeeder> _logger;
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
     public DatabaseSeeder(
         UserManager<User> userManager,
         ApplicationDbContext context,
-        RoleManager<IdentityRole> roleManager,
+        RoleManager<IdentityRole<Guid>> roleManager,
         ILogger<DatabaseSeeder> logger)
 
     {
@@ -205,7 +208,7 @@ public class DatabaseSeeder
             {
                 var domainUser = new DomainUser
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid(),
                     UserId = user.Id,
                     PreferredContactMethod = "Email"
                     // Add other properties as needed
@@ -237,7 +240,7 @@ public class DatabaseSeeder
                 {
                     _context.OccurrenceLeaders.Add(new OccurrenceLeader
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Guid.NewGuid(),
                         OccurrenceId = occ.Id,
                         UserId = domainLeader.Id
                     });
@@ -257,7 +260,7 @@ public class DatabaseSeeder
                 {
                     _context.OccurrenceAttendees.Add(new OccurrenceAttendee
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Guid.NewGuid(),
                         OccurrenceId = occ.Id,
                         UserId = domainCustomer.Id
                     });
@@ -307,7 +310,7 @@ public class DatabaseSeeder
         {
             if (!await _roleManager.RoleExistsAsync(role))
             {
-                await _roleManager.CreateAsync(new IdentityRole(role));
+                await _roleManager.CreateAsync(new IdentityRole<Guid>(role));
             }
         }
     }
@@ -334,7 +337,7 @@ public class DatabaseSeeder
                 _logger.LogInformation("Creating new admin user: {Email}", adminEmail);
                 adminUser = new User
                 {
-                    Id = adminUserId, // Fixed ID to match seed data
+                    Id = Guid.Parse(adminUserId), // Fixed ID to match seed data
                     UserName = adminEmail,
                     Email = adminEmail,
                     FirstName = "Admin",

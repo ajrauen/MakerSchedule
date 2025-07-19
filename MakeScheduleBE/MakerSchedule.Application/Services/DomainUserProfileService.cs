@@ -19,7 +19,7 @@ public class DomainUserProfileService(IUserService userService, IDomainUserServi
     private readonly UserManager<User> _userManager = userManager;
     private readonly ILogger<DomainUserProfileService> _logger = logger;
 
-    public async Task<string> CreateDomainUserAsync(CreateDomainUserDTO dto)
+    public async Task<Guid> CreateDomainUserAsync(CreateDomainUserDTO dto)
     {
         _logger.LogInformation("Attempting to create user with email: {Email}", dto.Email);
 
@@ -135,7 +135,7 @@ public class DomainUserProfileService(IUserService userService, IDomainUserServi
             return false;
         }
 
-        var user = await _userManager.FindByIdAsync(domainUser.UserId);
+        var user = await _userManager.FindByIdAsync(domainUser.UserId.ToString());
         if (user == null)
         {
             _logger.LogWarning("User with ID {UserId} not found.", domainUser.UserId);
