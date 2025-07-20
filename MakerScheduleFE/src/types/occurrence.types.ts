@@ -4,7 +4,7 @@ interface Occurrence {
   scheduleStart: string;
   duration?: number;
   attendees?: number[];
-  leaders?: number[];
+  leaders?: string[];
   meta?: Record<string | number, string | number | boolean>; //store UI only data
 }
 
