@@ -6,29 +6,35 @@ namespace MakerSchedule.Domain.ValueObjects;
 
 public record ScheduleStart
 {
-    public DateTime Value { get;  }
+    public DateTime Value { get; }
 
-    public ScheduleStart(DateTime date)
+
+    private ScheduleStart(DateTime date)
     {
-        if (date <= DateTime.UtcNow)
+        Value = date;
+    }
+
+    public static ScheduleStart Create(DateTime date)
+    {
+        if (!IsValid(date))
         {
             throw new ScheduleDateOutOfBoundsException("Schedule start must be in the future");
         }
-        Value = date;
+        return new ScheduleStart(date);
     }
 
-    public static ScheduleStart ForSeeding(DateTime date) => new ScheduleStart(date, skipCheck: true);
-
-    private ScheduleStart(DateTime date, bool skipCheck)
+    private static bool IsValid(DateTime date)
     {
-        Value = date;
+        return date >= DateTime.UtcNow;
     }
 
 
-    public static ValueConverter<ScheduleStart?, DateTime?> Converter =>
-        new ValueConverter<ScheduleStart?, DateTime?>(
-            scheduleStart => scheduleStart == null ? (DateTime?)null : scheduleStart.Value,
-            value => value.HasValue ? new ScheduleStart(value.Value) : null);
+   public static ScheduleStart ForSeeding(DateTime date) => new ScheduleStart(date);
+
+public static ValueConverter<ScheduleStart?, DateTime?> Converter =>
+    new ValueConverter<ScheduleStart?, DateTime?>(
+        scheduleStart => scheduleStart == null ? (DateTime?)null : scheduleStart.Value,
+        value => value.HasValue ? ScheduleStart.ForSeeding(value.Value) : null);
 
     
 

@@ -23,7 +23,7 @@ public class Occurrence
     public Occurrence(Guid eventId, OccurrenceInfo info)
     {
         EventId = eventId;
-        ScheduleStart = new ScheduleStart(info.ScheduleStart);
+        ScheduleStart = ScheduleStart.Create(info.ScheduleStart);
         Duration = info.Duration;
     }
 } 

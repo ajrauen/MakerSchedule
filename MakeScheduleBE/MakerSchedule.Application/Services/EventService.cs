@@ -62,7 +62,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 Duration = o.Duration,
                 EventId = o.EventId,
                 Leaders = o.Leaders.Select(a => a.UserId.ToString()).ToList(),
-                ScheduleStart = o.ScheduleStart != null ? new DateTimeOffset(o.ScheduleStart.Value).ToString("O") : string.Empty,
+                ScheduleStart = o.ScheduleStart.Value,
             })
         };
     }
@@ -261,9 +261,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
     
     public async Task<Guid> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO)
     {
-        var scheduledStart = DateTimeOffset.Parse(occurrenceDTO.ScheduleStart).UtcDateTime;
 
-        // Load the Event aggregate root
         var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
         if (eventEntity == null)
             throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
@@ -272,7 +270,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         Occurrence newOccurrence;
         try
         {
-            info = new OccurrenceInfo(scheduledStart, occurrenceDTO.Duration);
+            info = new OccurrenceInfo(occurrenceDTO.ScheduleStart, occurrenceDTO.Duration);
             newOccurrence = eventEntity.AddOccurrence(info);
             _context.Occurrences.Add(newOccurrence);
         }

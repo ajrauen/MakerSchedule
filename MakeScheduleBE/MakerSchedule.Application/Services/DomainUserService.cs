@@ -158,7 +158,7 @@ public class DomainUserService(
         {
             var parsedDate = DateTimeOffset.Parse(startTime).UtcDateTime;
             _logger.LogInformation("Parsed ISO timestamp {StartTime} to date: {ParsedDate}", startTime, parsedDate);
-            occurrenceStart = new ScheduleStart(parsedDate);
+            occurrenceStart = ScheduleStart.Create(parsedDate);
         }
         catch (ScheduleDateOutOfBoundsException ex)
         {
