@@ -15,7 +15,7 @@ import {
 } from "@ms/Pages/Admin/Events/utils/event.utils";
 import { ImageUpload } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/ImageUpload";
 import { useMutation } from "@tanstack/react-query";
-import { createEvent } from "@ms/api/event.api";
+import { createEvent, patchEvent, updateEvent } from "@ms/api/event.api";
 import { z } from "zod";
 
 const createEventvalidationSchema = z.object({
@@ -26,7 +26,7 @@ const createEventvalidationSchema = z.object({
     .string()
     .min(3, { error: "Description must be at least 3 characters" }),
 
-  duration: z.string().optional(),
+  duration: z.number().optional(),
   imageFile: z.instanceof(File, { error: "Event Image is required" }),
   eventType: z.string(),
 });
@@ -86,9 +86,16 @@ const BasicEventDetails = ({
     reset(createEventInitialFormData);
   };
 
-  const { mutate: saveEvent, isPending: isSavePending } = useMutation({
+  const { mutate: saveEventQuery, isPending: isSavePending } = useMutation({
     mutationKey: ["createEvent"],
     mutationFn: createEvent,
+    onSuccess: () => handleOnClose(true),
+  });
+
+  const { mutate: patchEventQuery, isPending: isPatchPending } = useMutation({
+    mutationKey: ["patchEvent"],
+    mutationFn: ({ id, event }: { id: string; event: FormData }) =>
+      patchEvent(id, event),
     onSuccess: () => handleOnClose(true),
   });
 
@@ -104,7 +111,15 @@ const BasicEventDetails = ({
       imageFile,
     };
     const formEvent = createSaveForm(eventOffering);
-    saveEvent(formEvent);
+
+    if (selectedEvent.id) {
+      patchEventQuery({
+        event: formEvent,
+        id: selectedEvent.id,
+      });
+    } else {
+      saveEventQuery(formEvent);
+    }
   };
 
   const eventTypeOptions = useMemo(() => {
@@ -117,7 +132,6 @@ const BasicEventDetails = ({
     }
     return options;
   }, [eventTypes]);
-
   return (
     <form onSubmit={handleSubmit(handleSave)} className="flex flex-col h-full">
       <div className="flex flex-col gap-3">
@@ -175,7 +189,12 @@ const BasicEventDetails = ({
         >
           Cancel
         </Button>
-        <Button type="submit" variant="outlined" disabled={isSavePending}>
+        <Button
+          type="submit"
+          variant="outlined"
+          disabled={isSavePending || isPatchPending}
+          loading={isSavePending || isPatchPending}
+        >
           Save
         </Button>
       </div>

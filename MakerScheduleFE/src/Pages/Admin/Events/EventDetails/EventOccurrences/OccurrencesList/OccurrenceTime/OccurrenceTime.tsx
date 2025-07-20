@@ -1,6 +1,6 @@
 interface OccurrenceTimeProps {
-  start: Date | number;
-  end: Date | number;
+  start: Date | string;
+  end: Date | string;
 }
 
 const OccurrenceTime = ({ start, end }: OccurrenceTimeProps) => {
@@ -13,8 +13,8 @@ const OccurrenceTime = ({ start, end }: OccurrenceTimeProps) => {
       : `${hours} ${ampm}`;
   };
 
-  const startDate = typeof start === "number" ? new Date(start) : start;
-  const endDate = typeof end === "number" ? new Date(end) : end;
+  const startDate = typeof start === "string" ? new Date(start) : start;
+  const endDate = typeof end === "string" ? new Date(end) : end;
   return (
     <span className="text-gray-500 text-sm relative ">
       {formatTime(startDate)}

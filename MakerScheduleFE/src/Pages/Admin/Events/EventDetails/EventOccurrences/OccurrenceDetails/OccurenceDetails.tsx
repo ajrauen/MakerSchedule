@@ -1,13 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { getAvailableDomainUserLeaders } from "@ms/api/domain-user.api";
+import {
+  getAvailableDomainUserLeaders,
+  getDomainUsers,
+} from "@ms/api/domain-user.api";
+import { createOccurrence } from "@ms/api/occurrence.api";
 import { FormDateTime } from "@ms/Components/FormComponents/FormDateTime/FormDateTime";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { durationOptions } from "@ms/Pages/Admin/Events/utils/event.utils";
 import type { EventOffering } from "@ms/types/event.types";
 import type { SelectOption } from "@ms/types/form.types";
-import type { Occurrence } from "@ms/types/occurrence.types";
+import type { CreateOccurrence, Occurrence } from "@ms/types/occurrence.types";
+import { Button } from "@mui/material";
 import type { PickerValidDate } from "@mui/x-date-pickers";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -19,9 +24,9 @@ interface OccurenceDetailsProps {
 }
 
 const createOccurrenceValidationSchema = z.object({
-  scheduleStart: z.number(),
+  scheduleStart: z.date(),
   duration: z.number().optional(),
-  leaders: z.array(z.number()).optional(),
+  leaders: z.array(z.string()).optional(),
 });
 
 type CreateOccurrenceFormData = z.infer<
@@ -38,16 +43,16 @@ const OccurenceDetails = ({
     leaders: [],
   };
 
-  const {
-    getValues,
-    control,
-    handleSubmit,
-    formState: { errors },
-    reset,
-    watch,
-  } = useForm<CreateOccurrenceFormData>({
-    resolver: zodResolver(createOccurrenceValidationSchema),
-    defaultValues: creatOccurrenceFormData,
+  const { control, handleSubmit, reset, watch, getValues } =
+    useForm<CreateOccurrenceFormData>({
+      resolver: zodResolver(createOccurrenceValidationSchema),
+      defaultValues: creatOccurrenceFormData,
+    });
+
+  const { data: domainLeaderResponse } = useQuery({
+    queryKey: ["domainUserLeaders"],
+    queryFn: () => getDomainUsers("leader"),
+    staleTime: Infinity,
   });
 
   const time = watch("scheduleStart");
@@ -57,18 +62,27 @@ const OccurenceDetails = ({
     useQuery({
       queryKey: ["available-leaders", time, duration, event.duration],
       queryFn: () => {
-        const timeMS = new Date(time).getTime();
-        const utcTimeMS = timeMS - new Date().getTimezoneOffset() * 60 * 1000;
+        const isoString = time.toISOString();
 
         const apiDuration = duration ?? event.duration;
 
         if (!apiDuration) return;
 
-        return getAvailableDomainUserLeaders(utcTimeMS, apiDuration);
+        return getAvailableDomainUserLeaders(
+          isoString,
+          apiDuration,
+          occurrence?.leaders
+        );
       },
       staleTime: 3000,
       enabled: false,
     });
+
+  const { mutate: createOccurrenceMutation } = useMutation({
+    mutationKey: ["createMutation"],
+    mutationFn: ({ occurrence }: { occurrence: CreateOccurrence }) =>
+      createOccurrence(occurrence),
+  });
 
   useEffect(() => {
     if (occurrence?.meta?.isNew) {
@@ -81,14 +95,35 @@ const OccurenceDetails = ({
         0,
         0,
         0
-      ).getTime();
-
+      );
       reset({
         ...creatOccurrenceFormData,
         scheduleStart: todayAt10am,
       });
     } else {
-      reset(occurrence);
+      let scheduleStartDate: Date;
+      if (occurrence?.scheduleStart) {
+        const isoString = occurrence.scheduleStart;
+
+        if (isoString.endsWith("Z")) {
+          const utcDate = new Date(isoString);
+          scheduleStartDate = new Date(
+            utcDate.getTime() - utcDate.getTimezoneOffset() * 60000
+          );
+        } else {
+          scheduleStartDate = new Date(isoString);
+        }
+      } else {
+        scheduleStartDate = new Date();
+      }
+
+      const processedLeaders = occurrence?.leaders ?? [];
+
+      reset({
+        scheduleStart: scheduleStartDate,
+        duration: occurrence?.duration,
+        leaders: processedLeaders,
+      });
     }
   }, [occurrence]);
 
@@ -115,26 +150,65 @@ const OccurenceDetails = ({
     return date < today;
   };
 
-  return (
-    <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
-      <FormDateTime
-        control={control}
-        name="scheduleStart"
-        label="Start Time"
-        shouldDisableDate={shouldDisableDate}
-      />
-      <FormSelect name="duration" control={control} options={durationOptions} />
+  const onSave = () => {
+    if (!event.id) return;
 
-      <FormSelect
-        name="leaders"
-        control={control}
-        options={leaderOptions}
-        label="Availabe Leaders"
-        multiSelect
-        disabled={!availableLeaderResponse?.status}
-        helperText={!availableLeaderResponse ? "Select Time and Duration" : ""}
-      />
-    </div>
+    const { scheduleStart, duration, leaders } = getValues();
+
+    const occurrence: CreateOccurrence = {
+      eventId: event.id,
+      scheduleStart: scheduleStart.toISOString(),
+      duration,
+      leaders,
+    };
+
+    createOccurrenceMutation({ occurrence });
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSave)}>
+      <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
+        <FormDateTime
+          control={control}
+          name="scheduleStart"
+          label="Start Time"
+          shouldDisableDate={shouldDisableDate}
+        />
+        <FormSelect
+          name="duration"
+          control={control}
+          options={durationOptions}
+        />
+
+        <FormSelect
+          name="leaders"
+          control={control}
+          options={leaderOptions}
+          label="Availabe Leaders"
+          multiSelect
+          disabled={!availableLeaderResponse?.status}
+          helperText={
+            !availableLeaderResponse ? "Select Time and Duration" : ""
+          }
+        />
+        <div className="flex gap-4">
+          <Button
+            className=" px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 !ml-auto"
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            variant="contained"
+            type="submit"
+            className=" px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 "
+          >
+            {occurrence?.id ? "Update" : "Save"}
+          </Button>
+        </div>
+      </div>
+    </form>
   );
 };
 

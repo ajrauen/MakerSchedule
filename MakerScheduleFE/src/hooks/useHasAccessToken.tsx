@@ -12,7 +12,6 @@ const useHasAccessToken = () => {
   };
 
   useEffect(() => {
-    // Listen for changes in other tabs
     const onStorage = (e: StorageEvent) => {
       if (e.key === "accessToken") {
         setHasAccessToken(getHasAccessToken());
@@ -20,7 +19,6 @@ const useHasAccessToken = () => {
     };
     window.addEventListener("storage", onStorage);
 
-    // Listen for changes in this tab
     const origSetItem = localStorage.setItem;
     const origRemoveItem = localStorage.removeItem;
     localStorage.setItem = function (...args) {

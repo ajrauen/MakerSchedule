@@ -10,7 +10,6 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 const getRouterTree = () => {
-  // Create the root route
   const rootRoute = createRootRoute({
     component: () => (
       <>
@@ -20,7 +19,6 @@ const getRouterTree = () => {
     ),
   });
 
-  // Create child routes
   const homeRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: "/",
@@ -39,10 +37,8 @@ const getRouterTree = () => {
     component: Admin,
   });
 
-  // Build the route tree
   const routeTree = rootRoute.addChildren([homeRoute, ClassRoute, AdminRoute]);
 
-  // Create the router
   const router = createRouter({
     routeTree,
   });

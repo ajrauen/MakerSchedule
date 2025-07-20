@@ -17,8 +17,8 @@ interface ClassCalendarProps {
 export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
   // Only allow the event's day to be selected
   const eventDate = useMemo(() => {
-    if (!event?.scheduleStart) return undefined;
-    const d = new Date(event.scheduleStart);
+    if (!event?.occurences?.[0]?.scheduleStart) return undefined;
+    const d = new Date(event.occurences[0].scheduleStart);
     d.setHours(0, 0, 0, 0);
     return d;
   }, [event]);
@@ -33,7 +33,6 @@ export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
     const { day, selected, outsideCurrentMonth, ...other } = props;
     const eventDay = isEventDay(day);
 
-    // Disable all days except the event day
     if (!eventDay) {
       return (
         <PickersDay
@@ -45,7 +44,6 @@ export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
       );
     }
 
-    // Style for the event day
     return (
       <PickersDay
         {...other}

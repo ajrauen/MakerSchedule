@@ -15,14 +15,11 @@ var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
-// Add services to the container.
 services.AddControllersWithErrorParser();
 
 services.AddCorsWithOptions();
-// Add Database
 services.AddDatabase(configuration);
 
-// Add Identity service with role support for User
 services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
@@ -63,13 +60,11 @@ services.ConfigureApplicationCookie(options =>
     };
 });
 
-// Add Swagger/OpenAPI
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "MakerSchedule API", Version = "v1" });
 
-    // Define the Bearer token security scheme
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -80,7 +75,6 @@ services.AddSwaggerGen(c =>
         BearerFormat = "JWT"
     });
 
-    // Make sure Swagger UI requires a Bearer token to be specified
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -102,7 +96,6 @@ services.AddProblemDetails();
 
 var app = builder.Build();
 
-// Test database connection
 try
 {
     using var scope = app.Services.CreateScope();
@@ -110,7 +103,6 @@ try
     await dbContext.Database.CanConnectAsync();
     app.Logger.LogInformation("Successfully connected to the database.");
 
-    //Apply migration (only in development)
     if (app.Environment.IsDevelopment())
     {
         app.Logger.LogInformation("Applying database migrations...");
@@ -118,7 +110,6 @@ try
         app.Logger.LogInformation("Database migrations completed successfully.");
     }
     
-    // Seed the database (run in all environments for now)
     app.Logger.LogInformation("Seeding database...");
     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
     await seeder.SeedAsync();
@@ -131,8 +122,7 @@ catch (Exception ex)
     throw;
 }
 
-// Configure the HTTP request pipeline.
-// Enable Swagger for both Development and Production
+
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "MakerSchedule API v1"));
 
@@ -144,12 +134,11 @@ app.Use(async (context, next) =>
 });
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Enable static file serving from wwwroot
+app.UseStaticFiles(); 
 app.UseRouting();
 app.UseCors("AllowAll");
 app.UseAuthorization();
 
-// Use the newer minimal API style routing
 app.MapControllers();
 
 app.UseExceptionHandler();

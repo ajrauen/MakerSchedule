@@ -96,8 +96,23 @@ public class SeedData
                 for (int i = 0; i < count; i++)
                 {
                     var daysOffset = random.Next(0, 90);
-                    var minutesOffset = random.Next(0, 24 * 60);
-                    var start = now.AddDays(daysOffset).AddMinutes(minutesOffset);
+                    
+                    // Business hours: 9 AM to 6 PM (9:00 to 18:00)
+                    var businessHourStart = 9; // 9 AM
+                    var businessHourEnd = 18; // 6 PM
+                    var businessHours = businessHourEnd - businessHourStart; // 9 hours
+                    
+                    // Random hour within business hours
+                    var randomHour = businessHourStart + random.Next(businessHours);
+                    // Random minute (0, 15, 30, or 45 for cleaner times)
+                    var randomMinute = random.Next(4) * 15;
+                    
+                    var start = now.AddDays(daysOffset)
+                        .Date // Start of the day
+                        .AddHours(randomHour)
+                        .AddMinutes(randomMinute)
+                        .ToUniversalTime();
+                    
                     var duration = durationOptions[random.Next(durationOptions.Length) ] * 60 * 1000;
                     
                     // Create occurrence directly with ScheduleStart.ForSeeding to bypass future date validation
@@ -227,12 +242,43 @@ public class DatabaseSeeder
         var events = await _context.Events.ToListAsync();
         var occurrences = await _context.Occurrences.ToListAsync();
 
-        // Assign each leader to lead 1-2 random occurrences
+        // Ensure every occurrence has at least one leader
         var random = new Random(42);
+        var domainLeaders = new List<DomainUser>();
+        
+        // Get all domain leaders
         foreach (var leader in leaders)
         {
             var domainLeader = await _context.DomainUsers.FirstOrDefaultAsync(d => d.UserId == leader.Id);
-            if (domainLeader == null) continue;
+            if (domainLeader != null)
+            {
+                domainLeaders.Add(domainLeader);
+            }
+        }
+
+        // Assign at least one leader to each occurrence
+        foreach (var occurrence in occurrences)
+        {
+            var existingLeaders = await _context.OccurrenceLeaders
+                .Where(x => x.OccurrenceId == occurrence.Id)
+                .ToListAsync();
+
+            if (!existingLeaders.Any())
+            {
+                // Assign a random leader to this occurrence
+                var randomLeader = domainLeaders[random.Next(domainLeaders.Count)];
+                _context.OccurrenceLeaders.Add(new OccurrenceLeader
+                {
+                    Id = Guid.NewGuid(),
+                    OccurrenceId = occurrence.Id,
+                    UserId = randomLeader.Id
+                });
+            }
+        }
+
+        // Additionally, assign each leader to 1-2 more random occurrences for variety
+        foreach (var domainLeader in domainLeaders)
+        {
             var leaderOccurrences = occurrences.OrderBy(_ => random.Next()).Take(2).ToList();
             foreach (var occ in leaderOccurrences)
             {

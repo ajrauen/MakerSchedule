@@ -57,6 +57,32 @@ public class AzureImageStorageService : IImageStorageService
         return imageBlob.Uri.ToString();
     }
 
+    public async Task<bool> DeleteImageAsync(string fileUrl)
+    {
+        var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
+        if (!containerClient.Exists())
+        {
+            return true;
+        }
+
+        try
+        {
+            var uri = new Uri(fileUrl);
+            var blobName = uri.AbsolutePath.TrimStart('/');
+            if (blobName.StartsWith(_blobContainerName + "/"))
+            {
+                blobName = blobName.Substring(_blobContainerName.Length + 1);
+            }
+            var blobClient = containerClient.GetBlobClient(blobName);
+            await blobClient.DeleteIfExistsAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     private static string GetContentType(string fileName)
     {
         var extension = Path.GetExtension(fileName).ToLowerInvariant();

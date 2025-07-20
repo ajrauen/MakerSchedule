@@ -30,14 +30,38 @@ const registerNewDomainUser = async (user: RegisterDomainUserRequest) => {
   return response;
 };
 
-const getAvailableDomainUserLeaders = async (
-  startTime: number,
-  duration: number
-) => {
+const getDomainUsers = async (role?: string) => {
+  let url = BASE_DOMAIN_USER_ENDPOINT;
+  if (role) {
+    url += `?role=${role}`;
+  }
+
   const req: AxiosRequestConfig = {
     method: "GET",
-    url: `${BASE_DOMAIN_USER_ENDPOINT}/available-leaders?startTime=${startTime}&duration=${duration}`,
+    url: url,
     withCredentials: true,
+  };
+  const response = await sendRequest<DomainUser[]>(req);
+
+  return response;
+};
+
+const getAvailableDomainUserLeaders = async (
+  startTime: string,
+  duration: number,
+  currentLeaderIds?: string[]
+) => {
+  const requestData = {
+    startTime: startTime,
+    duration: duration,
+    currentLeaderIds: currentLeaderIds?.map((id) => id) || [],
+  };
+
+  const req: AxiosRequestConfig = {
+    method: "POST",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/available-leaders`,
+    withCredentials: true,
+    data: requestData,
   };
   const response = await sendRequest<DomainUser[]>(req);
 
@@ -48,4 +72,5 @@ export {
   getDomainUserList,
   registerNewDomainUser,
   getAvailableDomainUserLeaders,
+  getDomainUsers,
 };

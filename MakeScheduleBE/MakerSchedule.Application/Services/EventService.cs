@@ -61,8 +61,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 Attendees = o.Attendees.Select(a => a.Id.ToString()).ToList(),
                 Duration = o.Duration,
                 EventId = o.EventId,
-                Leaders = o.Leaders.Select(a => a.Id.ToString()).ToList(),
-                ScheduleStart = o.ScheduleStart != null ? new DateTimeOffset(o.ScheduleStart.Value).ToUnixTimeMilliseconds() : 0,
+                Leaders = o.Leaders.Select(a => a.UserId.ToString()).ToList(),
+                ScheduleStart = o.ScheduleStart != null ? new DateTimeOffset(o.ScheduleStart.Value).ToString("O") : string.Empty,
             })
         };
     }
@@ -126,6 +126,130 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return e.Id;
     }
 
+        public async Task<Guid> UpdateEventAsync(Guid eventId, UpdateEventDTO dto)
+    {
+
+        if (dto.FormFile == null || dto.FormFile.Length == 0)
+        {
+            throw new ArgumentException("Image file is required for event creation", nameof(dto.FormFile));
+        }
+
+        var e = _context.Events.FirstOrDefault(e => e.Id == eventId);
+
+        if (e == null)
+        {
+            throw new NotFoundException($"Event with id {eventId} not found", eventId);
+        }
+
+
+        
+        string fileUrl;
+        try
+        {
+
+            using (var stream = dto.FormFile.OpenReadStream())
+            {
+                if (ImageUtilities.IsSvg(stream))
+                {
+                    if (!ImageUtilities.IsSvgAspectRatioValid(stream, RequiredAspectRatio))
+                    {
+                        throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
+                    }
+                }
+                else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
+                {
+                    throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
+                }
+            }
+
+            var fileName = $"{dto.EventName}_{e.Id}{Path.GetExtension(dto.FormFile.FileName)}";
+            fileUrl = await _imageStorageService.SaveImageAsync(dto.FormFile, fileName);
+            e.FileUrl = fileUrl;
+            await _context.SaveChangesAsync();
+        }
+        catch (InvalidImageAspectRatioException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save image for event {EventName}", dto.EventName);
+            _context.Events.Remove(e);
+            await _context.SaveChangesAsync();
+            throw new InvalidOperationException("Failed to save event image", ex);
+        }
+
+        return e.Id;
+    }
+
+    public async Task<Guid> PatchEventAsync(Guid eventId, PatchEventDTO dto)
+    {
+        var e = await _context.Events.FindAsync(eventId);
+        if (e == null)
+        {
+            throw new NotFoundException($"Event with id {eventId} not found", eventId);
+        }
+
+        if (dto.EventName != null)
+            e.EventName = new EventName(dto.EventName);
+        if (dto.Description != null)
+            e.Description = dto.Description;
+        if (dto.Duration.HasValue)
+            e.Duration = new Duration(dto.Duration.Value);
+        if (dto.EventType.HasValue)
+            e.EventType = dto.EventType.Value;
+        if (dto.FormFile != null && dto.FormFile.Length > 0)
+        {
+            if (!string.IsNullOrEmpty(e.FileUrl))
+            {
+                try
+                {
+                    await _imageStorageService.DeleteImageAsync(e.FileUrl);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to delete previous image for event {EventName}", e.EventName);
+                }
+            }
+
+            string fileUrl;
+            try
+            {
+                using (var stream = dto.FormFile.OpenReadStream())
+                {
+                    if (ImageUtilities.IsSvg(stream))
+                    {
+                        if (!ImageUtilities.IsSvgAspectRatioValid(stream, RequiredAspectRatio))
+                        {
+                            throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
+                        }
+                    }
+                    else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
+                    {
+                        throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
+                    }
+                }
+                var fileName = $"{e.EventName}_{e.Id}{Path.GetExtension(dto.FormFile.FileName)}";
+                fileUrl = await _imageStorageService.SaveImageAsync(dto.FormFile, fileName);
+                e.FileUrl = fileUrl;
+            }
+            catch (InvalidImageAspectRatioException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to save image for event {EventName}", e.EventName);
+                throw new InvalidOperationException("Failed to save event image", ex);
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        return e.Id;
+    }
+
+    
+
     public async Task<bool> DeleteEventAsync(Guid id)
     {
         var e = await _context.Events.FindAsync(id);
@@ -137,7 +261,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
     
     public async Task<Guid> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO)
     {
-        var scheduledStart = DateTimeOffset.FromUnixTimeMilliseconds(occurrenceDTO.ScheduleStart).UtcDateTime;
+        var scheduledStart = DateTimeOffset.Parse(occurrenceDTO.ScheduleStart).UtcDateTime;
 
         // Load the Event aggregate root
         var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
@@ -149,7 +273,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         try
         {
             info = new OccurrenceInfo(scheduledStart, occurrenceDTO.Duration);
-             newOccurrence = eventEntity.AddOccurrence(info);
+            newOccurrence = eventEntity.AddOccurrence(info);
+            _context.Occurrences.Add(newOccurrence);
         }
         catch (ScheduleDateOutOfBoundsException ex)
         {
@@ -157,6 +282,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             throw new BaseException(ex.Message, "SCHEDULE_START_INVALID", 400);
         }
         
+
+        await _context.SaveChangesAsync();
 
         foreach (var leaderId in occurrenceDTO.Leaders)
         {

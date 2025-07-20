@@ -151,12 +151,13 @@ public class DomainUserService(
     }
 
 
-    public async Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(long startTime, long duration)
+    public async Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(string startTime, long duration, List<Guid> currentLeaderIds ) 
     {
          ScheduleStart occurrenceStart;
         try
         {
-            var parsedDate = DateTimeOffset.FromUnixTimeMilliseconds(startTime).UtcDateTime;
+            var parsedDate = DateTimeOffset.Parse(startTime).UtcDateTime;
+            _logger.LogInformation("Parsed ISO timestamp {StartTime} to date: {ParsedDate}", startTime, parsedDate);
             occurrenceStart = new ScheduleStart(parsedDate);
         }
         catch (ScheduleDateOutOfBoundsException ex)
@@ -167,12 +168,13 @@ public class DomainUserService(
         var occurrenceEnd = occurrenceStart.Value.AddMilliseconds(duration);
 
         var leaderUsers = await userManager.GetUsersInRoleAsync(Roles.Leader);
-        var leaderIds = leaderUsers.Select(l => l.Id).ToList();
+        var allLeaderIds = leaderUsers.Select(l => l.Id).ToList();
 
-        var domainUsers = await _context.DomainUsers.Include(du => du.User).Where(du => leaderIds.Contains(du.UserId)).ToListAsync();
+        var domainUsers = await _context.DomainUsers.Include(du => du.User).Where(du => allLeaderIds.Contains(du.UserId)).ToListAsync();
         var allLeaders = await _context.OccurrenceLeaders
             .Include(l => l.Occurrence)
             .Where(o => o.Occurrence != null)
+            .Distinct() 
             .ToListAsync();
 
         var busyLeaders = allLeaders
@@ -180,16 +182,19 @@ public class DomainUserService(
             {
                 var occStart = o.Occurrence.ScheduleStart!.Value;
                 var occEnd = occStart.AddMilliseconds(o.Occurrence.Duration ?? 0);
+                
                 var overlaps = occStart < occurrenceEnd && occEnd > occurrenceStart.Value;
-
+              
                 return overlaps;
             })
             .Select(l => l.UserId)
             .Distinct()
             .ToList();
             
+        // Remove the current leaders from busy list (they should be available for editing)
+        busyLeaders = busyLeaders.Except(currentLeaderIds).ToList();
 
-
+        // Get available leaders (not busy) plus explicitly include current leaders
         var availableLeaders = domainUsers.Where(u => !busyLeaders.Contains(u.Id));
 
         return availableLeaders.Select(l => new DomainUserListDTO

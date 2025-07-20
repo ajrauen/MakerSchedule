@@ -9,6 +9,7 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import type { PickerValidDate, TimeView } from "@mui/x-date-pickers";
+import { enUS } from "date-fns/locale";
 
 interface FormDateTimeProps<T extends FieldValues>
   extends Omit<TextFieldProps, "name" | "value" | "onChange"> {
@@ -33,24 +34,30 @@ const FormDateTime = <T extends FieldValues>({
     <Controller
       name={name}
       control={control}
-      render={({ field, fieldState }) => (
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateTimePicker
-            label={label}
-            value={field.value}
-            slotProps={{
-              textField: {
-                ...props,
-                error: !!fieldState.error,
-                helperText: fieldState.error?.message,
-              },
-            }}
-            shouldDisableDate={shouldDisableDate}
-            shouldDisableTime={shouldDisableTime}
-            onAccept={field.onChange}
-          />
-        </LocalizationProvider>
-      )}
+      render={({ field, fieldState }) => {
+        return (
+          <LocalizationProvider
+            dateAdapter={AdapterDateFns}
+            adapterLocale={enUS}
+          >
+            <DateTimePicker
+              key={field.value ? field.value.getTime() : "empty"}
+              label={label}
+              value={field.value}
+              slotProps={{
+                textField: {
+                  ...props,
+                  error: !!fieldState.error,
+                  helperText: fieldState.error?.message,
+                },
+              }}
+              shouldDisableDate={shouldDisableDate}
+              shouldDisableTime={shouldDisableTime}
+              onAccept={field.onChange}
+            />
+          </LocalizationProvider>
+        );
+      }}
     />
   );
 };

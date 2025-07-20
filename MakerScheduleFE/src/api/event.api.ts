@@ -15,6 +15,28 @@ const createEvent = async (event: FormData) => {
   return await sendRequest<number>(req);
 };
 
+const updateEvent = async (id: string, event: FormData) => {
+  const req: AxiosRequestConfig = {
+    method: "PUT",
+    url: `${BASE_EVENT_ENDPOINT}/${id}`,
+    withCredentials: true,
+    data: event,
+  };
+
+  return await sendRequest<number>(req);
+};
+
+const patchEvent = async (id: string, event: FormData) => {
+  const req: AxiosRequestConfig = {
+    method: "PATCH",
+    url: `${BASE_EVENT_ENDPOINT}/${id}`,
+    withCredentials: true,
+    data: event,
+  };
+
+  return await sendRequest<number>(req);
+};
+
 const getEvents = async () => {
   const req: AxiosRequestConfig = {
     method: "GET",
@@ -45,4 +67,11 @@ const deleteEvent = async (eventId: string) => {
   return await sendRequest<boolean>(req);
 };
 
-export { createEvent, getEvents, getEvent, deleteEvent };
+export {
+  createEvent,
+  getEvents,
+  getEvent,
+  deleteEvent,
+  updateEvent,
+  patchEvent,
+};

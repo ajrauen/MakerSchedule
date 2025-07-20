@@ -1,3 +1,4 @@
+import { getDomainUsers } from "@ms/api/domain-user.api";
 import { getEvents } from "@ms/api/event.api";
 import { getApplicaitonMetadata } from "@ms/api/metadata.api";
 import type { ApplicaitonMetadata } from "@ms/types/application-metadata.types";
@@ -20,6 +21,16 @@ const useApplicationData = () => {
   });
 
   const {
+    data: domainLeaderResponse,
+    isError: domainLeaderError,
+    isFetching: domainLeaderLoading,
+  } = useQuery({
+    queryKey: ["domainUserLeaders"],
+    queryFn: () => getDomainUsers("leader"),
+    staleTime: Infinity,
+  });
+
+  const {
     data: applicaitonMetadataResponse,
     isError: appMetadataError,
     isFetching: metadataLoading,
@@ -29,13 +40,14 @@ const useApplicationData = () => {
     staleTime: Infinity,
   });
 
-  if (appMetadataError || eventError) {
+  if (appMetadataError || eventError || domainLeaderError) {
     throw Error("Required app data missing");
   }
 
   return {
-    isLoading: eventsLoading || metadataLoading,
+    isLoading: eventsLoading || metadataLoading || domainLeaderLoading,
     events: eventsResponse?.data ?? [],
+    domainleaders: domainLeaderResponse?.data ?? [],
     appMetaData: applicaitonMetadataResponse?.data ?? defaultAppMetaData,
   };
 };

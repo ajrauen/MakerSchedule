@@ -1,7 +1,7 @@
 interface Occurrence {
-  eventId: number;
-  id: number;
-  scheduleStart: number;
+  eventId: string;
+  id?: string;
+  scheduleStart: string;
   duration?: number;
   attendees?: number[];
   leaders?: number[];

@@ -15,9 +15,11 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
 {
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAllDomainUsersAsync()
+    public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAllDomainUsersAsync([FromQuery] string? role = null)
     {
-        var users = await domainUserService.GetAllDomainUsersAsync();
+        var users = string.IsNullOrEmpty(role) 
+            ? await domainUserService.GetAllDomainUsersAsync()
+            : await domainUserService.GetAllDomainUsersByRoleAsync(role);
         return Ok(users);
     }
 
@@ -57,36 +59,12 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
         return BadRequest("User could not be created.");
     }
 
-    // [HttpGet()]
-    // // [Authorize(Roles = "Admin")]
-    // [Route("/leaders")]
-    // public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromQuery] string? occurrenceId = null, [FromQuery] string? role = null)
-    // {
-    //     IEnumerable<DomainUserListDTO> leaders;
-
-
-
-    //     if (string.IsNullOrEmpty(occurrenceId))
-    //     {
-    //         leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(occurrenceId);
-    //     }
-    //     else
-    //     {
-    //         leaders = await domainUserService.GetAllDomainUsersByRoleAsync(role);
-    //     }
-
-    //     return Ok(leaders);
-    // }
-
-     [HttpGet()]
+     [HttpPost]
     // [Authorize(Roles = "Admin")]
     [Route("available-leaders")]
-    public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromQuery] long startTime, [FromQuery] long duration)
+    public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromBody] GetAvailableLeadersRequest request)
     {
-        IEnumerable<DomainUserListDTO> leaders;
-
-            leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(startTime, duration);
-      
+        IEnumerable<DomainUserListDTO> leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(request.StartTime, request.Duration, request.CurrentLeaderIds ?? []);
 
         return Ok(leaders);
     }

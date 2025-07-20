@@ -30,7 +30,6 @@ const DropZoneInner = ({
 
   const handleDrop = React.useCallback(
     (acceptedFiles: File[], rejectedFiles: any[]) => {
-      // Clear previous rejected files
       setRejectedFiles([]);
 
       if (rejectedFiles.length > 0) {
@@ -38,7 +37,7 @@ const DropZoneInner = ({
           .map((file: any) => file.file.name)
           .join(", ");
         setRejectedFiles(rejectedFiles.map((file: any) => file.file));
-        return; // Don't process accepted files if there are rejected ones
+        return;
       }
 
       if (onChange) onChange(multiple ? acceptedFiles : acceptedFiles[0]);
@@ -54,7 +53,6 @@ const DropZoneInner = ({
       multiple,
     } as unknown as DropzoneOptions);
 
-  // Show either the controlled value or acceptedFiles
   const filesToShow = value
     ? Array.isArray(value)
       ? value

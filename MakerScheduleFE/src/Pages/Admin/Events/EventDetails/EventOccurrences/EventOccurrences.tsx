@@ -1,7 +1,7 @@
 import { OccurenceDetails } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceDetails/OccurenceDetails";
 import { OccurencesList } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrencesList";
 import type { EventOffering } from "@ms/types/event.types";
-import type { CreateOccurrence, Occurrence } from "@ms/types/occurrence.types";
+import type { Occurrence } from "@ms/types/occurrence.types";
 import { useState } from "react";
 
 interface EventOccurrencesProps {
@@ -21,10 +21,11 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
   };
 
   const handleOccurrenceCreate = () => {
+    if (!selectedEvent?.id) return;
+
     const newOccurrence: Occurrence = {
       eventId: selectedEvent.id,
-      id: 10,
-      scheduleStart: 0,
+      scheduleStart: new Date().toISOString(),
       attendees: [],
       leaders: [],
       meta: {
@@ -64,7 +65,6 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
           occurences={selectedEvent.occurences}
           onOccurenceSelect={handleOccurrenceSelection}
           onOccurenceCreate={handleOccurrenceCreate}
-          selectedEvent={selectedEvent}
         />
       </div>
       <div
@@ -75,15 +75,8 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
         <OccurenceDetails
           occurrence={selectedOccurrence}
           event={selectedEvent}
+          onCancel={handleBack}
         />
-        {showDetails && (
-          <button
-            className="mt-4 ml-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            onClick={handleBack}
-          >
-            Back
-          </button>
-        )}
       </div>
     </div>
   );

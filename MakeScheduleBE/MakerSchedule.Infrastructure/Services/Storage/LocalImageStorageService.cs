@@ -22,4 +22,24 @@ public class LocalImageStorageService(IHostEnvironment _env, IHttpContextAccesso
         var baseUrl = request != null ? $"{request.Scheme}://{request.Host}" : "http://localhost:5000";
         return $"{baseUrl}/images/events/{fileName}";
     }
+
+    public Task<bool> DeleteImageAsync(string fileUrl)
+    {
+        try
+        {
+            var fileName = Path.GetFileName(new Uri(fileUrl).LocalPath);
+            var wwwrootPath = Path.Combine(_env.ContentRootPath, "wwwroot");
+            var uploads = Path.Combine(wwwrootPath, "images", "events");
+            var filePath = Path.Combine(uploads, fileName);
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+            return Task.FromResult(true);
+        }
+        catch
+        {
+            return Task.FromResult(false);
+        }
+    }
 }

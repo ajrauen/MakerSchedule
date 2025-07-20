@@ -43,22 +43,28 @@ export default function MyCalendar() {
 
   const events = useMemo(() => {
     if (eventResponse?.data) {
-      let calendarEvents = eventResponse.data
-        .filter(
-          (e): e is typeof e & { scheduleStart: number } =>
-            e.scheduleStart !== undefined
-        )
-        .map((eventOffering) => {
-          const e: Event = {
-            title: eventOffering.eventName,
-            start: new Date(eventOffering.scheduleStart),
-            end: new Date(eventOffering.scheduleStart + 10000000),
-            resource: {
-              eventOffering: eventOffering,
-            },
-          };
-          return e;
-        });
+      let calendarEvents: Event[] = [];
+
+      eventResponse.data.forEach((eventOffering) => {
+        if (eventOffering.occurences) {
+          eventOffering.occurences.forEach((occurrence) => {
+            const e: Event = {
+              title: eventOffering.eventName,
+              start: new Date(occurrence.scheduleStart),
+              end: new Date(
+                new Date(occurrence.scheduleStart).getTime() +
+                  (occurrence.duration ?? 10000000)
+              ),
+              resource: {
+                eventOffering: eventOffering,
+                occurrence: occurrence,
+              },
+            };
+            calendarEvents.push(e);
+          });
+        }
+      });
+
       return calendarEvents;
     }
   }, [eventResponse]);

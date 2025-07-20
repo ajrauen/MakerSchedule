@@ -26,13 +26,16 @@ const AdminEvents = () => {
     mutationKey: ["deleteEvent"],
     mutationFn: deleteEvent,
     onSuccess: () => {
-      debugger;
       if (!eventToDelete) return;
 
       queryClient.setQueryData(
         ["events"],
         (oldEvents: AxiosResponse<EventOffering[]>) => {
-          return oldEvents.data.filter((evt) => evt.id === eventToDelete.id);
+          if (!oldEvents) return oldEvents;
+          return {
+            ...oldEvents,
+            data: oldEvents.data.filter((evt) => evt.id !== eventToDelete.id),
+          };
         }
       );
 

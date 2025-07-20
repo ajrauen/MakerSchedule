@@ -42,6 +42,14 @@ public class EventsController : ControllerBase
         return Ok(eventId);
     }
 
+    [HttpPatch("{id}")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> PathchEvent([FromForm] PatchEventDTO dto, Guid id)
+    {
+        var eventId = await _eventService.PatchEventAsync(id, dto);
+        return Ok(eventId);
+    }
+
     [HttpDelete("{eventId}")]
     public async Task<IActionResult> DeleteEvent(Guid eventId)
     {

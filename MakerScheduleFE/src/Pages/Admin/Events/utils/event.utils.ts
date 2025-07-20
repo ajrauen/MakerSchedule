@@ -31,7 +31,7 @@ const durationMap: Record<number, string> = {
 
 const durationOptions = Object.entries(durationMap).map(([value, label]) => ({
   label,
-  value: value,
+  value: parseInt(value),
 }));
 
 export { durationOptions, createSaveForm, durationMap };
