@@ -91,42 +91,50 @@ const OccurenceDetails = ({
         ...creatOccurrenceFormData,
         scheduleStart: undefined,
       });
+    } else {
+      let scheduleStartDate: Date;
+      if (occurrence?.scheduleStart) {
+        const isoString = occurrence.scheduleStart;
+
+        if (isoString.endsWith("Z")) {
+          const utcDate = new Date(isoString);
+          scheduleStartDate = new Date(
+            utcDate.getTime() - utcDate.getTimezoneOffset() * 60000
+          );
+        } else {
+          scheduleStartDate = new Date(isoString);
+        }
+      } else {
+        scheduleStartDate = new Date();
+      }
+
+      const processedLeaders =
+        occurrence?.leaders?.map((leader) => leader.id) ?? [];
+
+      reset({
+        scheduleStart: scheduleStartDate,
+        duration: occurrence?.duration,
+        leaders: processedLeaders,
+      });
     }
-    // } else {
-    //   let scheduleStartDate: Date;
-    //   if (occurrence?.scheduleStart) {
-    //     const isoString = occurrence.scheduleStart;
-
-    //     if (isoString.endsWith("Z")) {
-    //       const utcDate = new Date(isoString);
-    //       scheduleStartDate = new Date(
-    //         utcDate.getTime() - utcDate.getTimezoneOffset() * 60000
-    //       );
-    //     } else {
-    //       scheduleStartDate = new Date(isoString);
-    //     }
-    //   } else {
-    //     scheduleStartDate = new Date();
-    //   }
-
-    //   const processedLeaders = occurrence?.leaders ?? [];
-
-    //   reset({
-    //     scheduleStart: scheduleStartDate,
-    //     duration: occurrence?.duration,
-    //     leaders: processedLeaders,
-    //   });
-    // }
   }, [occurrence]);
 
   useEffect(() => {
-    console.log(time, duration);
+    if (occurrence?.status.toLowerCase() === "complete") return;
+
     if (time && duration) {
       getAvailableLeaders();
     }
   }, [duration, time]);
 
   const leaderOptions = useMemo(() => {
+    if (occurrence?.status.toLowerCase() === "complete") {
+      return occurrence.leaders?.map((leader) => ({
+        label: `${leader.firstName} ${leader.lastName}`,
+        value: leader.id,
+      }));
+    }
+
     let options: SelectOption[] = [];
     if (availableLeaderResponse?.data) {
       options = availableLeaderResponse.data.map((user) => ({
@@ -135,7 +143,7 @@ const OccurenceDetails = ({
       }));
     }
     return options;
-  }, [availableLeaderResponse?.data]);
+  }, [availableLeaderResponse?.data, occurrence]);
 
   const shouldDisableDate = (date: PickerValidDate) => {
     const today = new Date();
@@ -185,8 +193,12 @@ const OccurenceDetails = ({
         <FormSelect
           name="leaders"
           control={control}
-          options={leaderOptions}
-          label="Availabe Leaders"
+          options={leaderOptions ?? []}
+          label={
+            occurrence?.status.toLowerCase() === "complete"
+              ? "Assigned Leanders"
+              : "Assign Leaders"
+          }
           multiSelect
           disabled={!availableLeaderResponse?.status || isFormItemDisable}
           helperText={
