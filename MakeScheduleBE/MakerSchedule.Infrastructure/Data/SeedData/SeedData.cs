@@ -95,8 +95,18 @@ public class SeedData
                 int count = random.Next(3, 8); // 3 to 7 occurrences
                 for (int i = 0; i < count; i++)
                 {
-                    var daysOffset = random.Next(0, 90);
-                    
+                    // Alternate between past and future occurrences
+                    int daysOffset;
+                    if (i % 2 == 0)
+                    {
+                        // Past: 1 to 45 days ago
+                        daysOffset = -random.Next(1, 46);
+                    }
+                    else
+                    {
+                        // Future: 1 to 45 days ahead
+                        daysOffset = random.Next(1, 46);
+                    }
                     // Business hours: 9 AM to 6 PM (9:00 to 18:00) CST
                     var businessHourStart = 9; // 9 AM
                     var businessHourEnd = 18; // 6 PM
@@ -105,7 +115,6 @@ public class SeedData
                     var randomHour = businessHourStart + random.Next(businessHours);
                     // Random minute (0, 15, 30, or 45 for cleaner times)
                     var randomMinute = random.Next(4) * 15;
-
                     // Define CST zone before use
                     var cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
                     // Generate the local CST time with Kind=Unspecified
@@ -264,27 +273,23 @@ public class DatabaseSeeder
             }
         }
 
-        // Assign at least one leader to each occurrence
-        foreach (var occurrence in occurrences)
+        // Assign at least one unique leader to each occurrence
+        var shuffledLeaders = domainLeaders.OrderBy(_ => random.Next()).ToList();
+        for (int i = 0; i < occurrences.Count; i++)
         {
-            var existingLeaders = await _context.OccurrenceLeaders
-                .Where(x => x.OccurrenceId == occurrence.Id)
-                .ToListAsync();
-
-            if (!existingLeaders.Any())
+            var leader = shuffledLeaders[i % shuffledLeaders.Count];
+            if (!await _context.OccurrenceLeaders.AnyAsync(x => x.OccurrenceId == occurrences[i].Id && x.UserId == leader.Id))
             {
-                // Assign a random leader to this occurrence
-                var randomLeader = domainLeaders[random.Next(domainLeaders.Count)];
                 _context.OccurrenceLeaders.Add(new OccurrenceLeader
                 {
                     Id = Guid.NewGuid(),
-                    OccurrenceId = occurrence.Id,
-                    UserId = randomLeader.Id
+                    OccurrenceId = occurrences[i].Id,
+                    UserId = leader.Id
                 });
             }
         }
 
-        // Additionally, assign each leader to 1-2 more random occurrences for variety
+        // Optionally, assign each leader to 1-2 more random occurrences for variety, but never duplicate
         foreach (var domainLeader in domainLeaders)
         {
             var leaderOccurrences = occurrences.OrderBy(_ => random.Next()).Take(2).ToList();
