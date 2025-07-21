@@ -54,6 +54,7 @@ const FormDateTime = <T extends FieldValues>({
               shouldDisableDate={shouldDisableDate}
               shouldDisableTime={shouldDisableTime}
               onAccept={field.onChange}
+              onChange={field.onChange}
             />
           </LocalizationProvider>
         );

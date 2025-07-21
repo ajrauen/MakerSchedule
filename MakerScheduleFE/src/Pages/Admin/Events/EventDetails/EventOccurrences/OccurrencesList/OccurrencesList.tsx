@@ -16,12 +16,14 @@ interface OccurencesListProps {
   occurences?: Occurrence[];
   onOccurenceSelect: (occurrence: Occurrence) => void;
   onOccurenceCreate: () => void;
+  selectedEvent: EventOffering;
 }
 
 const OccurencesList = ({
   occurences = [],
   onOccurenceSelect,
   onOccurenceCreate,
+  selectedEvent,
 }: OccurencesListProps) => {
   const today = startOfDay(new Date());
 
@@ -40,13 +42,11 @@ const OccurencesList = ({
           new Date(a.scheduleStart).getTime() -
           new Date(b.scheduleStart).getTime()
       );
-  }, [selectedDate]);
+  }, [selectedDate, selectedEvent]);
 
   const handleAddOccurrenceClick = () => {
     onOccurenceCreate();
   };
-
-  console.log(occurrencesForDay);
 
   return (
     <OccurrenceCalendarContext.Provider
@@ -73,6 +73,7 @@ const OccurencesList = ({
               {occurrencesForDay.map((occ) => (
                 <OccurenceRow
                   occurrence={occ}
+                  selectedEvent={selectedEvent}
                   onOccurenceSelect={onOccurenceSelect}
                   key={occ.id}
                 />

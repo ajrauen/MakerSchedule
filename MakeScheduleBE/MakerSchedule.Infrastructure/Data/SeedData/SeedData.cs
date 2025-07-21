@@ -97,21 +97,26 @@ public class SeedData
                 {
                     var daysOffset = random.Next(0, 90);
                     
-                    // Business hours: 9 AM to 6 PM (9:00 to 18:00)
+                    // Business hours: 9 AM to 6 PM (9:00 to 18:00) CST
                     var businessHourStart = 9; // 9 AM
                     var businessHourEnd = 18; // 6 PM
                     var businessHours = businessHourEnd - businessHourStart; // 9 hours
-                    
                     // Random hour within business hours
                     var randomHour = businessHourStart + random.Next(businessHours);
                     // Random minute (0, 15, 30, or 45 for cleaner times)
                     var randomMinute = random.Next(4) * 15;
-                    
-                    var start = now.AddDays(daysOffset)
-                        .Date // Start of the day
-                        .AddHours(randomHour)
-                        .AddMinutes(randomMinute)
-                        .ToUniversalTime();
+
+                    // Define CST zone before use
+                    var cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+                    // Generate the local CST time with Kind=Unspecified
+                    var localCstDate = DateTime.SpecifyKind(
+                        now.Date.AddDays(daysOffset)
+                            .AddHours(randomHour)
+                            .AddMinutes(randomMinute),
+                        DateTimeKind.Unspecified
+                    );
+                    // Convert CST to UTC
+                    var start = TimeZoneInfo.ConvertTimeToUtc(localCstDate, cstZone);
                     
                     var duration = durationOptions[random.Next(durationOptions.Length) ] * 60 * 1000;
                     
@@ -121,7 +126,10 @@ public class SeedData
                         Id = Guid.NewGuid(),
                         EventId = eventId,
                         ScheduleStart = ScheduleStart.ForSeeding(start),
-                        Duration = duration
+                        Duration = duration,
+                        Status = (start.AddMilliseconds(duration) < DateTime.UtcNow)
+                            ? OccurrenceStatus.Complete
+                            : OccurrenceStatus.Pending
                     };
                     occurrences.Add(occurrence);
                 }

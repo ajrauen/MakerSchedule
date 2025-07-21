@@ -31,6 +31,7 @@ public class EventsController : ControllerBase
     public async Task<ActionResult<EventDTO>> GetEvent(Guid id)
     {
         var eventItem = await _eventService.GetEventAsync(id);
+
         return Ok(eventItem);
     }
 

@@ -42,8 +42,12 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         var e = await _context.Events
         .Include(ev => ev.Occurrences)
             .ThenInclude(ev => ev.Attendees)
+                .ThenInclude(a => a.User)
+                    .ThenInclude(u => u.User)
         .Include(ev => ev.Occurrences)
             .ThenInclude(ev => ev.Leaders)
+                .ThenInclude(l => l.User)
+                    .ThenInclude(u => u.User)
         .FirstOrDefaultAsync(ev => ev.Id == id);
 
         if (e == null) throw new NotFoundException("Event", id);
@@ -58,11 +62,22 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Occurences = e.Occurrences.Select(o => new OccurenceDTO
             {
                 Id = o.Id,
-                Attendees = o.Attendees.Select(a => a.Id.ToString()).ToList(),
+                Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
+                {
+                    Id = a.UserId.ToString(),
+                    FirstName = a.User?.User?.FirstName ?? "",
+                    LastName = a.User?.User?.LastName ?? ""
+                }).ToList(),
                 Duration = o.Duration,
                 EventId = o.EventId,
-                Leaders = o.Leaders.Select(a => a.UserId.ToString()).ToList(),
-                ScheduleStart = o.ScheduleStart.Value,
+                Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
+                {
+                    Id = l.UserId.ToString(),
+                    FirstName = l.User?.User?.FirstName ?? "",
+                    LastName = l.User?.User?.LastName ?? ""
+                }).ToList(),
+                ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
+                Status = o.Status
             })
         };
     }
@@ -270,7 +285,13 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         Occurrence newOccurrence;
         try
         {
-            info = new OccurrenceInfo(occurrenceDTO.ScheduleStart, occurrenceDTO.Duration);
+            var start = occurrenceDTO.ScheduleStart;
+            if (start.Kind == DateTimeKind.Local)
+                start = start.ToUniversalTime();
+            else if (start.Kind == DateTimeKind.Unspecified)
+                start = DateTime.SpecifyKind(start, DateTimeKind.Local).ToUniversalTime();
+            // Now start is always UTC
+            info = new OccurrenceInfo(start, occurrenceDTO.Duration);
             newOccurrence = eventEntity.AddOccurrence(info);
             _context.Occurrences.Add(newOccurrence);
         }

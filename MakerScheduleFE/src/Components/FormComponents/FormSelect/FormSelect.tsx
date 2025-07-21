@@ -81,6 +81,10 @@ const FormSelect = <T extends FieldValues, C>({
                               const newValue = (
                                 selected as (string | number)[]
                               ).filter((item) => item !== value);
+                              console.log(
+                                "FormSelect onDelete onChange value:",
+                                newValue
+                              );
                               field.onChange(newValue);
                             }}
                           />

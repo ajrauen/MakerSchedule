@@ -17,7 +17,7 @@ public class Occurrence
     // Navigation properties for many-to-many relationships
     public ICollection<OccurrenceAttendee> Attendees { get; set; } = new List<OccurrenceAttendee>();
     public ICollection<OccurrenceLeader> Leaders { get; set; } = new List<OccurrenceLeader>();
-
+    public OccurrenceStatus Status { get; set; }
     public Occurrence() { }
 
     public Occurrence(Guid eventId, OccurrenceInfo info)
@@ -25,5 +25,6 @@ public class Occurrence
         EventId = eventId;
         ScheduleStart = ScheduleStart.Create(info.ScheduleStart);
         Duration = info.Duration;
+        Status = OccurrenceStatus.Pending;
     }
 } 

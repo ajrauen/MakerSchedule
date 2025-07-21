@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace MakerSchedule.API.Extensions;
 
@@ -10,6 +11,7 @@ public static class ControllerExtensions
         .AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         })
         .AddXmlDataContractSerializerFormatters();
     }

@@ -10,6 +10,7 @@ import { durationOptions } from "@ms/Pages/Admin/Events/utils/event.utils";
 import type { EventOffering } from "@ms/types/event.types";
 import type { SelectOption } from "@ms/types/form.types";
 import type { CreateOccurrence, Occurrence } from "@ms/types/occurrence.types";
+import { Label } from "@mui/icons-material";
 import { Button } from "@mui/material";
 import type { PickerValidDate } from "@mui/x-date-pickers";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -18,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 interface OccurenceDetailsProps {
-  event: EventOffering;
+  selectedEvent: EventOffering;
   occurrence?: Occurrence;
   onCancel: () => void;
 }
@@ -35,7 +36,7 @@ type CreateOccurrenceFormData = z.infer<
 
 const OccurenceDetails = ({
   occurrence,
-  event,
+  selectedEvent,
   onCancel,
 }: OccurenceDetailsProps) => {
   const creatOccurrenceFormData = {
@@ -60,21 +61,21 @@ const OccurenceDetails = ({
 
   const { refetch: getAvailableLeaders, data: availableLeaderResponse } =
     useQuery({
-      queryKey: ["available-leaders", time, duration, event.duration],
+      queryKey: ["available-leaders", selectedEvent.id],
       queryFn: () => {
         const isoString = time.toISOString();
 
-        const apiDuration = duration ?? event.duration;
+        const apiDuration = duration ?? selectedEvent.duration;
 
         if (!apiDuration) return;
 
         return getAvailableDomainUserLeaders(
           isoString,
           apiDuration,
-          occurrence?.leaders
+          occurrence?.leaders?.map((leader) => leader.id)
         );
       },
-      staleTime: 3000,
+      staleTime: 10000,
       enabled: false,
     });
 
@@ -86,48 +87,40 @@ const OccurenceDetails = ({
 
   useEffect(() => {
     if (occurrence?.meta?.isNew) {
-      const now = new Date();
-      const todayAt10am = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        10,
-        0,
-        0,
-        0
-      );
       reset({
         ...creatOccurrenceFormData,
-        scheduleStart: todayAt10am,
-      });
-    } else {
-      let scheduleStartDate: Date;
-      if (occurrence?.scheduleStart) {
-        const isoString = occurrence.scheduleStart;
-
-        if (isoString.endsWith("Z")) {
-          const utcDate = new Date(isoString);
-          scheduleStartDate = new Date(
-            utcDate.getTime() - utcDate.getTimezoneOffset() * 60000
-          );
-        } else {
-          scheduleStartDate = new Date(isoString);
-        }
-      } else {
-        scheduleStartDate = new Date();
-      }
-
-      const processedLeaders = occurrence?.leaders ?? [];
-
-      reset({
-        scheduleStart: scheduleStartDate,
-        duration: occurrence?.duration,
-        leaders: processedLeaders,
+        scheduleStart: undefined,
       });
     }
+    // } else {
+    //   let scheduleStartDate: Date;
+    //   if (occurrence?.scheduleStart) {
+    //     const isoString = occurrence.scheduleStart;
+
+    //     if (isoString.endsWith("Z")) {
+    //       const utcDate = new Date(isoString);
+    //       scheduleStartDate = new Date(
+    //         utcDate.getTime() - utcDate.getTimezoneOffset() * 60000
+    //       );
+    //     } else {
+    //       scheduleStartDate = new Date(isoString);
+    //     }
+    //   } else {
+    //     scheduleStartDate = new Date();
+    //   }
+
+    //   const processedLeaders = occurrence?.leaders ?? [];
+
+    //   reset({
+    //     scheduleStart: scheduleStartDate,
+    //     duration: occurrence?.duration,
+    //     leaders: processedLeaders,
+    //   });
+    // }
   }, [occurrence]);
 
   useEffect(() => {
+    console.log(time, duration);
     if (time && duration) {
       getAvailableLeaders();
     }
@@ -151,33 +144,42 @@ const OccurenceDetails = ({
   };
 
   const onSave = () => {
-    if (!event.id) return;
+    if (!selectedEvent.id) return;
 
     const { scheduleStart, duration, leaders } = getValues();
 
     const occurrence: CreateOccurrence = {
-      eventId: event.id,
+      eventId: selectedEvent.id,
       scheduleStart: scheduleStart.toISOString(),
       duration,
-      leaders,
+      leaders: leaders ?? [],
     };
 
     createOccurrenceMutation({ occurrence });
   };
 
+  const isFormItemDisable =
+    occurrence?.status?.toLocaleLowerCase() === "complete" ||
+    occurrence?.status?.toLocaleLowerCase() === "canceled";
+
   return (
     <form onSubmit={handleSubmit(onSave)}>
       <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
+        <div>Status : {occurrence?.status}</div>
+
         <FormDateTime
           control={control}
           name="scheduleStart"
           label="Start Time"
           shouldDisableDate={shouldDisableDate}
+          disabled={isFormItemDisable}
         />
         <FormSelect
           name="duration"
           control={control}
           options={durationOptions}
+          label={"Duration"}
+          disabled={isFormItemDisable}
         />
 
         <FormSelect
@@ -186,26 +188,28 @@ const OccurenceDetails = ({
           options={leaderOptions}
           label="Availabe Leaders"
           multiSelect
-          disabled={!availableLeaderResponse?.status}
+          disabled={!availableLeaderResponse?.status || isFormItemDisable}
           helperText={
             !availableLeaderResponse ? "Select Time and Duration" : ""
           }
         />
+
         <div className="flex gap-4">
           <Button
             className=" px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 !ml-auto"
             onClick={onCancel}
           >
-            Cancel
+            {occurrence?.status === "pending" ? "Cancel" : "Back"}
           </Button>
-
-          <Button
-            variant="contained"
-            type="submit"
-            className=" px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 "
-          >
-            {occurrence?.id ? "Update" : "Save"}
-          </Button>
+          {occurrence?.status === "pending" && (
+            <Button
+              variant="contained"
+              type="submit"
+              className=" px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 "
+            >
+              {occurrence?.id ? "Update" : "Save"}
+            </Button>
+          )}
         </div>
       </div>
     </form>

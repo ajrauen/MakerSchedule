@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakerSchedule.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250720070752_initial")]
+    [Migration("20250721043629_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -76,7 +76,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("eb2d2b01-3b72-42a8-92fe-1eed46cd1aa1"),
+                            Id = new Guid("9f9b9aff-79bb-4837-a5ca-499673f9112c"),
                             Description = "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.",
                             Duration = 7200000,
                             EventName = "Advanced Pottery",
@@ -84,7 +84,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("98b6daeb-8d84-4aa1-9b35-1b753f0e6a56"),
+                            Id = new Guid("c8bcb79a-07bd-40e0-b80e-baa62e8426cb"),
                             Description = "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.",
                             Duration = 10800000,
                             EventName = "Woodworking Workshop",
@@ -92,7 +92,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("0822b772-18f2-4a16-8d72-c22d90c50cf9"),
+                            Id = new Guid("4b6daacb-2ab6-4c46-b262-d156a264337e"),
                             Description = "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.",
                             Duration = 5400000,
                             EventName = "Sewing Basics",
@@ -100,7 +100,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("23050dae-aa9c-4b99-97f5-ef1ff4b13887"),
+                            Id = new Guid("57c7944c-ff89-4a07-8e8f-2e443d115a2d"),
                             Description = "Introduction to pottery and clay work. Learn basic hand-building techniques. This beginner-friendly class introduces you to the world of ceramics through hand-building methods like pinch pots, coil building, and slab construction. You will learn about different types of clay, basic glazing techniques, and the firing process. The instructor will guide you through creating several small pieces that will be fired and glazed. No prior experience is necessary. All materials and firing fees are included.",
                             Duration = 9000000,
                             EventName = "Pottery for Beginners",
@@ -108,7 +108,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("ad81a540-767c-42a2-a20c-782352573691"),
+                            Id = new Guid("8cdf6a28-8d6a-4dbe-a2f3-ca1879f62744"),
                             Description = "Advanced woodworking techniques for experienced craftsmen. Learn joinery and finishing methods. This advanced workshop focuses on traditional woodworking joinery techniques such as dovetails, mortise and tenon, and finger joints. You will also learn advanced finishing techniques including French polishing, oil finishes, and lacquer application. The class includes safety training for power tools and hand tools. Participants should have basic woodworking experience. Bring your own safety equipment or use ours.",
                             Duration = 14400000,
                             EventName = "Advanced Woodworking",
@@ -131,6 +131,9 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.Property<DateTime?>("ScheduleStart")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
@@ -140,185 +143,211 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f36121a8-4e6e-417f-a734-a53c814e3094"),
+                            Id = new Guid("f5d0506e-9cca-4a5e-b579-46aa40695fb0"),
                             Duration = 2700000,
-                            EventId = new Guid("eb2d2b01-3b72-42a8-92fe-1eed46cd1aa1"),
-                            ScheduleStart = new DateTime(2025, 8, 1, 10, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("9f9b9aff-79bb-4837-a5ca-499673f9112c"),
+                            ScheduleStart = new DateTime(2025, 8, 2, 15, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("348d7087-5614-4d0e-a7b9-be84cd1e1853"),
+                            Id = new Guid("b5328991-9967-429b-8395-b1a494a5235e"),
                             Duration = 2700000,
-                            EventId = new Guid("eb2d2b01-3b72-42a8-92fe-1eed46cd1aa1"),
-                            ScheduleStart = new DateTime(2025, 8, 12, 15, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("9f9b9aff-79bb-4837-a5ca-499673f9112c"),
+                            ScheduleStart = new DateTime(2025, 8, 13, 20, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("5a7c1fe7-a421-49bc-925a-8a0ed1bdd9f0"),
+                            Id = new Guid("99e9235e-db7c-4fc1-afd9-72a6c9caf7f6"),
                             Duration = 5400000,
-                            EventId = new Guid("eb2d2b01-3b72-42a8-92fe-1eed46cd1aa1"),
-                            ScheduleStart = new DateTime(2025, 9, 26, 11, 15, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("9f9b9aff-79bb-4837-a5ca-499673f9112c"),
+                            ScheduleStart = new DateTime(2025, 9, 27, 16, 15, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("f14be5e4-b321-41c9-84f5-6c09eb5e21f4"),
+                            Id = new Guid("38f53bf9-f182-4134-b516-782f48cbd230"),
                             Duration = 5400000,
-                            EventId = new Guid("eb2d2b01-3b72-42a8-92fe-1eed46cd1aa1"),
-                            ScheduleStart = new DateTime(2025, 8, 17, 12, 15, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("9f9b9aff-79bb-4837-a5ca-499673f9112c"),
+                            ScheduleStart = new DateTime(2025, 8, 18, 17, 15, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("40d19266-db55-4600-92ac-5d17c03548cb"),
+                            Id = new Guid("23ca075b-de83-4470-887d-c5cb3e3a629b"),
                             Duration = 4500000,
-                            EventId = new Guid("eb2d2b01-3b72-42a8-92fe-1eed46cd1aa1"),
-                            ScheduleStart = new DateTime(2025, 7, 23, 16, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("9f9b9aff-79bb-4837-a5ca-499673f9112c"),
+                            ScheduleStart = new DateTime(2025, 7, 24, 21, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("34f59a4e-35dc-4644-a601-a28e2e68cbc7"),
+                            Id = new Guid("a03f1d93-6de2-41fa-b561-5802557dfe1c"),
                             Duration = 7200000,
-                            EventId = new Guid("eb2d2b01-3b72-42a8-92fe-1eed46cd1aa1"),
-                            ScheduleStart = new DateTime(2025, 8, 2, 9, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("9f9b9aff-79bb-4837-a5ca-499673f9112c"),
+                            ScheduleStart = new DateTime(2025, 8, 3, 14, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("8ff78f64-8adb-4f79-84d2-85d784ed4688"),
+                            Id = new Guid("74bdecf6-7eec-4e77-ac42-22179ac61452"),
                             Duration = 8100000,
-                            EventId = new Guid("98b6daeb-8d84-4aa1-9b35-1b753f0e6a56"),
-                            ScheduleStart = new DateTime(2025, 7, 23, 15, 0, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("c8bcb79a-07bd-40e0-b80e-baa62e8426cb"),
+                            ScheduleStart = new DateTime(2025, 7, 24, 20, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("37fed6b9-856e-448e-9452-8c16f7781932"),
+                            Id = new Guid("3dc96884-de19-4279-8225-85245b20c3d4"),
                             Duration = 1800000,
-                            EventId = new Guid("98b6daeb-8d84-4aa1-9b35-1b753f0e6a56"),
-                            ScheduleStart = new DateTime(2025, 9, 20, 13, 0, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("c8bcb79a-07bd-40e0-b80e-baa62e8426cb"),
+                            ScheduleStart = new DateTime(2025, 9, 21, 18, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("6597ef47-e67d-4b7e-98ac-9b66ce8935a4"),
+                            Id = new Guid("bebdaaa5-d30b-4cc9-aad0-0e5a4d0f19e7"),
                             Duration = 1800000,
-                            EventId = new Guid("98b6daeb-8d84-4aa1-9b35-1b753f0e6a56"),
-                            ScheduleStart = new DateTime(2025, 8, 16, 14, 45, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("c8bcb79a-07bd-40e0-b80e-baa62e8426cb"),
+                            ScheduleStart = new DateTime(2025, 8, 17, 19, 45, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("9e63f97f-bb9a-4c7e-8aca-a6b1d4fc642b"),
+                            Id = new Guid("9e000ed5-2b41-438c-b447-c400e20f2470"),
                             Duration = 4500000,
-                            EventId = new Guid("98b6daeb-8d84-4aa1-9b35-1b753f0e6a56"),
-                            ScheduleStart = new DateTime(2025, 9, 6, 16, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("c8bcb79a-07bd-40e0-b80e-baa62e8426cb"),
+                            ScheduleStart = new DateTime(2025, 9, 7, 21, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("66bb8e0d-12ab-41bc-be38-daff7fe5dde3"),
+                            Id = new Guid("0eff7048-47ff-47b8-86c0-906fbfd2e8db"),
                             Duration = 7200000,
-                            EventId = new Guid("98b6daeb-8d84-4aa1-9b35-1b753f0e6a56"),
-                            ScheduleStart = new DateTime(2025, 8, 2, 9, 0, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("c8bcb79a-07bd-40e0-b80e-baa62e8426cb"),
+                            ScheduleStart = new DateTime(2025, 8, 3, 14, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("f42a51e5-08da-439e-b079-d44df6fe2e1c"),
+                            Id = new Guid("3a6779ad-65c2-4e7b-9f6e-87bbdbb5c41c"),
                             Duration = 3600000,
-                            EventId = new Guid("0822b772-18f2-4a16-8d72-c22d90c50cf9"),
-                            ScheduleStart = new DateTime(2025, 7, 30, 11, 45, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("4b6daacb-2ab6-4c46-b262-d156a264337e"),
+                            ScheduleStart = new DateTime(2025, 7, 31, 16, 45, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("3d0d920f-a80b-444c-9481-c09188f8c7bc"),
+                            Id = new Guid("ef63d334-3ae9-4b0a-8645-19181748c248"),
                             Duration = 5400000,
-                            EventId = new Guid("0822b772-18f2-4a16-8d72-c22d90c50cf9"),
-                            ScheduleStart = new DateTime(2025, 9, 16, 10, 0, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("4b6daacb-2ab6-4c46-b262-d156a264337e"),
+                            ScheduleStart = new DateTime(2025, 9, 17, 15, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("7801d6c1-81c9-4958-a17c-ab5619d87723"),
+                            Id = new Guid("d0ef8382-161a-405c-80ab-53e0ffd7f600"),
                             Duration = 6300000,
-                            EventId = new Guid("0822b772-18f2-4a16-8d72-c22d90c50cf9"),
-                            ScheduleStart = new DateTime(2025, 9, 4, 9, 15, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("4b6daacb-2ab6-4c46-b262-d156a264337e"),
+                            ScheduleStart = new DateTime(2025, 9, 5, 14, 15, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("99d0309e-3caa-4ab3-a517-7a5a30eae9a7"),
+                            Id = new Guid("cc1be26d-aebc-4ce1-b7e5-e416a1ee6ce3"),
                             Duration = 3600000,
-                            EventId = new Guid("0822b772-18f2-4a16-8d72-c22d90c50cf9"),
-                            ScheduleStart = new DateTime(2025, 9, 14, 10, 0, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("4b6daacb-2ab6-4c46-b262-d156a264337e"),
+                            ScheduleStart = new DateTime(2025, 9, 15, 15, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("9a85a537-9c60-472f-88dd-3e809e5de43c"),
+                            Id = new Guid("9c44346f-c0fd-4648-a669-15ef2e8b717d"),
                             Duration = 1800000,
-                            EventId = new Guid("0822b772-18f2-4a16-8d72-c22d90c50cf9"),
-                            ScheduleStart = new DateTime(2025, 8, 13, 9, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("4b6daacb-2ab6-4c46-b262-d156a264337e"),
+                            ScheduleStart = new DateTime(2025, 8, 14, 14, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("db353e46-f6a5-49ee-b06f-bc0de897209d"),
+                            Id = new Guid("74da77ea-b31a-4341-a79a-15b528367a54"),
                             Duration = 4500000,
-                            EventId = new Guid("0822b772-18f2-4a16-8d72-c22d90c50cf9"),
-                            ScheduleStart = new DateTime(2025, 8, 30, 9, 45, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("4b6daacb-2ab6-4c46-b262-d156a264337e"),
+                            ScheduleStart = new DateTime(2025, 8, 31, 14, 45, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("81774aa0-9848-4991-94b3-4115484f8aee"),
+                            Id = new Guid("cba64abd-0be7-4b58-8099-905063115137"),
                             Duration = 1800000,
-                            EventId = new Guid("23050dae-aa9c-4b99-97f5-ef1ff4b13887"),
-                            ScheduleStart = new DateTime(2025, 9, 2, 9, 45, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("57c7944c-ff89-4a07-8e8f-2e443d115a2d"),
+                            ScheduleStart = new DateTime(2025, 9, 3, 14, 45, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("dc3d5f0b-a678-4437-9d2e-51dfa5af54e3"),
+                            Id = new Guid("8f89c275-c273-43d9-bf17-8a8889efe826"),
                             Duration = 1800000,
-                            EventId = new Guid("23050dae-aa9c-4b99-97f5-ef1ff4b13887"),
-                            ScheduleStart = new DateTime(2025, 7, 20, 9, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("57c7944c-ff89-4a07-8e8f-2e443d115a2d"),
+                            ScheduleStart = new DateTime(2025, 7, 21, 14, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("4dc961da-445f-4002-bd6b-59b20e974988"),
+                            Id = new Guid("aa69edf9-9ea2-4334-a291-6a8dc14a694a"),
                             Duration = 4500000,
-                            EventId = new Guid("23050dae-aa9c-4b99-97f5-ef1ff4b13887"),
-                            ScheduleStart = new DateTime(2025, 10, 10, 17, 15, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("57c7944c-ff89-4a07-8e8f-2e443d115a2d"),
+                            ScheduleStart = new DateTime(2025, 10, 11, 22, 15, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("8a09a45a-28ed-436a-8ce1-6217979b8089"),
+                            Id = new Guid("e769d393-c7d4-4e91-b31a-238a31692aa8"),
                             Duration = 2700000,
-                            EventId = new Guid("23050dae-aa9c-4b99-97f5-ef1ff4b13887"),
-                            ScheduleStart = new DateTime(2025, 9, 13, 9, 15, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("57c7944c-ff89-4a07-8e8f-2e443d115a2d"),
+                            ScheduleStart = new DateTime(2025, 9, 14, 14, 15, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("a42ec6f5-8264-4a89-a045-6385c944bdf8"),
+                            Id = new Guid("5faa4599-b174-4449-87f0-69f1b9338ce7"),
                             Duration = 4500000,
-                            EventId = new Guid("23050dae-aa9c-4b99-97f5-ef1ff4b13887"),
-                            ScheduleStart = new DateTime(2025, 8, 28, 16, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("57c7944c-ff89-4a07-8e8f-2e443d115a2d"),
+                            ScheduleStart = new DateTime(2025, 8, 29, 21, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("648549e0-729d-47e9-b9a4-a6085afaef91"),
+                            Id = new Guid("ef78a562-5897-4422-9b95-e5d031d7b135"),
                             Duration = 1800000,
-                            EventId = new Guid("ad81a540-767c-42a2-a20c-782352573691"),
-                            ScheduleStart = new DateTime(2025, 10, 9, 14, 30, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("8cdf6a28-8d6a-4dbe-a2f3-ca1879f62744"),
+                            ScheduleStart = new DateTime(2025, 10, 10, 19, 30, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("df31cd44-5550-418f-9811-1a2ec328efca"),
+                            Id = new Guid("71bb75f2-775d-4fac-8e4c-6a3fae77d850"),
                             Duration = 6300000,
-                            EventId = new Guid("ad81a540-767c-42a2-a20c-782352573691"),
-                            ScheduleStart = new DateTime(2025, 10, 7, 17, 15, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("8cdf6a28-8d6a-4dbe-a2f3-ca1879f62744"),
+                            ScheduleStart = new DateTime(2025, 10, 8, 22, 15, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("82026ea7-e4c7-40f1-9c20-3af45905ea6b"),
+                            Id = new Guid("c0832e11-cfb7-4494-8cb0-723a3ba592d9"),
                             Duration = 3600000,
-                            EventId = new Guid("ad81a540-767c-42a2-a20c-782352573691"),
-                            ScheduleStart = new DateTime(2025, 8, 3, 9, 15, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("8cdf6a28-8d6a-4dbe-a2f3-ca1879f62744"),
+                            ScheduleStart = new DateTime(2025, 8, 4, 14, 15, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         },
                         new
                         {
-                            Id = new Guid("7b645c79-f519-48f0-b4af-67340645c5a8"),
+                            Id = new Guid("e6c9bf2b-46a1-461d-9d22-f55f6d909674"),
                             Duration = 2700000,
-                            EventId = new Guid("ad81a540-767c-42a2-a20c-782352573691"),
-                            ScheduleStart = new DateTime(2025, 9, 27, 10, 0, 0, 0, DateTimeKind.Utc)
+                            EventId = new Guid("8cdf6a28-8d6a-4dbe-a2f3-ca1879f62744"),
+                            ScheduleStart = new DateTime(2025, 9, 28, 15, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1
                         });
                 });
 

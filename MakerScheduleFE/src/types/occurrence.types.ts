@@ -1,13 +1,24 @@
+interface OccurranceUsers {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
 interface Occurrence {
   eventId: string;
   id?: string;
   scheduleStart: string;
   duration?: number;
-  attendees?: number[];
-  leaders?: string[];
-  meta?: Record<string | number, string | number | boolean>; //store UI only data
+  attendees?: OccurranceUsers[];
+  leaders?: OccurranceUsers[];
+  status: OccurrenceStaus;
+  meta?: Record<string | number, string | number | boolean>;
 }
 
-type CreateOccurrence = Omit<Occurrence, "id"> & {};
+type OccurrenceStaus = "pending" | "complete" | "canceled";
+
+type CreateOccurrence = Omit<Occurrence, "id" | "status" | "leaders"> & {
+  leaders: string[];
+};
 
 export { type Occurrence, type CreateOccurrence };

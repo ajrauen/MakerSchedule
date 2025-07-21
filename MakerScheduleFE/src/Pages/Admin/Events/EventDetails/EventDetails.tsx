@@ -2,7 +2,7 @@ import type { EventOffering, EventType } from "@ms/types/event.types";
 
 import { BasicEventDetails } from "@ms/Pages/Admin/Events/EventDetails/BasicDetails/BasicEventDetails";
 import { IconButton, Tab, Tabs } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import CloseIcon from "@mui/icons-material/Close";
 import { useQuery } from "@tanstack/react-query";

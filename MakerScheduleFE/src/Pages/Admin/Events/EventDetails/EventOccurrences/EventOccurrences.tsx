@@ -2,7 +2,7 @@ import { OccurenceDetails } from "@ms/Pages/Admin/Events/EventDetails/EventOccur
 import { OccurencesList } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrencesList";
 import type { EventOffering } from "@ms/types/event.types";
 import type { Occurrence } from "@ms/types/occurrence.types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface EventOccurrencesProps {
   selectedEvent: EventOffering;
@@ -20,6 +20,12 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
     handleViewChange(setSelectedOccurrence(occ));
   };
 
+  useEffect(() => {
+    if (selectedEvent) {
+      setShowDetails(false);
+    }
+  }, [selectedEvent]);
+
   const handleOccurrenceCreate = () => {
     if (!selectedEvent?.id) return;
 
@@ -28,6 +34,7 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
       scheduleStart: new Date().toISOString(),
       attendees: [],
       leaders: [],
+      status: "pending",
       meta: {
         isNew: true,
       },
@@ -65,6 +72,7 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
           occurences={selectedEvent.occurences}
           onOccurenceSelect={handleOccurrenceSelection}
           onOccurenceCreate={handleOccurrenceCreate}
+          selectedEvent={selectedEvent}
         />
       </div>
       <div
@@ -74,7 +82,7 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
       >
         <OccurenceDetails
           occurrence={selectedOccurrence}
-          event={selectedEvent}
+          selectedEvent={selectedEvent}
           onCancel={handleBack}
         />
       </div>
