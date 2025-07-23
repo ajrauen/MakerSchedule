@@ -3,20 +3,25 @@ import {
   getAvailableDomainUserLeaders,
   getDomainUsers,
 } from "@ms/api/domain-user.api";
-import { createOccurrence } from "@ms/api/occurrence.api";
+import { createOccurrence, updateOccurrence } from "@ms/api/occurrence.api";
 import { FormDateTime } from "@ms/Components/FormComponents/FormDateTime/FormDateTime";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { durationOptions } from "@ms/Pages/Admin/Events/utils/event.utils";
 import type { EventOffering } from "@ms/types/event.types";
 import type { SelectOption } from "@ms/types/form.types";
-import type { CreateOccurrence, Occurrence } from "@ms/types/occurrence.types";
-import { Label } from "@mui/icons-material";
+import type {
+  CreateOccurrence,
+  Occurrence,
+  UpdateOccurrence,
+} from "@ms/types/occurrence.types";
 import { Button } from "@mui/material";
 import type { PickerValidDate } from "@mui/x-date-pickers";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { toast } from "react-toastify";
+import type { DomainUser } from "@ms/types/domain-user.types";
 
 interface OccurenceDetailsProps {
   selectedEvent: EventOffering;
@@ -39,12 +44,19 @@ const OccurenceDetails = ({
   selectedEvent,
   onCancel,
 }: OccurenceDetailsProps) => {
+  const [removedLeaders, setRemovedLeaders] = useState<DomainUser[]>([]);
+  const [availableLeaderOptions, setAvailableLeaderOptions] = useState<
+    SelectOption[]
+  >([]);
+
   const creatOccurrenceFormData = {
     duration: undefined,
     leaders: [],
   };
 
-  const { control, handleSubmit, reset, watch, getValues } =
+  const queryClient = useQueryClient();
+
+  const { control, handleSubmit, reset, watch, getValues, setValue } =
     useForm<CreateOccurrenceFormData>({
       resolver: zodResolver(createOccurrenceValidationSchema),
       defaultValues: creatOccurrenceFormData,
@@ -83,6 +95,25 @@ const OccurenceDetails = ({
     mutationKey: ["createMutation"],
     mutationFn: ({ occurrence }: { occurrence: CreateOccurrence }) =>
       createOccurrence(occurrence),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["event", selectedEvent?.id],
+      });
+      toast("Occurrence Created Successfully");
+      onCancel();
+    },
+  });
+
+  const { mutate: updateOccurrenceMutation } = useMutation({
+    mutationKey: ["updateMutation"],
+    mutationFn: ({ occurrence }: { occurrence: UpdateOccurrence }) =>
+      updateOccurrence(occurrence),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["event", selectedEvent?.id],
+      });
+      toast("Occurrence Saved Successfully");
+    },
   });
 
   useEffect(() => {
@@ -94,16 +125,7 @@ const OccurenceDetails = ({
     } else {
       let scheduleStartDate: Date;
       if (occurrence?.scheduleStart) {
-        const isoString = occurrence.scheduleStart;
-
-        if (isoString.endsWith("Z")) {
-          const utcDate = new Date(isoString);
-          scheduleStartDate = new Date(
-            utcDate.getTime() - utcDate.getTimezoneOffset() * 60000
-          );
-        } else {
-          scheduleStartDate = new Date(isoString);
-        }
+        scheduleStartDate = new Date(occurrence.scheduleStart);
       } else {
         scheduleStartDate = new Date();
       }
@@ -127,23 +149,58 @@ const OccurenceDetails = ({
     }
   }, [duration, time]);
 
-  const leaderOptions = useMemo(() => {
+  useEffect(() => {
     if (occurrence?.status.toLowerCase() === "complete") {
-      return occurrence.leaders?.map((leader) => ({
-        label: `${leader.firstName} ${leader.lastName}`,
-        value: leader.id,
-      }));
+      const leaders: SelectOption[] =
+        occurrence.leaders?.map((leader) => ({
+          label: `${leader.firstName} ${leader.lastName}`,
+          value: leader.id,
+        })) ?? [];
+      setAvailableLeaderOptions(leaders);
+      return;
     }
 
-    let options: SelectOption[] = [];
     if (availableLeaderResponse?.data) {
-      options = availableLeaderResponse.data.map((user) => ({
-        label: `${user.firstName} ${user.lastName}`,
-        value: user.id,
-      }));
+      const leaders: SelectOption[] = availableLeaderResponse.data.map(
+        (user) => ({
+          label: `${user.firstName} ${user.lastName}`,
+          value: user.id,
+        })
+      );
+      setAvailableLeaderOptions(leaders);
     }
-    return options;
-  }, [availableLeaderResponse?.data, occurrence]);
+  }, [availableLeaderResponse?.data, occurrence, duration, time]);
+
+  useEffect(() => {
+    const leaders = getValues("leaders") ?? [];
+
+    const availableLeader: string[] = [];
+    const unavailbeLeader = leaders.filter((leader) => {
+      const leaderOption = availableLeaderOptions?.find(
+        (availLeader) => availLeader.value === leader
+      );
+      if (leaderOption) {
+        availableLeader.push(leaderOption.value.toString());
+      }
+      return !leaderOption;
+    });
+
+    if (unavailbeLeader.length > 0) {
+      setValue("leaders", availableLeader);
+
+      let unavailableLeaderObjectArray: DomainUser[] = [];
+      for (const leaderIdx in unavailbeLeader) {
+        const domainLeader = domainLeaderResponse?.data.find(
+          (dlr) => dlr.id === unavailbeLeader[leaderIdx]
+        );
+        if (domainLeader) {
+          unavailableLeaderObjectArray.push(domainLeader);
+        }
+      }
+
+      setRemovedLeaders(unavailableLeaderObjectArray);
+    }
+  }, [availableLeaderOptions, occurrence]);
 
   const shouldDisableDate = (date: PickerValidDate) => {
     const today = new Date();
@@ -152,18 +209,29 @@ const OccurenceDetails = ({
   };
 
   const onSave = () => {
-    if (!selectedEvent.id) return;
+    if (!selectedEvent.id || !occurrence) return;
 
     const { scheduleStart, duration, leaders } = getValues();
 
-    const occurrence: CreateOccurrence = {
-      eventId: selectedEvent.id,
-      scheduleStart: scheduleStart.toISOString(),
-      duration,
-      leaders: leaders ?? [],
-    };
+    if (occurrence?.meta?.isNew) {
+      const createOccurrenceObj: CreateOccurrence = {
+        eventId: selectedEvent.id,
+        scheduleStart: scheduleStart.toISOString(),
+        duration,
+        leaders: leaders ?? [],
+      };
+      createOccurrenceMutation({ occurrence: createOccurrenceObj });
+    } else {
+      const updateOccurrenceObj: UpdateOccurrence = {
+        eventId: selectedEvent.id,
+        scheduleStart: scheduleStart.toISOString(),
+        duration,
+        leaders: leaders ?? [],
+        id: occurrence.id,
+      };
 
-    createOccurrenceMutation({ occurrence });
+      updateOccurrenceMutation({ occurrence: updateOccurrenceObj });
+    }
   };
 
   const isFormItemDisable =
@@ -193,7 +261,7 @@ const OccurenceDetails = ({
         <FormSelect
           name="leaders"
           control={control}
-          options={leaderOptions ?? []}
+          options={availableLeaderOptions}
           label={
             occurrence?.status.toLowerCase() === "complete"
               ? "Assigned Leanders"
@@ -205,15 +273,18 @@ const OccurenceDetails = ({
             !availableLeaderResponse ? "Select Time and Duration" : ""
           }
         />
+        {removedLeaders && removedLeaders.length > 0 && (
+          <div>Removed {removedLeaders.map((leader) => leader.lastName)}</div>
+        )}
 
         <div className="flex gap-4">
           <Button
             className=" px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 !ml-auto"
             onClick={onCancel}
           >
-            {occurrence?.status === "pending" ? "Cancel" : "Back"}
+            {occurrence?.status.toLowerCase() === "pending" ? "Cancel" : "Back"}
           </Button>
-          {occurrence?.status === "pending" && (
+          {occurrence?.status.toLowerCase() === "pending" && (
             <Button
               variant="contained"
               type="submit"

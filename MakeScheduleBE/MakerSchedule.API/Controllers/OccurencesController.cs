@@ -16,4 +16,21 @@ public class OccurrencesController(IEventService eventService) : ControllerBase
         var occurrence = await eventService.CreateOccurrenceAsync(createOccurenceDTO);
         return Ok(occurrence);
     }
+
+    [HttpPut]
+    public async Task<ActionResult<string>> UpdateOccuranceAsync([FromBody] UpdateOccurenceDTO updateOccurenceDTO)
+    {
+        var isSuccess = await eventService.UpdateOccuranceAsync(updateOccurenceDTO);
+        return Ok(isSuccess);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> DeleteOccuranceAsync(Guid id)
+    {
+        var isSuccess = await eventService.DeleteOccuranceAsync(id);
+        return Ok(isSuccess);
+    }
 }
+
+    // [HttpGet("{id}")]
+    // public async Task<ActionResult<EventDTO>> GetEvent(Guid id)

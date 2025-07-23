@@ -19,6 +19,7 @@ public class Occurrence
     public ICollection<OccurrenceLeader> Leaders { get; set; } = new List<OccurrenceLeader>();
     public OccurrenceStatus Status { get; set; }
     public Occurrence() { }
+    public bool isDeleted   { get; set; } = false;
 
     public Occurrence(Guid eventId, OccurrenceInfo info)
     {

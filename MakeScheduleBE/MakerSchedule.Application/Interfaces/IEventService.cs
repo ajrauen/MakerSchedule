@@ -12,5 +12,7 @@ public interface IEventService
     Task<Guid> PatchEventAsync(Guid eventId, PatchEventDTO eventDTO);
     Task<bool> DeleteEventAsync(Guid eventId);
     Task<Guid> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO);
+    Task<bool> UpdateOccuranceAsync(UpdateOccurenceDTO updateOccurenceDTO);
+    Task<bool> DeleteOccuranceAsync(Guid occurrenceGUID);
 
 }

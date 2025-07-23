@@ -9,7 +9,7 @@ interface RegisterDomainUserRequest {
 }
 
 interface DomainUser {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
 }

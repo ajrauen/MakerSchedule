@@ -43,7 +43,7 @@ const FormDateTime = <T extends FieldValues>({
             <DateTimePicker
               key={field.value ? field.value.getTime() : "empty"}
               label={label}
-              value={field.value}
+              defaultValue={field.value}
               slotProps={{
                 textField: {
                   ...props,
@@ -54,7 +54,6 @@ const FormDateTime = <T extends FieldValues>({
               shouldDisableDate={shouldDisableDate}
               shouldDisableTime={shouldDisableTime}
               onAccept={field.onChange}
-              onChange={field.onChange}
             />
           </LocalizationProvider>
         );

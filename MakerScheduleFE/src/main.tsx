@@ -6,11 +6,13 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@ms/common/query-client";
 import { App } from "@ms/App";
 import ErrorBoundary from "@ms/common/ErrorBoundary";
+import { ToastContainer } from "react-toastify";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
+        <ToastContainer />
         <App />
       </QueryClientProvider>
     </ErrorBoundary>

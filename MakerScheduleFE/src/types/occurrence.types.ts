@@ -21,4 +21,8 @@ type CreateOccurrence = Omit<Occurrence, "id" | "status" | "leaders"> & {
   leaders: string[];
 };
 
-export { type Occurrence, type CreateOccurrence };
+type UpdateOccurrence = Omit<Occurrence, "status" | "leaders"> & {
+  leaders: string[];
+};
+
+export { type Occurrence, type CreateOccurrence, type UpdateOccurrence };

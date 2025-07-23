@@ -59,26 +59,28 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             EventType = e.EventType,
             Duration = e.Duration,
             FileUrl = e.FileUrl,
-            Occurences = e.Occurrences.Select(o => new OccurenceDTO
-            {
-                Id = o.Id,
-                Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
+            Occurences = e.Occurrences
+                .Where(o => !o.isDeleted)
+                .Select(o => new OccurenceDTO
                 {
-                    Id = a.UserId.ToString(),
-                    FirstName = a.User?.User?.FirstName ?? "",
-                    LastName = a.User?.User?.LastName ?? ""
-                }).ToList(),
-                Duration = o.Duration,
-                EventId = o.EventId,
-                Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
-                {
-                    Id = l.UserId.ToString(),
-                    FirstName = l.User?.User?.FirstName ?? "",
-                    LastName = l.User?.User?.LastName ?? ""
-                }).ToList(),
-                ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
-                Status = o.Status
-            })
+                    Id = o.Id,
+                    Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
+                    {
+                        Id = a.UserId.ToString(),
+                        FirstName = a.User?.User?.FirstName ?? "",
+                        LastName = a.User?.User?.LastName ?? ""
+                    }).ToList(),
+                    Duration = o.Duration,
+                    EventId = o.EventId,
+                    Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
+                    {
+                        Id = l.UserId.ToString(),
+                        FirstName = l.User?.User?.FirstName ?? "",
+                        LastName = l.User?.User?.LastName ?? ""
+                    }).ToList(),
+                    ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
+                    Status = o.Status
+                })
         };
     }
 
@@ -141,7 +143,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return e.Id;
     }
 
-        public async Task<Guid> UpdateEventAsync(Guid eventId, UpdateEventDTO dto)
+    public async Task<Guid> UpdateEventAsync(Guid eventId, UpdateEventDTO dto)
     {
 
         if (dto.FormFile == null || dto.FormFile.Length == 0)
@@ -157,7 +159,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         }
 
 
-        
+
         string fileUrl;
         try
         {
@@ -263,7 +265,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return e.Id;
     }
 
-    
+
 
     public async Task<bool> DeleteEventAsync(Guid id)
     {
@@ -273,7 +275,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         await _context.SaveChangesAsync();
         return true;
     }
-    
+
     public async Task<Guid> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO)
     {
 
@@ -300,11 +302,12 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             _logger.LogError("Exception type: {Type}, message: {Message}", ex.GetType().FullName, ex.Message);
             throw new BaseException(ex.Message, "SCHEDULE_START_INVALID", 400);
         }
-        
+
 
         await _context.SaveChangesAsync();
 
-        foreach (var leaderId in occurrenceDTO.Leaders)
+        var uniqueLeaderIds = occurrenceDTO.Leaders.Distinct().ToList();
+        foreach (var leaderId in uniqueLeaderIds)
         {
             var leader = await _context.DomainUsers.FindAsync(leaderId);
             if (leader != null)
@@ -337,6 +340,78 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         await _context.SaveChangesAsync();
         _logger.LogInformation("Successfully created occurrence with {OccurrenceId}", newOccurrence.Id);
         return newOccurrence.Id;
+    }
+
+    public async Task<bool> UpdateOccuranceAsync(UpdateOccurenceDTO occurrenceDTO)
+    {
+
+
+        var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
+        if (eventEntity == null)
+            throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
+
+        var occurrence = await _context.Occurrences.FirstOrDefaultAsync(o => o.Id == occurrenceDTO.Id && o.EventId == occurrenceDTO.EventId);
+        if (occurrence == null)
+            throw new NotFoundException($"Occurrence with id {occurrenceDTO.Id} not found", occurrenceDTO.Id);
+
+        var start = occurrenceDTO.ScheduleStart;
+        if (start.Kind == DateTimeKind.Local)
+            start = start.ToUniversalTime();
+        else if (start.Kind == DateTimeKind.Unspecified)
+            start = DateTime.SpecifyKind(start, DateTimeKind.Local).ToUniversalTime();
+        occurrence.ScheduleStart = ScheduleStart.Create(start);
+        occurrence.Duration = occurrenceDTO.Duration;
+
+        var existingLeaders = _context.OccurrenceLeaders.Where(l => l.OccurrenceId == occurrence.Id);
+        _context.OccurrenceLeaders.RemoveRange(existingLeaders);
+        var existingAttendees = _context.OccurrenceAttendees.Where(a => a.OccurrenceId == occurrence.Id);
+        _context.OccurrenceAttendees.RemoveRange(existingAttendees);
+
+        var uniqueLeaderIds = occurrenceDTO.Leaders.Distinct().ToList();
+        foreach (var leaderId in uniqueLeaderIds)
+        {
+            var leader = await _context.DomainUsers.FindAsync(leaderId);
+            if (leader != null)
+            {
+                var occurrenceLeader = new OccurrenceLeader
+                {
+                    OccurrenceId = occurrence.Id,
+                    UserId = leaderId,
+                    AssignedAt = DateTime.UtcNow
+                };
+                _context.OccurrenceLeaders.Add(occurrenceLeader);
+            }
+        }
+
+        foreach (var attendeeId in occurrenceDTO.Attendees.Distinct())
+        {
+            var attendee = await _context.DomainUsers.FindAsync(attendeeId);
+            if (attendee != null)
+            {
+                var occurrenceAttendee = new OccurrenceAttendee
+                {
+                    OccurrenceId = occurrence.Id,
+                    UserId = attendeeId,
+                    RegisteredAt = DateTime.UtcNow
+                };
+                _context.OccurrenceAttendees.Add(occurrenceAttendee);
+            }
+        }
+
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> DeleteOccuranceAsync(Guid occurrenceid)
+    {
+        var occurrence = await _context.Occurrences.FirstOrDefaultAsync(o => o.Id == occurrenceid);
+        if (occurrence == null)
+            throw new NotFoundException($"Occurrence with id {occurrenceid} not found", occurrenceid);
+            occurrence.isDeleted = true;
+        _context.Occurrences.Update(occurrence);
+
+        await _context.SaveChangesAsync();
+        return true;
     }
 
 
