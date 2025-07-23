@@ -44,6 +44,7 @@ const OccurenceDetails = ({
   selectedEvent,
   onCancel,
 }: OccurenceDetailsProps) => {
+  const [isFormDataSet, setIsFormDataSet] = useState(false);
   const [removedLeaders, setRemovedLeaders] = useState<DomainUser[]>([]);
   const [availableLeaderOptions, setAvailableLeaderOptions] = useState<
     SelectOption[]
@@ -84,10 +85,11 @@ const OccurenceDetails = ({
         return getAvailableDomainUserLeaders(
           isoString,
           apiDuration,
+          occurrence?.id ?? "",
           occurrence?.leaders?.map((leader) => leader.id)
         );
       },
-      staleTime: 10000,
+      staleTime: 4000,
       enabled: false,
     });
 
@@ -121,7 +123,9 @@ const OccurenceDetails = ({
       reset({
         ...creatOccurrenceFormData,
         scheduleStart: undefined,
+        leaders: occurrence?.leaders?.map((leader) => leader.id) ?? [],
       });
+      setIsFormDataSet(true);
     } else {
       let scheduleStartDate: Date;
       if (occurrence?.scheduleStart) {
@@ -129,66 +133,57 @@ const OccurenceDetails = ({
       } else {
         scheduleStartDate = new Date();
       }
-
-      const processedLeaders =
-        occurrence?.leaders?.map((leader) => leader.id) ?? [];
-
       reset({
         scheduleStart: scheduleStartDate,
         duration: occurrence?.duration,
-        leaders: processedLeaders,
+        leaders: occurrence?.leaders?.map((leader) => leader.id) ?? [],
       });
+      setIsFormDataSet(true);
     }
   }, [occurrence]);
 
   useEffect(() => {
-    if (occurrence?.status.toLowerCase() === "complete") return;
+    if (!availableLeaderResponse?.data || !isFormDataSet) return;
 
-    if (time && duration) {
-      getAvailableLeaders();
-    }
-  }, [duration, time]);
-
-  useEffect(() => {
+    let availableLeaderOptions: SelectOption[] = [];
+    //get the default leader options.
     if (occurrence?.status.toLowerCase() === "complete") {
       const leaders: SelectOption[] =
         occurrence.leaders?.map((leader) => ({
           label: `${leader.firstName} ${leader.lastName}`,
           value: leader.id,
         })) ?? [];
-      setAvailableLeaderOptions(leaders);
-      return;
-    }
-
-    if (availableLeaderResponse?.data) {
+      availableLeaderOptions = leaders;
+    } else if (availableLeaderResponse?.data) {
       const leaders: SelectOption[] = availableLeaderResponse.data.map(
         (user) => ({
           label: `${user.firstName} ${user.lastName}`,
           value: user.id,
         })
       );
-      setAvailableLeaderOptions(leaders);
+      availableLeaderOptions = leaders;
+    } else {
+      return;
     }
-  }, [availableLeaderResponse?.data, occurrence, duration, time]);
 
-  useEffect(() => {
     const leaders = getValues("leaders") ?? [];
 
-    const availableLeader: string[] = [];
+    // Filter out from the options array leaders who are not available
+    // Also add to the availableLeaders array leader who are available
+    const availableLeaders: string[] = [];
     const unavailbeLeader = leaders.filter((leader) => {
       const leaderOption = availableLeaderOptions?.find(
         (availLeader) => availLeader.value === leader
       );
       if (leaderOption) {
-        availableLeader.push(leaderOption.value.toString());
+        availableLeaders.push(leaderOption.value.toString());
       }
       return !leaderOption;
     });
 
+    // From the unavailable leaders array, get the domain user object and make a new array
+    let unavailableLeaderObjectArray: DomainUser[] = [];
     if (unavailbeLeader.length > 0) {
-      setValue("leaders", availableLeader);
-
-      let unavailableLeaderObjectArray: DomainUser[] = [];
       for (const leaderIdx in unavailbeLeader) {
         const domainLeader = domainLeaderResponse?.data.find(
           (dlr) => dlr.id === unavailbeLeader[leaderIdx]
@@ -197,10 +192,20 @@ const OccurenceDetails = ({
           unavailableLeaderObjectArray.push(domainLeader);
         }
       }
-
-      setRemovedLeaders(unavailableLeaderObjectArray);
     }
-  }, [availableLeaderOptions, occurrence]);
+
+    setAvailableLeaderOptions(availableLeaderOptions);
+    setRemovedLeaders(unavailableLeaderObjectArray);
+    setValue("leaders", availableLeaders);
+  }, [availableLeaderResponse?.data, isFormDataSet]);
+
+  useEffect(() => {
+    if (occurrence?.status.toLowerCase() === "complete") return;
+
+    if (time && duration) {
+      getAvailableLeaders();
+    }
+  }, [duration, time]);
 
   const shouldDisableDate = (date: PickerValidDate) => {
     const today = new Date();
@@ -274,7 +279,12 @@ const OccurenceDetails = ({
           }
         />
         {removedLeaders && removedLeaders.length > 0 && (
-          <div>Removed {removedLeaders.map((leader) => leader.lastName)}</div>
+          <div>
+            Leaders removed due to unavailability:
+            {removedLeaders.map((leader, idx) => (
+              <span className="pl-2">{`${leader.lastName}${idx === removedLeaders.length - 1 ? "" : ", "}`}</span>
+            ))}
+          </div>
         )}
 
         <div className="flex gap-4">

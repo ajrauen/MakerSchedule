@@ -36,10 +36,11 @@ const OccurenceRow = ({
       return getAvailableDomainUserLeaders(
         isoString,
         apiDuration,
+        occurrence.id ?? "",
         occurrence.leaders?.map((leader) => leader.id) ?? []
       );
     },
-    staleTime: 10000,
+    staleTime: 4000,
     enabled: false,
   });
 
@@ -93,9 +94,10 @@ const OccurenceRow = ({
           {!occurrence.leaders || occurrence.leaders.length === 0 ? (
             <span className="ml-2 text-red-800">No leaders assigned</span>
           ) : (
-            occurrence.leaders.map((leader) => (
+            occurrence.leaders.map((leader, idx) => (
               <span key={leader.id} className="ml-2">
                 {leader.lastName}
+                {idx === (occurrence.leaders?.length ?? 0) - 1 ? "" : ", "}
               </span>
             ))
           )}

@@ -49,11 +49,13 @@ const getDomainUsers = async (role?: string) => {
 const getAvailableDomainUserLeaders = async (
   startTime: string,
   duration: number,
+  occurrenceId: string,
   currentLeaderIds?: string[]
 ) => {
   const requestData = {
     startTime: startTime,
     duration: duration,
+    occurrenceId: occurrenceId === "" ? null : occurrenceId,
     currentLeaderIds: currentLeaderIds?.map((id) => id) || [],
   };
 

@@ -64,7 +64,7 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     [Route("available-leaders")]
     public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromBody] GetAvailableLeadersRequest request)
     {
-        IEnumerable<DomainUserListDTO> leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(request.StartTime, request.Duration, request.CurrentLeaderIds ?? []);
+        IEnumerable<DomainUserListDTO> leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(request.StartTime, request.Duration, request.CurrentLeaderIds ?? [], request.OccurrenceId);
 
         return Ok(leaders);
     }

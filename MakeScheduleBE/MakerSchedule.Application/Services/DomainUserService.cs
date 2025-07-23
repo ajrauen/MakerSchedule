@@ -151,9 +151,9 @@ public class DomainUserService(
     }
 
 
-    public async Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(string startTime, long duration, List<Guid> currentLeaderIds ) 
+    public async Task<IEnumerable<DomainUserListDTO>> GetAvailableOccurrenceLeadersAsync(string startTime, long duration, List<Guid> currentLeaderIds, Guid? currentOccurrenceId ) 
     {
-         ScheduleStart occurrenceStart;
+        ScheduleStart occurrenceStart;
         try
         {
             var parsedDate = DateTimeOffset.Parse(startTime).UtcDateTime;
@@ -173,29 +173,52 @@ public class DomainUserService(
         var domainUsers = await _context.DomainUsers.Include(du => du.User).Where(du => allLeaderIds.Contains(du.UserId)).ToListAsync();
         var allLeaders = await _context.OccurrenceLeaders
             .Include(l => l.Occurrence)
-            .Where(o => o.Occurrence != null)
-            .Distinct() 
+            .Where(o => o.Occurrence != null && !o.Occurrence.isDeleted)
             .ToListAsync();
 
+        // Normalize empty string occurrenceId to null
+        if (currentOccurrenceId.HasValue && currentOccurrenceId.Value == Guid.Empty)
+        {
+            currentOccurrenceId = null;
+        }
+
+        // For currentLeaderIds, only exclude if double-booked (overlap with another occurrence)
+        var doubleBookedLeaderIds = new HashSet<Guid>();
+        foreach (var leaderId in currentLeaderIds)
+        {
+            var leaderOccurrences = allLeaders.Where(l => l.UserId == leaderId).ToList();
+            foreach (var occLeader in leaderOccurrences)
+            {
+                if (currentOccurrenceId.HasValue && occLeader.Occurrence.Id == currentOccurrenceId.Value)
+                    continue;
+                var occStart = occLeader.Occurrence.ScheduleStart!.Value;
+                var occEnd = occStart.AddMilliseconds(occLeader.Occurrence.Duration ?? 0);
+                if (occStart < occurrenceEnd && occEnd > occurrenceStart.Value)
+                {
+                    doubleBookedLeaderIds.Add(leaderId);
+                    break;
+                }
+            }
+        }
+
+        // Find all leaders busy for the requested window (excluding current occurrence)
         var busyLeaders = allLeaders
             .Where(o =>
             {
+                if (currentOccurrenceId.HasValue && o.Occurrence.Id == currentOccurrenceId.Value)
+                    return false;
                 var occStart = o.Occurrence.ScheduleStart!.Value;
                 var occEnd = occStart.AddMilliseconds(o.Occurrence.Duration ?? 0);
-                
-                var overlaps = occStart < occurrenceEnd && occEnd > occurrenceStart.Value;
-              
-                return overlaps;
+                return occStart < occurrenceEnd && occEnd > occurrenceStart.Value;
             })
             .Select(l => l.UserId)
             .Distinct()
             .ToList();
-            
-        // Remove the current leaders from busy list (they should be available for editing)
-        busyLeaders = busyLeaders.Except(currentLeaderIds).ToList();
 
-        // Get available leaders (not busy) plus explicitly include current leaders
-        var availableLeaders = domainUsers.Where(u => !busyLeaders.Contains(u.Id));
+        // Leaders available: not busy, and current leaders only excluded if double-booked
+        var availableLeaders = domainUsers.Where(u =>
+            (!busyLeaders.Contains(u.Id) || (currentLeaderIds.Contains(u.Id) && !doubleBookedLeaderIds.Contains(u.Id)))
+        );
 
         return availableLeaders.Select(l => new DomainUserListDTO
         {
