@@ -15,7 +15,7 @@ import type { EventOffering } from "@ms/types/event.types";
 interface OccurencesListProps {
   occurences?: Occurrence[];
   onOccurenceSelect: (occurrence: Occurrence) => void;
-  onOccurenceCreate: () => void;
+  onOccurenceCreate: (selectedDate: Date) => void;
   selectedEvent: EventOffering;
 }
 
@@ -45,7 +45,11 @@ const OccurencesList = ({
   }, [selectedDate, selectedEvent]);
 
   const handleAddOccurrenceClick = () => {
-    onOccurenceCreate();
+    let date = selectedDate;
+    if (!date) {
+      date = new Date();
+    }
+    onOccurenceCreate(date);
   };
 
   return (

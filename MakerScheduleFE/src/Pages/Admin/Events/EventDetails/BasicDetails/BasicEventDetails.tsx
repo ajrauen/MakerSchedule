@@ -15,7 +15,7 @@ import {
 } from "@ms/Pages/Admin/Events/utils/event.utils";
 import { ImageUpload } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/ImageUpload";
 import { useMutation } from "@tanstack/react-query";
-import { createEvent, patchEvent, updateEvent } from "@ms/api/event.api";
+import { createEvent, patchEvent } from "@ms/api/event.api";
 import { z } from "zod";
 
 const createEventvalidationSchema = z.object({

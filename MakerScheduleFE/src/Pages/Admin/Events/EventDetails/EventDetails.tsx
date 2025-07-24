@@ -26,6 +26,14 @@ const EventDetails = ({
     setValue(newValue);
   };
 
+  useEffect(() => {
+    if (selectedEvent.meta?.isNew) {
+      setValue(0);
+    } else {
+      setValue(1);
+    }
+  }, [selectedEvent.meta?.isNew]);
+
   const { data: eventResponse } = useQuery({
     queryKey: ["event", selectedEvent?.id],
     queryFn: async () => {
@@ -65,7 +73,9 @@ const EventDetails = ({
         aria-label="Vertical tabs example"
       >
         <Tab label="Details" {...a11yProps(0)} />
-        <Tab label="Occurences" {...a11yProps(1)} />
+        {event.meta?.isNew ? null : (
+          <Tab label="Occurrences" {...a11yProps(1)} />
+        )}
       </Tabs>
       <TabPanel index={0} value={value}>
         <BasicEventDetails

@@ -120,9 +120,15 @@ const OccurenceDetails = ({
 
   useEffect(() => {
     if (occurrence?.meta?.isNew) {
+      let defaultDate = new Date(occurrence.scheduleStart);
+      if (defaultDate < new Date()) {
+        defaultDate = new Date();
+        defaultDate.setHours(10, 0, 0, 0);
+      }
+
       reset({
         ...creatOccurrenceFormData,
-        scheduleStart: undefined,
+        scheduleStart: defaultDate,
         leaders: occurrence?.leaders?.map((leader) => leader.id) ?? [],
       });
       setIsFormDataSet(true);
@@ -246,8 +252,6 @@ const OccurenceDetails = ({
   return (
     <form onSubmit={handleSubmit(onSave)}>
       <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
-        <div>Status : {occurrence?.status}</div>
-
         <FormDateTime
           control={control}
           name="scheduleStart"

@@ -26,12 +26,12 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
     }
   }, [selectedEvent]);
 
-  const handleOccurrenceCreate = () => {
+  const handleOccurrenceCreate = (selectedDate: Date) => {
     if (!selectedEvent?.id) return;
 
     const newOccurrence: Occurrence = {
       eventId: selectedEvent.id,
-      scheduleStart: new Date().toISOString(),
+      scheduleStart: new Date(selectedDate).toISOString(),
       attendees: [],
       leaders: [],
       status: "pending",
