@@ -32,12 +32,6 @@ namespace MakerSchedule.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -188,7 +182,15 @@ namespace MakerSchedule.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    PreferredContactMethod = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PreferredContactMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -282,11 +284,11 @@ namespace MakerSchedule.Infrastructure.Migrations
                 columns: new[] { "Id", "Description", "Duration", "EventName", "EventType", "FileUrl" },
                 values: new object[,]
                 {
-                    { new Guid("8aac4c12-3ad3-4da5-be6c-e2d94e16922e"), "Advanced woodworking techniques for experienced craftsmen. Learn joinery and finishing methods. This advanced workshop focuses on traditional woodworking joinery techniques such as dovetails, mortise and tenon, and finger joints. You will also learn advanced finishing techniques including French polishing, oil finishes, and lacquer application. The class includes safety training for power tools and hand tools. Participants should have basic woodworking experience. Bring your own safety equipment or use ours.", 14400000, "Advanced Woodworking", 1, null },
-                    { new Guid("9704124c-81be-40d9-a870-7ac2f40eb7ca"), "Introduction to pottery and clay work. Learn basic hand-building techniques. This beginner-friendly class introduces you to the world of ceramics through hand-building methods like pinch pots, coil building, and slab construction. You will learn about different types of clay, basic glazing techniques, and the firing process. The instructor will guide you through creating several small pieces that will be fired and glazed. No prior experience is necessary. All materials and firing fees are included.", 9000000, "Pottery for Beginners", 2, null },
-                    { new Guid("b6bce105-e723-4da1-bb11-07b04e1b6372"), "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.", 7200000, "Advanced Pottery", 2, null },
-                    { new Guid("d860c49c-2fbc-44a2-9cbc-871b44eb5a90"), "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.", 10800000, "Woodworking Workshop", 1, null },
-                    { new Guid("fdf36425-d2ad-40dd-8ef2-0051cc103594"), "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.", 5400000, "Sewing Basics", 3, null }
+                    { new Guid("13f8db47-ef70-4745-b4c2-f44406731600"), "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.", 7200000, "Advanced Pottery", 2, null },
+                    { new Guid("261de8f4-12a5-4020-8d7d-87605433e4ec"), "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.", 10800000, "Woodworking Workshop", 1, null },
+                    { new Guid("3c6b7ef0-0ee2-4bf7-9833-dfe3ea581fde"), "Introduction to pottery and clay work. Learn basic hand-building techniques. This beginner-friendly class introduces you to the world of ceramics through hand-building methods like pinch pots, coil building, and slab construction. You will learn about different types of clay, basic glazing techniques, and the firing process. The instructor will guide you through creating several small pieces that will be fired and glazed. No prior experience is necessary. All materials and firing fees are included.", 9000000, "Pottery for Beginners", 2, null },
+                    { new Guid("414e4b0c-c69c-4c33-b4dc-ed851f7ca152"), "Advanced woodworking techniques for experienced craftsmen. Learn joinery and finishing methods. This advanced workshop focuses on traditional woodworking joinery techniques such as dovetails, mortise and tenon, and finger joints. You will also learn advanced finishing techniques including French polishing, oil finishes, and lacquer application. The class includes safety training for power tools and hand tools. Participants should have basic woodworking experience. Bring your own safety equipment or use ours.", 14400000, "Advanced Woodworking", 1, null },
+                    { new Guid("c0de217f-e23f-4d3b-ade8-bc939ce5c32d"), "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.", 5400000, "Sewing Basics", 3, null }
                 });
 
             migrationBuilder.InsertData(
@@ -294,32 +296,32 @@ namespace MakerSchedule.Infrastructure.Migrations
                 columns: new[] { "Id", "Duration", "EventId", "ScheduleStart", "Status", "isDeleted" },
                 values: new object[,]
                 {
-                    { new Guid("0273883f-3ad2-4c99-bfc1-9cdbfc31cf61"), 6300000, new Guid("fdf36425-d2ad-40dd-8ef2-0051cc103594"), new DateTime(2025, 6, 30, 14, 15, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("22529b56-42ec-458d-9272-9852e0cdbc86"), 4500000, new Guid("9704124c-81be-40d9-a870-7ac2f40eb7ca"), new DateTime(2025, 7, 4, 21, 30, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("26ab78c2-0369-4fd3-aa0c-ff56968c0fee"), 8100000, new Guid("d860c49c-2fbc-44a2-9cbc-871b44eb5a90"), new DateTime(2025, 7, 22, 20, 0, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("3058faa6-d2c9-4d45-b871-d31836092f27"), 1800000, new Guid("9704124c-81be-40d9-a870-7ac2f40eb7ca"), new DateTime(2025, 7, 1, 14, 45, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("386dddb8-7503-417a-b3cf-d5a5cad3402f"), 3600000, new Guid("fdf36425-d2ad-40dd-8ef2-0051cc103594"), new DateTime(2025, 8, 22, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("42820b8c-d41e-49cf-805b-452793cffb71"), 7200000, new Guid("d860c49c-2fbc-44a2-9cbc-871b44eb5a90"), new DateTime(2025, 7, 17, 14, 0, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("477603ea-7882-4895-98cf-abeec53ec3c4"), 2700000, new Guid("9704124c-81be-40d9-a870-7ac2f40eb7ca"), new DateTime(2025, 8, 21, 14, 15, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("60b47b18-cf5e-494b-a647-bb3c90194693"), 4500000, new Guid("9704124c-81be-40d9-a870-7ac2f40eb7ca"), new DateTime(2025, 6, 12, 22, 15, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("66eb32cb-59c3-4650-b8ae-96b14b81a44b"), 3600000, new Guid("8aac4c12-3ad3-4da5-be6c-e2d94e16922e"), new DateTime(2025, 7, 16, 14, 15, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("74c332f3-8498-4b9b-8e52-bc3d21491add"), 1800000, new Guid("d860c49c-2fbc-44a2-9cbc-871b44eb5a90"), new DateTime(2025, 7, 10, 19, 45, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("7a20ba3b-d311-4c7c-ad7b-a9261e2148b4"), 5400000, new Guid("b6bce105-e723-4da1-bb11-07b04e1b6372"), new DateTime(2025, 6, 19, 16, 15, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("7b9125b9-9de4-4965-87be-2d67027f56f9"), 6300000, new Guid("8aac4c12-3ad3-4da5-be6c-e2d94e16922e"), new DateTime(2025, 9, 2, 22, 15, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("81a8876c-b6ae-454b-be50-846223db7729"), 2700000, new Guid("8aac4c12-3ad3-4da5-be6c-e2d94e16922e"), new DateTime(2025, 8, 28, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("95a10070-0b43-4cd8-8665-495adf4fde2a"), 1800000, new Guid("9704124c-81be-40d9-a870-7ac2f40eb7ca"), new DateTime(2025, 7, 25, 14, 30, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("9dd97fa0-7c7d-4718-8121-e7d085c4740f"), 1800000, new Guid("8aac4c12-3ad3-4da5-be6c-e2d94e16922e"), new DateTime(2025, 6, 13, 19, 30, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("9e8477cd-7461-48c1-9e2f-a5ec01b08c06"), 4500000, new Guid("fdf36425-d2ad-40dd-8ef2-0051cc103594"), new DateTime(2025, 8, 14, 14, 45, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("a2ec72ba-f1cd-459e-99a0-092171c86425"), 7200000, new Guid("b6bce105-e723-4da1-bb11-07b04e1b6372"), new DateTime(2025, 7, 31, 14, 30, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("b76947e6-8079-4a72-ac6f-ea43333559ed"), 4500000, new Guid("b6bce105-e723-4da1-bb11-07b04e1b6372"), new DateTime(2025, 7, 22, 21, 30, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("bc251576-2a4d-42b3-a345-d634b409e483"), 1800000, new Guid("fdf36425-d2ad-40dd-8ef2-0051cc103594"), new DateTime(2025, 7, 11, 14, 30, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("c35a644a-28ae-4aaf-82e1-257d9a23ba3a"), 5400000, new Guid("b6bce105-e723-4da1-bb11-07b04e1b6372"), new DateTime(2025, 8, 8, 17, 15, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("d746ca04-4dd0-40cf-97e6-72d63d84336b"), 4500000, new Guid("d860c49c-2fbc-44a2-9cbc-871b44eb5a90"), new DateTime(2025, 8, 18, 21, 30, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("dfef3076-b78e-4de1-aac4-53930bacdf53"), 2700000, new Guid("b6bce105-e723-4da1-bb11-07b04e1b6372"), new DateTime(2025, 7, 17, 15, 30, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("eb37451a-97a8-4beb-8296-83d409e43be8"), 1800000, new Guid("d860c49c-2fbc-44a2-9cbc-871b44eb5a90"), new DateTime(2025, 8, 25, 18, 0, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("f9fb20bb-7313-4bc8-b944-1da64a19a479"), 3600000, new Guid("fdf36425-d2ad-40dd-8ef2-0051cc103594"), new DateTime(2025, 7, 18, 16, 45, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("faab32ac-4c63-4370-8d88-c01e8a993801"), 2700000, new Guid("b6bce105-e723-4da1-bb11-07b04e1b6372"), new DateTime(2025, 8, 5, 20, 30, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("fe4bac14-ec42-4b9b-853f-c41170e1f589"), 5400000, new Guid("fdf36425-d2ad-40dd-8ef2-0051cc103594"), new DateTime(2025, 8, 23, 15, 0, 0, 0, DateTimeKind.Utc), 1, false }
+                    { new Guid("18289e74-b887-43d8-9f0d-14b9cc41b7d0"), 3600000, new Guid("c0de217f-e23f-4d3b-ade8-bc939ce5c32d"), new DateTime(2025, 7, 18, 16, 45, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("1aea4c6b-7f52-4385-a9f5-37049b747c2b"), 1800000, new Guid("c0de217f-e23f-4d3b-ade8-bc939ce5c32d"), new DateTime(2025, 7, 11, 14, 30, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("2026d755-886e-414f-8aac-dc7af1f0469d"), 7200000, new Guid("261de8f4-12a5-4020-8d7d-87605433e4ec"), new DateTime(2025, 7, 17, 14, 0, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("2245a080-1de3-4761-a8f0-86a051828a27"), 1800000, new Guid("414e4b0c-c69c-4c33-b4dc-ed851f7ca152"), new DateTime(2025, 6, 13, 19, 30, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("445136bc-f7ac-47df-baa3-e4535ff15dbe"), 1800000, new Guid("3c6b7ef0-0ee2-4bf7-9833-dfe3ea581fde"), new DateTime(2025, 7, 25, 14, 30, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("4834c06c-72f8-4a0d-941d-897fb692f512"), 4500000, new Guid("13f8db47-ef70-4745-b4c2-f44406731600"), new DateTime(2025, 7, 22, 21, 30, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("4a5abfe4-6bcf-453d-822d-70a17ef8979c"), 1800000, new Guid("261de8f4-12a5-4020-8d7d-87605433e4ec"), new DateTime(2025, 7, 10, 19, 45, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("688d0d68-09ae-4041-9abd-5da4c7aebaa6"), 8100000, new Guid("261de8f4-12a5-4020-8d7d-87605433e4ec"), new DateTime(2025, 7, 22, 20, 0, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("6b4dae87-84a9-4e38-9372-7aa14c25b37b"), 4500000, new Guid("3c6b7ef0-0ee2-4bf7-9833-dfe3ea581fde"), new DateTime(2025, 7, 4, 21, 30, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("6c250541-bfc8-431d-808d-164d9162a2d6"), 4500000, new Guid("261de8f4-12a5-4020-8d7d-87605433e4ec"), new DateTime(2025, 8, 18, 21, 30, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("78b44314-8997-42e3-a2d1-097f42e597b0"), 1800000, new Guid("261de8f4-12a5-4020-8d7d-87605433e4ec"), new DateTime(2025, 8, 25, 18, 0, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("8167e1d8-745f-449b-bda1-3455a9743ec0"), 6300000, new Guid("414e4b0c-c69c-4c33-b4dc-ed851f7ca152"), new DateTime(2025, 9, 2, 22, 15, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("907d9e0c-6cd7-4887-bf5b-1952d3d8b7e6"), 5400000, new Guid("c0de217f-e23f-4d3b-ade8-bc939ce5c32d"), new DateTime(2025, 8, 23, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("91b94ba7-ec3c-4ad8-90d1-df30b3fd63c4"), 7200000, new Guid("13f8db47-ef70-4745-b4c2-f44406731600"), new DateTime(2025, 7, 31, 14, 30, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("96b392f3-2193-496c-ba76-25e64ae37785"), 4500000, new Guid("c0de217f-e23f-4d3b-ade8-bc939ce5c32d"), new DateTime(2025, 8, 14, 14, 45, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("9b04a499-a273-4e90-a016-7f85dabb747e"), 2700000, new Guid("13f8db47-ef70-4745-b4c2-f44406731600"), new DateTime(2025, 7, 17, 15, 30, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("aa93ddc8-f002-480a-b59d-6ac0b65aa5e9"), 5400000, new Guid("13f8db47-ef70-4745-b4c2-f44406731600"), new DateTime(2025, 8, 8, 17, 15, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("aa9473f1-1c53-40e6-bb29-a1ae02cd8496"), 2700000, new Guid("414e4b0c-c69c-4c33-b4dc-ed851f7ca152"), new DateTime(2025, 8, 28, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("b6244803-500d-4b91-a1ee-f0e6d043cc8d"), 3600000, new Guid("414e4b0c-c69c-4c33-b4dc-ed851f7ca152"), new DateTime(2025, 7, 16, 14, 15, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("be1e1f38-c656-43e0-a541-d1b1c68f61df"), 3600000, new Guid("c0de217f-e23f-4d3b-ade8-bc939ce5c32d"), new DateTime(2025, 8, 22, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("c87fd5e2-1bf5-44e7-9aba-cf16c7cacf83"), 2700000, new Guid("13f8db47-ef70-4745-b4c2-f44406731600"), new DateTime(2025, 8, 5, 20, 30, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("e19b166d-59dc-4b91-8b13-913d575a19fb"), 1800000, new Guid("3c6b7ef0-0ee2-4bf7-9833-dfe3ea581fde"), new DateTime(2025, 7, 1, 14, 45, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("e51e1fca-0c5d-439b-a510-95b4fb9ebfe2"), 2700000, new Guid("3c6b7ef0-0ee2-4bf7-9833-dfe3ea581fde"), new DateTime(2025, 8, 21, 14, 15, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("f12bf7c7-d925-4182-96e7-1aca29f3c6a1"), 5400000, new Guid("13f8db47-ef70-4745-b4c2-f44406731600"), new DateTime(2025, 6, 19, 16, 15, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("f1ba91f6-adea-4ba1-9f35-82bddda1edfa"), 4500000, new Guid("3c6b7ef0-0ee2-4bf7-9833-dfe3ea581fde"), new DateTime(2025, 6, 12, 22, 15, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("ff1cd40e-f00e-4451-a7e4-390666f7730d"), 6300000, new Guid("c0de217f-e23f-4d3b-ade8-bc939ce5c32d"), new DateTime(2025, 6, 30, 14, 15, 0, 0, DateTimeKind.Utc), 2, false }
                 });
 
             migrationBuilder.CreateIndex(

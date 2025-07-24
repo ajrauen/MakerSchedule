@@ -17,7 +17,7 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     [HttpGet]
     public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAllDomainUsersAsync([FromQuery] string? role = null)
     {
-        var users = string.IsNullOrEmpty(role) 
+        var users = string.IsNullOrEmpty(role)
             ? await domainUserService.GetAllDomainUsersAsync()
             : await domainUserService.GetAllDomainUsersByRoleAsync(role);
         return Ok(users);
@@ -38,7 +38,7 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateDomainUserProfile(string id, [FromBody] UpdateUserProfileDTO dto)
+    public async Task<IActionResult> UpdateDomainUserProfile(Guid id, [FromBody] UpdateUserProfileDTO dto)
     {
         var success = await domainUserProfileService.UpdateUserProfileAsync(id, dto);
         if (success)
@@ -59,7 +59,7 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
         return BadRequest("User could not be created.");
     }
 
-     [HttpPost]
+    [HttpPost]
     // [Authorize(Roles = "Admin")]
     [Route("available-leaders")]
     public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromBody] GetAvailableLeadersRequest request)

@@ -90,6 +90,24 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
             .HasOne(d => d.User)
             .WithOne(u => u.DomainUser)
             .HasForeignKey<DomainUser>(d => d.UserId);
+
+        // Configure value objects for DomainUser
+        modelBuilder.Entity<DomainUser>(entity =>
+        {
+            entity.Property(d => d.Email)
+                .HasConversion(
+                    email => email == null ? null : email.Value,
+                    value => value == null ? null : new MakerSchedule.Domain.ValueObjects.Email(value)
+                )
+                .HasColumnType("nvarchar(max)");
+
+            entity.Property(d => d.PhoneNumber)
+                .HasConversion(
+                    phone => phone == null ? null : phone.Value,
+                    value => value == null ? null : new MakerSchedule.Domain.ValueObjects.PhoneNumber(value)
+                )
+                .HasColumnType("nvarchar(max)");
+        });
     }
 
     public DbSet<DomainUser> DomainUsers { get; set; }

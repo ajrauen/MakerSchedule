@@ -51,8 +51,8 @@ public class DomainUserService(
             var DomainUserDTO = DomainUsers.Select(DomainUser => new DomainUserListDTO
             {
                 Id = DomainUser.Id,
-                FirstName = DomainUser.User?.FirstName ?? string.Empty,
-                LastName = DomainUser.User?.LastName ?? string.Empty,
+                FirstName = DomainUser.FirstName ?? string.Empty,
+                LastName = DomainUser.LastName ?? string.Empty,
 
             }).ToList();
 
@@ -83,12 +83,12 @@ public class DomainUserService(
                 Id = DomainUser.Id,
 
                 UserId = DomainUser.UserId,
-                Email = DomainUser.User?.Email ?? string.Empty,
-                FirstName = DomainUser.User?.FirstName ?? string.Empty,
-                LastName = DomainUser.User?.LastName ?? string.Empty,
-                PhoneNumber = DomainUser.User?.PhoneNumber ?? string.Empty,
-                Address = DomainUser.User?.Address ?? string.Empty,
-                IsActive = DomainUser.User?.IsActive ?? false,
+                Email = DomainUser.Email,
+                FirstName = DomainUser.FirstName,
+                LastName = DomainUser.LastName,
+                PhoneNumber = DomainUser.PhoneNumber,
+                Address = DomainUser.Address,
+                IsActive = DomainUser.IsActive,
 
             };
         }
@@ -145,8 +145,8 @@ public class DomainUserService(
         return domainUsers.Select(du => new DomainUserListDTO
         {
             Id = du.Id,
-            FirstName = du.User?.FirstName ?? string.Empty,
-            LastName = du.User?.LastName ?? string.Empty
+            FirstName = du.FirstName,
+            LastName = du.LastName
         });
     }
 
@@ -223,8 +223,8 @@ public class DomainUserService(
         return availableLeaders.Select(l => new DomainUserListDTO
         {
             Id = l.Id,
-            FirstName = l.User.FirstName,
-            LastName = l.User.LastName,
+            FirstName = l.FirstName,
+            LastName = l.LastName,
         });
     }
 }

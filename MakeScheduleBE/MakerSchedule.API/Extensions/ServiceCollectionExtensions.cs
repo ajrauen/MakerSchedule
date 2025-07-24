@@ -8,11 +8,9 @@ public static class MakerScheduleExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // Add AutoMapper
         services.AddAutoMapper(typeof(MakerScheduleExtensions).Assembly);
 
         services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IUserService, UserService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
         services.AddScoped<IMetadataService, MetadataService>();

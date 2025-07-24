@@ -13,17 +13,18 @@ public class DomainUserMappingProfile : Profile
     {
         // DomainUser to DomainUserDTO
         CreateMap<DomainUser, DomainUserDTO>()
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
-            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
-            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName))
-            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
-            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.User.Address))
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.User.IsActive));
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+            .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+            .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive));
 
         // DomainUser to DomainUserListDTO
         CreateMap<DomainUser, DomainUserListDTO>()
-            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.User.FirstName))
-            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.User.LastName));
+            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName));
 
         // CreateDomainUserDTO to DomainUser
         CreateMap<CreateDomainUserDTO, DomainUser>()
@@ -39,9 +40,6 @@ public class DomainUserMappingProfile : Profile
             .ForMember(dest => dest.LockoutEnd, opt => opt.Ignore())
             .ForMember(dest => dest.LockoutEnabled, opt => opt.Ignore())
             .ForMember(dest => dest.AccessFailedCount, opt => opt.Ignore())
-            .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.Ignore())
             .ForMember(dest => dest.RefreshToken, opt => opt.Ignore())
             .ForMember(dest => dest.RefreshTokenExpiryTime, opt => opt.Ignore());
     }

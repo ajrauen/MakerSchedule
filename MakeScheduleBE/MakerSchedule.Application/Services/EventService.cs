@@ -67,16 +67,16 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
                     {
                         Id = a.UserId.ToString(),
-                        FirstName = a.User?.User?.FirstName ?? "",
-                        LastName = a.User?.User?.LastName ?? ""
+                        FirstName = a.User?.FirstName ?? "",
+                        LastName = a.User?.LastName ?? ""
                     }).ToList(),
                     Duration = o.Duration,
                     EventId = o.EventId,
                     Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
                     {
                         Id = l.UserId.ToString(),
-                        FirstName = l.User?.User?.FirstName ?? "",
-                        LastName = l.User?.User?.LastName ?? ""
+                        FirstName = l.User?.FirstName ?? "",
+                        LastName = l.User?.LastName ?? ""
                     }).ToList(),
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
                     Status = o.Status

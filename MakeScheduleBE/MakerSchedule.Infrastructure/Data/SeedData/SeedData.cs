@@ -22,7 +22,14 @@ public class SeedData
         {
             Id = Guid.NewGuid(),
             UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            // Add other required DomainUser properties if needed
+            PreferredContactMethod = "Email",
+            Email = new Email("admin@ms.com"),
+            PhoneNumber = new PhoneNumber("1234567890"),
+            FirstName = "Admin",
+            LastName = "User",
+            Address = "123 Admin St, City, Country",
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true
         }
     };
 
@@ -206,13 +213,8 @@ public class DatabaseSeeder
                 {
                     UserName = email,
                     Email = email,
-                    FirstName = firstName,
-                    LastName = lastName,
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true,
-                    IsActive = true,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
                 };
                 var result = await _userManager.CreateAsync(user, defaultPassword);
                 if (result.Succeeded)
@@ -238,12 +240,29 @@ public class DatabaseSeeder
             var domainUserExists = await _context.DomainUsers.AnyAsync(d => d.UserId == user.Id);
             if (!domainUserExists)
             {
+                // Ensure we have a valid email
+                if (string.IsNullOrEmpty(user.Email))
+                {
+                    _logger.LogWarning("User {UserId} has no email, skipping DomainUser creation", user.Id);
+                    continue;
+                }
+                
+                // Ensure we have a valid phone number
+                var phoneNumber = !string.IsNullOrEmpty(user.PhoneNumber) 
+                    ? user.PhoneNumber 
+                    : "0000000000"; // Default phone number if none provided
+                
                 var domainUser = new DomainUser
                 {
                     Id = Guid.NewGuid(),
                     UserId = user.Id,
-                    PreferredContactMethod = "Email"
-                    // Add other properties as needed
+                    PreferredContactMethod = "Email",
+                    Email = new Email(user.Email),
+                    PhoneNumber = new PhoneNumber(phoneNumber),
+                    FirstName = firstName,
+                    LastName = lastName,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
                 };
                 _context.DomainUsers.Add(domainUser);
                 await _context.SaveChangesAsync();
@@ -380,6 +399,7 @@ public class DatabaseSeeder
         {
             const string adminEmail = "admin@ms.com";
             const string adminPassword = "Admin123!"; // Default password - should be changed after first login
+            const string adminPhoneNumber = "1234567890"; 
             var adminUserId = "11111111-1111-1111-1111-111111111111";
 
             _logger.LogInformation("Starting admin user seeding process...");
@@ -396,17 +416,9 @@ public class DatabaseSeeder
                 _logger.LogInformation("Creating new admin user: {Email}", adminEmail);
                 adminUser = new User
                 {
-                    Id = Guid.Parse(adminUserId), // Fixed ID to match seed data
+                    Id = Guid.Parse(adminUserId),
                     UserName = adminEmail,
                     Email = adminEmail,
-                    FirstName = "Admin",
-                    LastName = "User",
-                    Address = "123 Admin St",
-                    PhoneNumber = "123-456-7890",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    IsActive = true,
-                    // UserType = UserType.Employee, // Remove or comment out if not present
                     EmailConfirmed = true,
                     PhoneNumberConfirmed = true
                 };
@@ -437,21 +449,76 @@ public class DatabaseSeeder
 
             // Ensure associated DomainUser exists
             _logger.LogInformation("Checking for admin domain user record...");
+            _logger.LogInformation("adminUser.Id: {AdminUserId}, adminEmail: {AdminEmail}", adminUser?.Id, adminEmail);
+            if (string.IsNullOrWhiteSpace(adminEmail))
+            {
+                _logger.LogError("Cannot create DomainUser: adminEmail is null or empty!");
+                return;
+            }
+            if (adminUser == null)
+            {
+                _logger.LogError("Cannot create DomainUser: adminUser is null!");
+                return;
+            }
             var adminDomainUser = await _context.DomainUsers.FirstOrDefaultAsync(e => e.UserId == adminUser.Id);
             if (adminDomainUser == null)
             {
                 _logger.LogInformation("Creating admin domain user record...");
                 try
                 {
+                    _logger.LogInformation("Preparing to create DomainUser with values: UserId={UserId}, Email={Email}, PhoneNumber={PhoneNumber}, FirstName={FirstName}, LastName={LastName}, Address={Address}",
+                        adminUser.Id,
+                        adminEmail,
+                        adminPhoneNumber,
+                        adminUser.DomainUser?.FirstName ?? "Admin",
+                        adminUser.DomainUser?.LastName ?? "User",
+                        adminUser.DomainUser?.Address ?? string.Empty);
+                    Email? domainEmailObj = null;
+                    string firstName = adminUser.DomainUser?.FirstName ?? "Admin";
+                    string lastName = adminUser.DomainUser?.LastName ?? "User";
+                    string address = adminUser.DomainUser?.Address ?? string.Empty;
+                    string phoneNumber = adminPhoneNumber;
+                    _logger.LogInformation("DomainUser constructor args: UserId={UserId}, Email={Email}, PhoneNumber={PhoneNumber}, FirstName={FirstName}, LastName={LastName}, Address={Address}",
+                        adminUser.Id, adminEmail, phoneNumber, firstName, lastName, address);
+                    if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(phoneNumber) || string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName))
+                    {
+                        _logger.LogError("Cannot create DomainUser: One or more required values are null or empty. Email={Email}, PhoneNumber={PhoneNumber}, FirstName={FirstName}, LastName={LastName}", adminEmail, phoneNumber, firstName, lastName);
+                        return;
+                    }
+                    try
+                    {
+                        domainEmailObj = new Email(adminEmail);
+                        _logger.LogInformation("Successfully created Email value object: {EmailValue}", domainEmailObj.Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to create Email value object with value: '{Email}'", adminEmail);
+                        throw;
+                    }
+                    if (domainEmailObj == null || string.IsNullOrWhiteSpace(domainEmailObj.Value))
+                    {
+                        _logger.LogError("Cannot create DomainUser: domainEmailObj is null or its Value is empty. domainEmailObj={DomainEmailObj}, type={Type}", domainEmailObj, domainEmailObj?.GetType());
+                        return;
+                    }
+                    _logger.LogInformation("About to construct DomainUser: UserId={UserId}, Email={Email}, PhoneNumber={PhoneNumber}, FirstName={FirstName}, LastName={LastName}, Address={Address}, EmailObjType={EmailObjType}",
+                        adminUser.Id, domainEmailObj.Value, phoneNumber, firstName, lastName, address, domainEmailObj.GetType());
                     var domainUser = new DomainUser
                     {
                         UserId = adminUser.Id,
-                        PreferredContactMethod = "Email"
+                        PreferredContactMethod = "Email",
+                        Email = domainEmailObj,
+                        PhoneNumber = new PhoneNumber(phoneNumber),
+                        FirstName = firstName,
+                        LastName = lastName,
+                        Address = address,
+                        CreatedAt = DateTime.UtcNow,
+                        IsActive = true
                     };
-                    _logger.LogInformation("DomainUser object created with UserId: {UserId}", domainUser.UserId);
+                    _logger.LogInformation("DomainUser constructed: UserId={UserId}, Email={Email}, PhoneNumber={PhoneNumber}, FirstName={FirstName}, LastName={LastName}, Address={Address}, EmailObjType={EmailObjType}, EmailObjValue={EmailObjValue}",
+                        domainUser.UserId, domainUser.Email?.Value, domainUser.PhoneNumber?.Value, domainUser.FirstName, domainUser.LastName, domainUser.Address, domainUser.Email?.GetType(), domainUser.Email?.Value);
 
                     _context.DomainUsers.Add(domainUser);
-                    _logger.LogInformation("DomainUser added to context");
+                    _logger.LogInformation("DomainUser added to context. Email property: {Email}", domainUser.Email?.Value);
 
                     var saveResult = await _context.SaveChangesAsync();
                     _logger.LogInformation("Admin domain user record created for user: {Email}. SaveChanges result: {SaveResult}", adminEmail, saveResult);

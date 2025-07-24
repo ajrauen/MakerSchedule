@@ -1,3 +1,5 @@
+using MakerSchedule.Domain.ValueObjects;
+
 namespace MakerSchedule.Application.DTO.DomainUser;
 
 public class DomainUserDTO
@@ -7,11 +9,11 @@ public class DomainUserDTO
     public Guid UserId { get; init; } =  Guid.NewGuid();
 
     // User fields
-    public string Email { get; set; } = string.Empty;
-    public string FirstName { get; set; } = string.Empty;
-    public string LastName { get; set; } = string.Empty;
-    public string PhoneNumber { get; set; } = string.Empty;
-    public string Address { get; set; } = string.Empty;
-    public bool IsActive { get; set; }
+    public required Email Email { get; set; }
+    public required string FirstName { get; set; }
+    public required string LastName { get; set; }
+    public required PhoneNumber PhoneNumber { get; set; }
+    public required string Address { get; set; }
+    public required bool IsActive { get; set; }
 
 }
