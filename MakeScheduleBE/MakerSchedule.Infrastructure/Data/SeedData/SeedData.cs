@@ -175,7 +175,47 @@ public static class SeedUserData
         ("customer7@ms.com", "Jack", "Anderson", Roles.Customer),
         ("customer8@ms.com", "Kathy", "Thomas", Roles.Customer),
         ("customer9@ms.com", "Leo", "Jackson", Roles.Customer),
-        ("customer10@ms.com", "Mona", "White", Roles.Customer)
+        ("customer10@ms.com", "Mona", "White", Roles.Customer),
+        ("customer11@ms.com", "Nina", "Martin", Roles.Customer),
+        ("customer12@ms.com", "Oscar", "Lee", Roles.Customer),
+        ("customer13@ms.com", "Paula", "Clark", Roles.Customer),
+        ("customer14@ms.com", "Quinn", "Lewis", Roles.Customer),
+        ("customer15@ms.com", "Rita", "Walker", Roles.Customer),
+        ("customer16@ms.com", "Sam", "Hall", Roles.Customer),
+        ("customer17@ms.com", "Tina", "Allen", Roles.Customer),
+        ("customer18@ms.com", "Uma", "Young", Roles.Customer),
+        ("customer19@ms.com", "Vince", "King", Roles.Customer),
+        ("customer20@ms.com", "Wendy", "Wright", Roles.Customer),
+        ("customer21@ms.com", "Xander", "Scott", Roles.Customer),
+        ("customer22@ms.com", "Yara", "Green", Roles.Customer),
+        ("customer23@ms.com", "Zane", "Baker", Roles.Customer),
+        ("customer24@ms.com", "Amy", "Adams", Roles.Customer),
+        ("customer25@ms.com", "Brian", "Nelson", Roles.Customer),
+        ("customer26@ms.com", "Cathy", "Carter", Roles.Customer),
+        ("customer27@ms.com", "Derek", "Mitchell", Roles.Customer),
+        ("customer28@ms.com", "Elena", "Perez", Roles.Customer),
+        ("customer29@ms.com", "Felix", "Roberts", Roles.Customer),
+        ("customer30@ms.com", "Gina", "Turner", Roles.Customer),
+        ("customer31@ms.com", "Harvey", "Phillips", Roles.Customer),
+        ("customer32@ms.com", "Isabel", "Campbell", Roles.Customer),
+        ("customer33@ms.com", "Jon", "Parker", Roles.Customer),
+        ("customer34@ms.com", "Kara", "Evans", Roles.Customer),
+        ("customer35@ms.com", "Liam", "Edwards", Roles.Customer),
+        ("customer36@ms.com", "Maya", "Collins", Roles.Customer),
+        ("customer37@ms.com", "Noah", "Stewart", Roles.Customer),
+        ("customer38@ms.com", "Olga", "Sanchez", Roles.Customer),
+        ("customer39@ms.com", "Peter", "Morris", Roles.Customer),
+        ("customer40@ms.com", "Queenie", "Rogers", Roles.Customer),
+        ("customer41@ms.com", "Ray", "Reed", Roles.Customer),
+        ("customer42@ms.com", "Sara", "Cook", Roles.Customer),
+        ("customer43@ms.com", "Tom", "Morgan", Roles.Customer),
+        ("customer44@ms.com", "Ursula", "Bell", Roles.Customer),
+        ("customer45@ms.com", "Vera", "Murphy", Roles.Customer),
+        ("customer46@ms.com", "Will", "Bailey", Roles.Customer),
+        ("customer47@ms.com", "Xenia", "Rivera", Roles.Customer),
+        ("customer48@ms.com", "Yusuf", "Cooper", Roles.Customer),
+        ("customer49@ms.com", "Zelda", "Richardson", Roles.Customer),
+        ("customer50@ms.com", "Ava", "Ward", Roles.Customer)
     };
 }
 
@@ -281,7 +321,6 @@ public class DatabaseSeeder
         // Ensure every occurrence has at least one leader
         var random = new Random(42);
         var domainLeaders = new List<DomainUser>();
-        
         // Get all domain leaders
         foreach (var leader in leaders)
         {
@@ -326,23 +365,68 @@ public class DatabaseSeeder
             }
         }
 
-        // Assign each customer as attendee to 1-2 random occurrences
+        // Assign customers to occurrences: ensure each occurrence has at least 10 unique customers, no duplicates
+        var domainCustomers = new List<DomainUser>();
         foreach (var customer in customers)
         {
             var domainCustomer = await _context.DomainUsers.FirstOrDefaultAsync(d => d.UserId == customer.Id);
-            if (domainCustomer == null) continue;
-            var customerOccurrences = occurrences.OrderBy(_ => random.Next()).Take(2).ToList();
-            foreach (var occ in customerOccurrences)
+            if (domainCustomer != null)
             {
-                if (!await _context.OccurrenceAttendees.AnyAsync(x => x.OccurrenceId == occ.Id && x.UserId == domainCustomer.Id))
+                domainCustomers.Add(domainCustomer);
+            }
+        }
+
+        // Shuffle customers for random assignment
+        var shuffledCustomers = domainCustomers.OrderBy(_ => random.Next()).ToList();
+
+        // Track which customers are assigned to which occurrences
+        var occurrenceToCustomers = new Dictionary<Guid, HashSet<Guid>>();
+        foreach (var occ in occurrences)
+        {
+            occurrenceToCustomers[occ.Id] = new HashSet<Guid>(
+                (await _context.OccurrenceAttendees.Where(x => x.OccurrenceId == occ.Id).Select(x => x.UserId).ToListAsync())
+            );
+        }
+
+        // First, ensure each occurrence has at least 10 unique customers
+        int customerIndex = 0;
+        foreach (var occ in occurrences)
+        {
+            var assigned = occurrenceToCustomers[occ.Id];
+            while (assigned.Count < 10 && customerIndex < shuffledCustomers.Count)
+            {
+                var customer = shuffledCustomers[customerIndex];
+                if (!assigned.Contains(customer.Id))
                 {
                     _context.OccurrenceAttendees.Add(new OccurrenceAttendee
                     {
                         Id = Guid.NewGuid(),
                         OccurrenceId = occ.Id,
-                        UserId = domainCustomer.Id
+                        UserId = customer.Id
                     });
+                    assigned.Add(customer.Id);
                 }
+                customerIndex = (customerIndex + 1) % shuffledCustomers.Count;
+            }
+        }
+
+        // Then, assign each customer to up to 2 more random occurrences (no duplicates)
+        foreach (var customer in shuffledCustomers)
+        {
+            // Get occurrences this customer is already assigned to
+            var assignedOccs = new HashSet<Guid>(
+                await _context.OccurrenceAttendees.Where(x => x.UserId == customer.Id).Select(x => x.OccurrenceId).ToListAsync()
+            );
+            // Pick up to 2 more occurrences not already assigned
+            var availableOccs = occurrences.Where(o => !assignedOccs.Contains(o.Id)).OrderBy(_ => random.Next()).Take(2);
+            foreach (var occ in availableOccs)
+            {
+                _context.OccurrenceAttendees.Add(new OccurrenceAttendee
+                {
+                    Id = Guid.NewGuid(),
+                    OccurrenceId = occ.Id,
+                    UserId = customer.Id
+                });
             }
         }
 

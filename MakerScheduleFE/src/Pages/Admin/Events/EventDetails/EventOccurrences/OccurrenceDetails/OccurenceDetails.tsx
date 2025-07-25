@@ -17,7 +17,7 @@ import type {
 import { Button } from "@mui/material";
 import type { PickerValidDate } from "@mui/x-date-pickers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "react-toastify";
@@ -72,26 +72,29 @@ const OccurenceDetails = ({
   const time = watch("scheduleStart");
   const duration = watch("duration");
 
-  const { refetch: getAvailableLeaders, data: availableLeaderResponse } =
-    useQuery({
-      queryKey: ["available-leaders", selectedEvent.id],
-      queryFn: () => {
-        const isoString = time.toISOString();
+  const {
+    refetch: getAvailableLeaders,
+    data: availableLeaderResponse,
+    isFetching: isLoadingAvailableLeaders,
+  } = useQuery({
+    queryKey: ["available-leaders", selectedEvent.id],
+    queryFn: () => {
+      const isoString = time.toISOString();
 
-        const apiDuration = duration ?? selectedEvent.duration;
+      const apiDuration = duration ?? selectedEvent.duration;
 
-        if (!apiDuration) return;
+      if (!apiDuration) return;
 
-        return getAvailableDomainUserLeaders(
-          isoString,
-          apiDuration,
-          occurrence?.id ?? "",
-          occurrence?.leaders?.map((leader) => leader.id)
-        );
-      },
-      staleTime: 4000,
-      enabled: false,
-    });
+      return getAvailableDomainUserLeaders(
+        isoString,
+        apiDuration,
+        occurrence?.id ?? "",
+        occurrence?.leaders?.map((leader) => leader.id)
+      );
+    },
+    staleTime: 4000,
+    enabled: false,
+  });
 
   const { mutate: createOccurrenceMutation } = useMutation({
     mutationKey: ["createMutation"],
@@ -245,10 +248,6 @@ const OccurenceDetails = ({
     }
   };
 
-  const isFormItemDisable =
-    occurrence?.status?.toLocaleLowerCase() === "complete" ||
-    occurrence?.status?.toLocaleLowerCase() === "canceled";
-
   return (
     <form onSubmit={handleSubmit(onSave)}>
       <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
@@ -257,14 +256,12 @@ const OccurenceDetails = ({
           name="scheduleStart"
           label="Start Time"
           shouldDisableDate={shouldDisableDate}
-          disabled={isFormItemDisable}
         />
         <FormSelect
           name="duration"
           control={control}
           options={durationOptions}
           label={"Duration"}
-          disabled={isFormItemDisable}
         />
 
         <FormSelect
@@ -277,10 +274,10 @@ const OccurenceDetails = ({
               : "Assign Leaders"
           }
           multiSelect
-          disabled={!availableLeaderResponse?.status || isFormItemDisable}
           helperText={
             !availableLeaderResponse ? "Select Time and Duration" : ""
           }
+          isLoading={isLoadingAvailableLeaders}
         />
         {removedLeaders && removedLeaders.length > 0 && (
           <div>

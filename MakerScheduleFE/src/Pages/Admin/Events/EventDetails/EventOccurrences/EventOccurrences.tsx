@@ -3,6 +3,7 @@ import { OccurencesList } from "@ms/Pages/Admin/Events/EventDetails/EventOccurre
 import type { EventOffering } from "@ms/types/event.types";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import { useEffect, useState } from "react";
+import { OccurrenceView } from "./OccurrencView/OccurrencView";
 
 interface EventOccurrencesProps {
   selectedEvent: EventOffering;
@@ -61,6 +62,10 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
     }, 200);
   };
 
+  const isSelectedOccurrenceInPast = selectedOccurrence
+    ? new Date(selectedOccurrence.scheduleStart) < new Date()
+    : false;
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       <div
@@ -80,11 +85,19 @@ const EventOccurrences = ({ selectedEvent }: EventOccurrencesProps) => {
           ${showDetails ? "opacity-100 translate-x-0 z-20" : "opacity-0 translate-x-10 pointer-events-none"}
         `}
       >
-        <OccurenceDetails
-          occurrence={selectedOccurrence}
-          selectedEvent={selectedEvent}
-          onCancel={handleBack}
-        />
+        {selectedOccurrence &&
+          (isSelectedOccurrenceInPast ? (
+            <OccurrenceView
+              occurrence={selectedOccurrence}
+              onBack={handleBack}
+            />
+          ) : (
+            <OccurenceDetails
+              occurrence={selectedOccurrence}
+              selectedEvent={selectedEvent}
+              onCancel={handleBack}
+            />
+          ))}
       </div>
     </div>
   );

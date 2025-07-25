@@ -1,11 +1,11 @@
 import { FormControl, FormHelperText, type SelectProps } from "@mui/material";
-import PlainSelect from "./PlainSelect";
 import {
   Controller,
   type Control,
   type FieldValues,
   type Path,
 } from "react-hook-form";
+import Select from "@ms/Components/FormComponents/FormSelect/Select/Select";
 
 export type FormSelectOption = {
   label: string;
@@ -22,6 +22,7 @@ type FormSelectProps<T extends FieldValues, C> = Omit<
   multiSelect?: boolean;
   label?: string;
   helperText?: string;
+  isLoading?: boolean;
 };
 
 const FormSelect = <T extends FieldValues, C>({
@@ -31,6 +32,7 @@ const FormSelect = <T extends FieldValues, C>({
   multiSelect = false,
   label,
   helperText,
+  isLoading,
   ...props
 }: FormSelectProps<T, C>) => {
   return (
@@ -44,11 +46,12 @@ const FormSelect = <T extends FieldValues, C>({
           control={control}
           render={({ field, fieldState }) => (
             <>
-              <PlainSelect
+              <Select
                 options={options}
                 multiSelect={multiSelect}
                 label={label}
                 helperText={fieldState.error?.message || helperText}
+                isLoading={isLoading}
                 {...field}
                 value={
                   multiSelect
@@ -61,19 +64,27 @@ const FormSelect = <T extends FieldValues, C>({
                   if (field.onChange) field.onChange(e);
                   if (props.onChange) props.onChange(e, child);
                 }}
-                {...props}
+                onDelete={(value) => {
+                  if (field.onChange) {
+                    const newValue = multiSelect
+                      ? field.value.filter((v: string | number) => v !== value)
+                      : "";
+                    field.onChange(newValue);
+                  }
+                }}
               />
             </>
           )}
         />
       ) : (
         <>
-          <PlainSelect
+          <Select
             name={name}
             options={options}
             multiSelect={multiSelect}
             label={label}
             helperText={helperText}
+            isLoading={isLoading}
             {...props}
           />
           {helperText && <FormHelperText>{helperText}</FormHelperText>}
