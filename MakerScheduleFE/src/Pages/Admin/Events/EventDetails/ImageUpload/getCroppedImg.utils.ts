@@ -4,7 +4,7 @@ const getCroppedImg = async (
 ) => {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas.getContext("2d", { alpha: true });
 
   if (!ctx) throw new Error("No 2d context");
 
@@ -30,7 +30,7 @@ const getCroppedImg = async (
       } else {
         reject(new Error("Canvas is empty"));
       }
-    }, "image/jpeg");
+    }, "image/png");
   });
 };
 

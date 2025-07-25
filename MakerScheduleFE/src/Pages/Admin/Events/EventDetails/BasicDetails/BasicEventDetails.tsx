@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   CreateEventOffering,
   EventOffering,
@@ -51,18 +51,23 @@ const BasicEventDetails = ({
   selectedEvent,
   eventTypes,
 }: BasicEventDetailsProps) => {
+  const [newEventFileUrl, setNewEventFileUrl] = useState<string | null>(null);
+
   const {
     getValues,
     control,
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
   } = useForm<CreateEventFormData>({
     resolver: zodResolver(createEventvalidationSchema),
     defaultValues: createEventInitialFormData,
   });
 
   useEffect(() => {
+    clearNewEventFileUrl();
+
     if (selectedEvent.meta?.isNew) {
       reset(createEventInitialFormData);
       return;
@@ -82,8 +87,17 @@ const BasicEventDetails = ({
   }, [selectedEvent]);
 
   const handleOnClose = (refreshData = false) => {
+    clearNewEventFileUrl();
+
     onClose(refreshData);
     reset(createEventInitialFormData);
+  };
+
+  const clearNewEventFileUrl = () => {
+    if (newEventFileUrl) {
+      URL.revokeObjectURL(newEventFileUrl);
+      setNewEventFileUrl(null);
+    }
   };
 
   const { mutate: saveEventQuery, isPending: isSavePending } = useMutation({
@@ -132,6 +146,17 @@ const BasicEventDetails = ({
     }
     return options;
   }, [eventTypes]);
+
+  const fileUrlWatch = watch("imageFile");
+
+  useEffect(() => {
+    if (fileUrlWatch) {
+      const img = new Image();
+      img.src = URL.createObjectURL(fileUrlWatch);
+      setNewEventFileUrl(img.src);
+    }
+  }, [fileUrlWatch]);
+
   return (
     <form onSubmit={handleSubmit(handleSave)} className="flex flex-col h-full">
       <div className="flex flex-col gap-3">
@@ -167,7 +192,7 @@ const BasicEventDetails = ({
           <div>
             <img
               className="h-auto  object-fit w-full lg:w-1/3 lg-flex-shrink-0 lg:object-contain aspect-4/3 object-cover"
-              src={selectedEvent.fileUrl}
+              src={newEventFileUrl ?? selectedEvent.fileUrl}
               alt="filter"
             />
           </div>

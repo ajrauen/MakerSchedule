@@ -1,29 +1,27 @@
 import { getCroppedImg } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/getCroppedImg.utils";
+import { Button } from "@mui/material";
 import { useState } from "react";
 import Cropper from "react-easy-crop";
 import type { Area } from "react-easy-crop";
 
 interface ImageCropperProps {
-  value: any;
-  setShowCropper: any;
-  showCropper: boolean;
-  onChange: any;
+  value: File;
+  onChange: (imgFile: File) => void;
 }
 
 const ImageCropper = ({
   value,
-  setShowCropper,
-  showCropper,
+
   onChange,
 }: ImageCropperProps) => {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
-  return showCropper ? (
+  return (
     <div className="flex flex-col gap-x-64">
       <div>Incorrect Image Ratio: Please fix</div>
-      <div className="relative w-full h-64 ">
+      <div className="relative w-full h-64">
         <Cropper
           image={URL.createObjectURL(value)}
           crop={crop}
@@ -36,8 +34,7 @@ const ImageCropper = ({
           }
         />
       </div>
-      <button
-        className="ml-auto bg-blue-600 text-white px-4 py-2 rounded"
+      <Button
         onClick={async () => {
           if (!croppedAreaPixels) return;
           const croppedBlob = await getCroppedImg(
@@ -48,24 +45,10 @@ const ImageCropper = ({
             type: value.type,
           });
           onChange(croppedFile);
-          setShowCropper(false);
         }}
       >
-        Save Crop
-      </button>
-    </div>
-  ) : (
-    <div className="flex flex-col items-center">
-      {value && (
-        <>
-          <img
-            src={URL.createObjectURL(value)}
-            alt={value.name}
-            className="max-w-xs max-h-48 rounded shadow"
-          />
-          <p className="mt-2 text-sm text-gray-700">{value.name}</p>
-        </>
-      )}
+        Update Image
+      </Button>
     </div>
   );
 };
