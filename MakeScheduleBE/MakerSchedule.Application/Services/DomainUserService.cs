@@ -1,3 +1,5 @@
+using System.Reflection.Emit;
+
 using AutoMapper;
 
 using MakerSchedule.Application.DTO.DomainUser;
@@ -44,20 +46,36 @@ public class DomainUserService(
     {
         try
         {
-            var DomainUsers = await _context.DomainUsers
-                            .Include(e => e.User)
-                            .ToListAsync();
+           
+           var userRoles = await (
+                from du in _context.DomainUsers
+                join u in _context.Users on du.UserId equals u.Id
+                join ur in _context.UserRoles on u.Id equals ur.UserId into urj
+                from ur in urj.DefaultIfEmpty()
+                join r in _context.Roles on ur.RoleId equals r.Id into rj
+                from r in rj.DefaultIfEmpty()
+                select new {
+                    DomainUser = du,
+                    RoleName = r != null ? r.Name : null
+                }
+            ).ToListAsync();
 
-            var DomainUserDTO = DomainUsers.Select(DomainUser => new DomainUserListDTO
-            {
-                Id = DomainUser.Id,
-                FirstName = DomainUser.FirstName ?? string.Empty,
-                LastName = DomainUser.LastName ?? string.Empty,
-
-            }).ToList();
+            var x = await _context.Roles.ToListAsync();
 
 
-            return DomainUserDTO;
+            var grouped = userRoles
+                .GroupBy(x => x.DomainUser.Id)
+                .Select(g => new DomainUserListDTO
+                {
+                    Id = g.Key,
+                    FirstName = g.First().DomainUser.FirstName,
+                    LastName = g.First().DomainUser.LastName,
+                    Roles = g.Where(x => x.RoleName != null).Select(x => x.RoleName).ToArray(),
+                    Email = g.First().DomainUser.Email.ToString()
+                })
+                .ToList();
+
+            return grouped;
         }
         catch (Exception ex)
         {
@@ -146,7 +164,9 @@ public class DomainUserService(
         {
             Id = du.Id,
             FirstName = du.FirstName,
-            LastName = du.LastName
+            LastName = du.LastName,
+            Roles = Array.Empty<string>(),
+            Email = du.Email.ToString()
         });
     }
 
@@ -225,6 +245,8 @@ public class DomainUserService(
             Id = l.Id,
             FirstName = l.FirstName,
             LastName = l.LastName,
+            Roles = Array.Empty<string>(),
+            Email =  l.Email.ToString()
         });
     }
 }

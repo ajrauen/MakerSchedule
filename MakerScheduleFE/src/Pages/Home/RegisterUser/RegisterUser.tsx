@@ -1,17 +1,16 @@
-import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
-import { FormHelperText, Paper } from "@mui/material";
+import { Paper } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { FormDialog } from "@ms/Components/FormComponents/FormDialog";
-import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import type { RegisterDomainUserRequest } from "@ms/types/domain-user.types";
 import { login } from "@ms/api/authentication.api";
 import type { AxiosError } from "axios";
 import type { RequestError } from "@ms/types/request-error.types";
 import { registerNewDomainUser } from "@ms/api/domain-user.api";
+import { UserForm } from "@ms/Components/UserForm/UserForm";
 
 const registerInitialFormData: RegisterDomainUserRequest = {
   email: "",
@@ -100,38 +99,7 @@ const RegisterUser = () => {
         <Paper elevation={0} className="flex flex-col gap-4 p-2">
           <h3 className="text-purple-300 text-2xl">Create an account</h3>
           <span className="text-3xl mb-4">Register a new user</span>
-          <FormTextField label="Email" control={control} name="email" />
-          <FormTextField
-            label="Password"
-            control={control}
-            name="password"
-            type="password"
-          />
-          <FormTextField
-            label="First Name"
-            control={control}
-            name="firstName"
-          />
-          <FormTextField label="Last Name" control={control} name="lastName" />
-          <FormTextField
-            label="Phone Number"
-            control={control}
-            name="phoneNumber"
-          />
-          <FormTextField label="Address" control={control} name="address" />
-          <FormSelect
-            label="Preferred Contact Method"
-            control={control}
-            name="preferredContactMethod"
-            options={[
-              { label: "Phone", value: "Phone" },
-              { label: "Email", value: "Email" },
-            ]}
-          />
-
-          {errorCode && (
-            <FormHelperText error={true}>{errorCode}</FormHelperText>
-          )}
+          <UserForm control={control} errorCode={errorCode} />
         </Paper>
       </FormDialog>
     </>

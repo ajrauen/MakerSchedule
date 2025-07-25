@@ -5,25 +5,22 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
-import type { EventOffering, EventType } from "@ms/types/event.types";
-import { durationMap } from "@ms/Pages/Admin/Events/utils/event.utils";
+import type { User } from "@ms/types/users.types";
 
 interface AdminEventTableProps {
-  events: EventOffering[];
-  eventTypes: EventType;
-  onEdit: (event: EventOffering) => void;
-  selectedEvent?: EventOffering;
-  onEventDelete: (event: EventOffering) => void;
+  users: User[];
+  onEdit: (event: User) => void;
+  selectedUser?: User;
+  onEventDelete: (event: User) => void;
 }
 
-const AdminEventsTable = ({
-  eventTypes,
+const AdminUsersTable = ({
   onEdit,
-  selectedEvent,
+  selectedUser,
   onEventDelete,
-  events = [],
+  users = [],
 }: AdminEventTableProps) => {
-  const handleDeletClick = (evt: React.MouseEvent, row: EventOffering) => {
+  const handleDeletClick = (evt: React.MouseEvent, row: User) => {
     evt.stopPropagation();
     onEventDelete(row);
   };
@@ -33,48 +30,33 @@ const AdminEventsTable = ({
       <Table stickyHeader aria-label="sticky table">
         <TableHead>
           <TableRow>
-            <TableCell>Event Name</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Event Type</TableCell>
-            <TableCell>Duration</TableCell>
-            <TableCell>Image</TableCell>
+            <TableCell>User Name</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Roles</TableCell>
             <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {events.map((row, idx) => (
+          {users.map((row, idx) => (
             <TableRow
               key={idx}
               hover
-              selected={selectedEvent?.id == row.id}
+              selected={selectedUser?.id == row.id}
               onClick={() => {
                 onEdit(row);
               }}
             >
-              <TableCell>{row.eventName}</TableCell>
+              <TableCell>{`${row.firstName} ${row.lastName}`}</TableCell>
               <TableCell className="w-2/5">
                 <div
                   className="line-clamp-2 break-words overflow-hidden"
-                  title={row.description}
+                  title={row.email}
                 >
-                  {row.description}
+                  {row.email}
                 </div>
               </TableCell>
               <TableCell>
-                {row.eventType ? eventTypes[row.eventType] : "unknown"}
-              </TableCell>
-              <TableCell>{row.duration && durationMap[row.duration]}</TableCell>
-              <TableCell>
-                <img
-                  src={
-                    row.fileUrl ??
-                    "https://t3.ftcdn.net/jpg/03/37/46/98/360_F_337469861_iFRwd4Ia15Ihuwfa8fEDA9OKPhIVsgZR.jpg"
-                  }
-                  alt={row.eventName}
-                  width={80}
-                  height={60}
-                  style={{ objectFit: "cover" }}
-                />
+                {row.roles?.length ? row.roles.join(", ") : "No roles assigned"}
               </TableCell>
               <TableCell>
                 <Button
@@ -95,4 +77,4 @@ const AdminEventsTable = ({
   );
 };
 
-export { AdminEventsTable };
+export { AdminUsersTable };

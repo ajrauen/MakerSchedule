@@ -9,14 +9,15 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class MetadataController(IMetadataService metadataService) : ControllerBase
+public class MetadataController(IEventsMetadataService eventsMetadataService) : ControllerBase
 {
 
     [HttpGet]
-    public async Task<ActionResult<MetadataDTO>> GetMetadata()
+    [Route("events")]
+    public async Task<ActionResult<EventsMetadataDTO>> GetEventsMetadata()
     {
-        var metadata = await metadataService.GetApplicationMetadata();
-        return Ok(metadata); 
+        var metadata = await eventsMetadataService.GetEventsMetadata();
+        return Ok(metadata);
     }
 
 }

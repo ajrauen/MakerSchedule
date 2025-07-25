@@ -56,14 +56,17 @@ const OccurencesList = ({
     <OccurrenceCalendarContext.Provider
       value={{ today, occurences: occurences }}
     >
-      <div className="flex flex-col items-center gap-4">
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DateCalendar
-            value={selectedDate}
-            onChange={setSelectedDate}
-            slots={{ day: OccurenceCalendarDate }}
-          />
-        </LocalizationProvider>
+      <div className="flex flex-col items-center gap-4 overflow-y-auto h-full pb-8">
+        <div className=" min-h-[255px]">
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DateCalendar
+              value={selectedDate}
+              onChange={setSelectedDate}
+              slots={{ day: OccurenceCalendarDate }}
+            />
+          </LocalizationProvider>
+        </div>
+
         <div className="flex w-full">
           <div className="ml-auto relative right-7">
             <IconButton onClick={handleAddOccurrenceClick}>

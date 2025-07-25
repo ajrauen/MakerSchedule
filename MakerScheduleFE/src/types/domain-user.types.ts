@@ -9,9 +9,11 @@ interface RegisterDomainUserRequest {
 }
 
 interface DomainUser {
+  firstName?: string;
+  lastName?: string;
   id: string;
-  firstName: string;
-  lastName: string;
+  roles?: string[];
+  email?: string;
 }
 
 export { type RegisterDomainUserRequest, type DomainUser };

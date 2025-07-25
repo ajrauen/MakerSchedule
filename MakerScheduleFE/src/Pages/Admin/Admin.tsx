@@ -2,6 +2,7 @@ import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import { AdminEvents } from "@ms/Pages/Admin/Events/Events";
 import { Tab, Tabs } from "@mui/material";
 import { useState } from "react";
+import { Users } from "./User/User";
 
 const Admin = () => {
   const [value, setValue] = useState(0);
@@ -27,10 +28,13 @@ const Admin = () => {
         aria-label="Vertical tabs example"
       >
         <Tab label="Events" {...a11yProps(0)} />
-        <Tab label="Item Two" {...a11yProps(1)} />
+        <Tab label="Users" {...a11yProps(1)} />
       </Tabs>
       <TabPanel index={0} value={value}>
         <AdminEvents />
+      </TabPanel>
+      <TabPanel index={1} value={value}>
+        <Users />
       </TabPanel>
     </div>
   );

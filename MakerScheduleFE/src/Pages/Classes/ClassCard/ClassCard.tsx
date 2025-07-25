@@ -3,7 +3,7 @@ import { Button, Paper } from "@mui/material";
 import { Construction, Circle, ContentCut } from "@mui/icons-material";
 import { ClassCalendarDialog } from "@ms/Pages/Classes/ClassCard/ClassCalendarDialog/ClassCalendarDialog";
 import { useState } from "react";
-import { useApplicationData } from "@ms/hooks/useApplicationData";
+import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 
 interface ClassCardProps {
   event: EventOffering;
@@ -11,7 +11,7 @@ interface ClassCardProps {
 
 const ClassCard = ({ event }: ClassCardProps) => {
   const [isScheduleCardOpen, setIsScheduleCardOpen] = useState(false);
-  const { appMetaData } = useApplicationData();
+  const { appMetaData } = useAdminEventsData();
 
   const getEventIcon = (eventType: number) => {
     switch (eventType) {

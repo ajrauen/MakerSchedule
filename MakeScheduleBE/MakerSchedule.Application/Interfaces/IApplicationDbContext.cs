@@ -4,6 +4,7 @@ using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Aggregates.User;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -17,5 +18,7 @@ public interface IApplicationDbContext
     DbSet<Occurrence> Occurrences { get; }
     DbSet<OccurrenceLeader> OccurrenceLeaders { get; }
     DbSet<OccurrenceAttendee> OccurrenceAttendees { get; }
+    DbSet<IdentityUserRole<Guid>> UserRoles { get; }
+    DbSet<IdentityRole<Guid>> Roles { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

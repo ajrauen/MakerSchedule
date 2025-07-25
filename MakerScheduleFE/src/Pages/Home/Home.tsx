@@ -40,17 +40,7 @@ const Home = () => {
         <div>Place Holder</div>
         <div className="justify-self-center flex flex-col items-center">
           <h1 className="text-white">Seeded Chaos</h1>
-          <div className="flex flex-row gap-3">
-            <Link to={"classes"}>
-              <MuiLink>Class Scheduel</MuiLink>
-            </Link>
-            <Link to={"asdfsaf"}>
-              <MuiLink>Class Scheduel</MuiLink>
-            </Link>
-            <Link to={"asdfsaf"}>
-              <MuiLink>Class Scheduel</MuiLink>
-            </Link>
-          </div>
+          <div className="flex flex-row gap-3"></div>
         </div>
         <div className="justify-self-end text-white">
           <ul className="flex gap-2">
@@ -67,9 +57,9 @@ const Home = () => {
             <li>whatever</li>
           </ul>
           <div>
-            <Link to={"classes"}>
-              <MuiLink>Class Scheduel</MuiLink>
-            </Link>
+            {/* <Link to={"classes"}> */}
+            {/* <MuiLink>Class Scheduel</MuiLink>
+            </Link> */}
           </div>
         </div>
       </div>

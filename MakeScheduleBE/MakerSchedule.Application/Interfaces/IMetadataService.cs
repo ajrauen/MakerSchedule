@@ -2,8 +2,8 @@ using MakerSchedule.Application.DTO.Metadata;
 
 namespace MakerSchedule.Application.Interfaces;
 
-public interface IMetadataService
+public interface IEventsMetadataService
 {
-    Task<MetadataDTO> GetApplicationMetadata();
+    Task<EventsMetadataDTO> GetEventsMetadata();
 }
 

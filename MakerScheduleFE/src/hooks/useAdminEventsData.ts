@@ -1,11 +1,11 @@
 import { getDomainUsers } from "@ms/api/domain-user.api";
 import { getEvents } from "@ms/api/event.api";
 import { getApplicaitonMetadata } from "@ms/api/metadata.api";
-import type { ApplicaitonMetadata } from "@ms/types/application-metadata.types";
+import type { AdminEventsMetaData } from "@ms/types/application-metadata.types";
 import { useQuery } from "@tanstack/react-query";
 
-const useApplicationData = () => {
-  const defaultAppMetaData: ApplicaitonMetadata = {
+const useAdminEventsData = () => {
+  const defaultAppMetaData: AdminEventsMetaData = {
     durations: {},
     eventTypes: {},
   };
@@ -20,15 +20,12 @@ const useApplicationData = () => {
     staleTime: Infinity,
   });
 
-  const {
-    data: domainLeaderResponse,
-    isError: domainLeaderError,
-    isFetching: domainLeaderLoading,
-  } = useQuery({
-    queryKey: ["domainUserLeaders"],
-    queryFn: () => getDomainUsers("leader"),
-    staleTime: Infinity,
-  });
+  const { isError: domainLeaderError, isFetching: domainLeaderLoading } =
+    useQuery({
+      queryKey: ["domainUserLeaders"],
+      queryFn: () => getDomainUsers("leader"),
+      staleTime: Infinity,
+    });
 
   const {
     data: applicaitonMetadataResponse,
@@ -47,9 +44,8 @@ const useApplicationData = () => {
   return {
     isLoading: eventsLoading || metadataLoading || domainLeaderLoading,
     events: eventsResponse?.data ?? [],
-    domainleaders: domainLeaderResponse?.data ?? [],
     appMetaData: applicaitonMetadataResponse?.data ?? defaultAppMetaData,
   };
 };
 
-export { useApplicationData };
+export { useAdminEventsData };

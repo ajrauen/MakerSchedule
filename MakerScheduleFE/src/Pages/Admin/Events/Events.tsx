@@ -1,6 +1,6 @@
 import { deleteEvent } from "@ms/api/event.api";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmatoin";
-import { useApplicationData } from "@ms/hooks/useApplicationData";
+import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { EventDetails } from "@ms/Pages/Admin/Events/EventDetails/EventDetails";
 import { EventsHeader } from "@ms/Pages/Admin/Events/Header/Header";
 import { AdminEventsTable } from "@ms/Pages/Admin/Events/Table/Table";
@@ -19,7 +19,7 @@ const AdminEvents = () => {
     EventOffering | undefined
   >();
 
-  const { events, appMetaData } = useApplicationData();
+  const { events, appMetaData } = useAdminEventsData();
   const queryClient = useQueryClient();
 
   const { mutate: deleteEventMutation } = useMutation({
@@ -98,7 +98,7 @@ const AdminEvents = () => {
   };
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full h-full overflow-hidden pb-12">
       <div
         className={`flex-grow basis-0 transition-all duration-300  flex-col ${isDrawerOpen ? "hidden md:flex" : ""}`}
         style={{

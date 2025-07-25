@@ -2,11 +2,9 @@ using MakerSchedule.Application.DTO.Metadata;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Enums;
 
-using Microsoft.Extensions.Logging;
-
 namespace MakerSchedule.Application.Services;
 
-public class MetadataService(): IMetadataService
+public class EventsMetadataService(): IEventsMetadataService
 {
     private static readonly Dictionary<int, string> Durations = new()
     {
@@ -22,12 +20,11 @@ public class MetadataService(): IMetadataService
         {240 * 60 * 1000, "4 hours" },
     };
 
-
-    public Task<MetadataDTO> GetApplicationMetadata()
+    public Task<EventsMetadataDTO> GetEventsMetadata()
     {
         var eventTypeDict = Enum.GetValues<EventTypeEnum>().ToDictionary(e =>(int)e, e => e.ToString());
 
-        var dto = new MetadataDTO
+        var dto = new EventsMetadataDTO
         {
             Durations = Durations,
             EventTypes = eventTypeDict
@@ -35,6 +32,5 @@ public class MetadataService(): IMetadataService
 
         return  Task.FromResult(dto) ;
     }
-
 }
 
