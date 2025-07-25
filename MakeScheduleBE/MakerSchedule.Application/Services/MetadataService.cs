@@ -1,10 +1,11 @@
 using MakerSchedule.Application.DTO.Metadata;
 using MakerSchedule.Application.Interfaces;
+using MakerSchedule.Domain.Constants;
 using MakerSchedule.Domain.Enums;
 
 namespace MakerSchedule.Application.Services;
 
-public class EventsMetadataService(): IEventsMetadataService
+public class MetadataService() : IMetadataService
 {
     private static readonly Dictionary<int, string> Durations = new()
     {
@@ -22,7 +23,7 @@ public class EventsMetadataService(): IEventsMetadataService
 
     public Task<EventsMetadataDTO> GetEventsMetadata()
     {
-        var eventTypeDict = Enum.GetValues<EventTypeEnum>().ToDictionary(e =>(int)e, e => e.ToString());
+        var eventTypeDict = Enum.GetValues<EventTypeEnum>().ToDictionary(e => (int)e, e => e.ToString());
 
         var dto = new EventsMetadataDTO
         {
@@ -30,7 +31,21 @@ public class EventsMetadataService(): IEventsMetadataService
             EventTypes = eventTypeDict
         };
 
-        return  Task.FromResult(dto) ;
+        return Task.FromResult(dto);
+    }
+
+    public Task<UserMetaDataDTO> GetUsersMetadata()
+    {
+        var userMetadate = new UserMetaDataDTO
+        {
+            Roles = [
+                Roles.Admin,
+                Roles.Leader,
+                Roles.Customer
+            ]
+        };
+
+        return Task.FromResult(userMetadate);
     }
 }
 

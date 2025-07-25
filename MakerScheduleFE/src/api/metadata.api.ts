@@ -1,9 +1,10 @@
 import { sendAxiosRequest } from "@ms/api/api";
 import type { AdminEventsMetaData } from "@ms/types/application-metadata.types";
+import type { UserMetaData } from "@ms/types/domain-user.types";
 
 const BASE_METADATA_ENDPOINT = "api/metadata";
 
-const getApplicaitonMetadata = async () => {
+const getEventMetadata = async () => {
   const url = `${BASE_METADATA_ENDPOINT}/events`;
   const req = {
     method: "Get",
@@ -13,4 +14,14 @@ const getApplicaitonMetadata = async () => {
   return await sendAxiosRequest<AdminEventsMetaData>(req);
 };
 
-export { getApplicaitonMetadata };
+const getUserMetadata = async () => {
+  const url = `${BASE_METADATA_ENDPOINT}/users`;
+  const req = {
+    method: "Get",
+    url: url,
+  };
+
+  return await sendAxiosRequest<UserMetaData>(req);
+};
+
+export { getEventMetadata, getUserMetadata };

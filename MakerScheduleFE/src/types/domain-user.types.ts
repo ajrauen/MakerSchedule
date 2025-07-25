@@ -6,6 +6,7 @@ interface RegisterDomainUserRequest {
   phoneNumber: string;
   address: string;
   preferredContactMethod: "Phone" | "Email";
+  roles: string[];
 }
 
 interface DomainUser {
@@ -16,4 +17,8 @@ interface DomainUser {
   email?: string;
 }
 
-export { type RegisterDomainUserRequest, type DomainUser };
+interface UserMetaData {
+  roles: string[];
+}
+
+export { type RegisterDomainUserRequest, type DomainUser, type UserMetaData };

@@ -1,4 +1,5 @@
 import { getDomainUserList } from "@ms/api/domain-user.api";
+import { getUserMetadata } from "@ms/api/metadata.api";
 
 import { useQuery } from "@tanstack/react-query";
 
@@ -13,13 +14,27 @@ const useAdminUsersData = () => {
     staleTime: Infinity,
   });
 
-  if (userError) {
+  const {
+    data: userMetadataResponse,
+    isError: userMetadataError,
+    isFetching: metadataLoading,
+  } = useQuery({
+    queryKey: ["users-metadata"],
+    queryFn: getUserMetadata,
+    staleTime: Infinity,
+  });
+
+  if (userError || userMetadataError) {
     throw Error("Required app data missing");
   }
 
   return {
-    isLoading: usersLoading,
+    isLoading: usersLoading || metadataLoading,
     users: usersResponse?.data ?? [],
+    appMetaData: userMetadataResponse?.data ?? {
+      roles: {},
+      domains: {},
+    },
   };
 };
 

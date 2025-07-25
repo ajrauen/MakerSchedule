@@ -74,6 +74,8 @@ const OccurenceRow = ({
     });
   };
 
+  const isPastOccurrence = new Date(occurrence.scheduleStart) < new Date();
+
   return (
     <li
       key={occurrence.id}
@@ -102,9 +104,11 @@ const OccurenceRow = ({
             ))
           )}
         </div>
-        <IconButton onClick={handleRowDelete} className="!ml-auto">
-          <DeleteIcon />
-        </IconButton>
+        {!isPastOccurrence && (
+          <IconButton onClick={handleRowDelete} className="!ml-auto">
+            <DeleteIcon />
+          </IconButton>
+        )}
       </div>
     </li>
   );

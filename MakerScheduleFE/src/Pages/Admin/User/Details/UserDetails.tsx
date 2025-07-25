@@ -1,12 +1,6 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { UserForm } from "@ms/Components/UserForm/UserForm";
-import type {
-  DomainUser,
-  RegisterDomainUserRequest,
-} from "@ms/types/domain-user.types";
-import { Button, Select } from "@mui/material";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
+import type { DomainUser } from "@ms/types/domain-user.types";
+import { Button } from "@mui/material";
 
 interface UserDetailsProps {
   selectedUser: DomainUser;
@@ -16,13 +10,14 @@ const UserDetails = ({ selectedUser }: UserDetailsProps) => {
   return (
     <div>
       Name: {selectedUser.firstName} {selectedUser.lastName}
-      <Select
+      <FormSelect
+        options={[
+          { label: "Admin", value: "admin" },
+          { label: "User", value: "user" },
+        ]}
         value={selectedUser.role}
-        onChange={(e) => console.log(e.target.value)}
-      >
-        <option value="admin">Admin</option>
-        <option value="user">User</option>
-      </Select>
+        onChange={(value) => console.log(value)}
+      />
       <div>
         <Button variant="contained" type="submit">
           Save

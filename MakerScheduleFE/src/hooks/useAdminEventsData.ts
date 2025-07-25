@@ -1,6 +1,6 @@
 import { getDomainUsers } from "@ms/api/domain-user.api";
 import { getEvents } from "@ms/api/event.api";
-import { getApplicaitonMetadata } from "@ms/api/metadata.api";
+import { getEventMetadata } from "@ms/api/metadata.api";
 import type { AdminEventsMetaData } from "@ms/types/application-metadata.types";
 import { useQuery } from "@tanstack/react-query";
 
@@ -28,23 +28,23 @@ const useAdminEventsData = () => {
     });
 
   const {
-    data: applicaitonMetadataResponse,
-    isError: appMetadataError,
+    data: eventMetadataResponse,
+    isError: eventMetadataError,
     isFetching: metadataLoading,
   } = useQuery({
-    queryKey: ["application-metadata"],
-    queryFn: getApplicaitonMetadata,
+    queryKey: ["events-metadata"],
+    queryFn: getEventMetadata,
     staleTime: Infinity,
   });
 
-  if (appMetadataError || eventError || domainLeaderError) {
+  if (eventMetadataError || eventError || domainLeaderError) {
     throw Error("Required app data missing");
   }
 
   return {
     isLoading: eventsLoading || metadataLoading || domainLeaderLoading,
     events: eventsResponse?.data ?? [],
-    appMetaData: applicaitonMetadataResponse?.data ?? defaultAppMetaData,
+    appMetaData: eventMetadataResponse?.data ?? defaultAppMetaData,
   };
 };
 

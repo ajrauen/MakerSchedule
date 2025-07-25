@@ -1,13 +1,5 @@
-import {
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  FormHelperText,
-  type SelectProps,
-  Chip,
-  Box,
-} from "@mui/material";
+import { FormControl, FormHelperText, type SelectProps } from "@mui/material";
+import PlainSelect from "./PlainSelect";
 import {
   Controller,
   type Control,
@@ -15,7 +7,7 @@ import {
   type Path,
 } from "react-hook-form";
 
-type FormSelectOption = {
+export type FormSelectOption = {
   label: string;
   value: string | number;
 };
@@ -24,8 +16,8 @@ type FormSelectProps<T extends FieldValues, C> = Omit<
   SelectProps,
   "multiple"
 > & {
-  name: Path<T>;
-  control: Control<T>;
+  name?: Path<T> | string;
+  control?: Control<T>;
   options: (C & FormSelectOption)[];
   multiSelect?: boolean;
   label?: string;
@@ -42,74 +34,52 @@ const FormSelect = <T extends FieldValues, C>({
   ...props
 }: FormSelectProps<T, C>) => {
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field, fieldState }) => (
-        <FormControl fullWidth error={!!fieldState.error}>
-          <InputLabel id={`${name}-label`}>{label || "Select"}</InputLabel>
-          <Select
-            labelId={`${name}-label`}
-            multiple={multiSelect}
-            {...field}
-            value={
-              multiSelect
-                ? field.value || []
-                : field.value === undefined
-                  ? ""
-                  : field.value
-            }
-            label={label || "Select"}
-            renderValue={
-              multiSelect
-                ? (selected) => (
-                    <div className="flex flex-wrap gap-0.5">
-                      {(selected as (string | number)[]).map((value) => {
-                        const option = options.find(
-                          (opt) => opt.value === value
-                        );
-                        return (
-                          <Chip
-                            key={value}
-                            label={option?.label || value}
-                            size="small"
-                            onMouseDown={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                            }}
-                            onDelete={() => {
-                              const newValue = (
-                                selected as (string | number)[]
-                              ).filter((item) => item !== value);
-                              console.log(
-                                "FormSelect onDelete onChange value:",
-                                newValue
-                              );
-                              field.onChange(newValue);
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  )
-                : undefined
-            }
-            {...props}
-          >
-            {options.map((option) => (
-              <MenuItem key={option.value} value={option.value}>
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-          {(fieldState.error || helperText) && (
-            <FormHelperText>
-              {fieldState.error?.message || helperText}
-            </FormHelperText>
+    <FormControl
+      fullWidth
+      error={!!(control && name ? undefined : props.error)}
+    >
+      {control && name ? (
+        <Controller
+          name={name as Path<T>}
+          control={control}
+          render={({ field, fieldState }) => (
+            <>
+              <PlainSelect
+                options={options}
+                multiSelect={multiSelect}
+                label={label}
+                helperText={fieldState.error?.message || helperText}
+                {...field}
+                value={
+                  multiSelect
+                    ? field.value || []
+                    : field.value === undefined
+                      ? ""
+                      : field.value
+                }
+                onChange={(e, child) => {
+                  if (field.onChange) field.onChange(e);
+                  if (props.onChange) props.onChange(e, child);
+                }}
+                {...props}
+              />
+            </>
           )}
-        </FormControl>
+        />
+      ) : (
+        <>
+          <PlainSelect
+            name={name}
+            options={options}
+            multiSelect={multiSelect}
+            label={label}
+            helperText={helperText}
+            {...props}
+          />
+          {helperText && <FormHelperText>{helperText}</FormHelperText>}
+        </>
       )}
-    />
+    </FormControl>
   );
 };
 

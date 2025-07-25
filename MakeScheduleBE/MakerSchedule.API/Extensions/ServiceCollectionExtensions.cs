@@ -13,7 +13,7 @@ public static class MakerScheduleExtensions
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-        services.AddScoped<IEventsMetadataService, EventsMetadataService>();
+        services.AddScoped<MetadataService, MetadataService>();
 
         services.AddScoped<IImageStorageService>(serviceProvider =>
         {

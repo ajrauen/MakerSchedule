@@ -26,6 +26,11 @@ const EventDetails = ({
     setValue(newValue);
   };
 
+  // useEffect(() => {
+  //   if (!selectedEvent) return;
+  //   setValue(0);
+  // }, [selectedEvent]);
+
   useEffect(() => {
     if (selectedEvent.meta?.isNew) {
       setValue(0);

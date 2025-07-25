@@ -19,7 +19,8 @@ const Users = () => {
   const [userToDelete, setUserToDelete] = useState<DomainUser | undefined>();
   const [filteredUsers, setFilteredUsers] = useState<DomainUser[]>([]);
 
-  const { users } = useAdminUsersData();
+  const { users, appMetaData } = useAdminUsersData();
+  console.log("appMetaData", appMetaData);
   const queryClient = useQueryClient();
 
   useEffect(() => {
