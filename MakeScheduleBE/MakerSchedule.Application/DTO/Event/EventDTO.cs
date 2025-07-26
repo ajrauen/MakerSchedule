@@ -15,10 +15,10 @@ public class EventDTO
     [Required]
     public required string Description { get; set; }
 
-    public EventTypeEnum EventType { get; set; }
+    public required string EventType { get; set; }
 
     public int? Duration { get; set; }
-    public string? FileUrl { get; set; }
+    public string? ThumbnailUrl { get; set; }
     public IEnumerable<OccurenceDTO> Occurences { get; set; } = new List<OccurenceDTO>();
 
 } 

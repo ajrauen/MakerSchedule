@@ -23,12 +23,16 @@ public class MetadataService() : IMetadataService
 
     public Task<EventsMetadataDTO> GetEventsMetadata()
     {
-        var eventTypeDict = Enum.GetValues<EventTypeEnum>().ToDictionary(e => (int)e, e => e.ToString());
+        var eventTypeArray = Enum.GetValues<EventTypeEnum>()
+            .Cast<EventTypeEnum>()
+            .Where(e => e != EventTypeEnum.Unknown)
+            .Select(e => e.ToString())
+            .ToArray();
 
         var dto = new EventsMetadataDTO
         {
             Durations = Durations,
-            EventTypes = eventTypeDict
+            EventTypes = eventTypeArray
         };
 
         return Task.FromResult(dto);

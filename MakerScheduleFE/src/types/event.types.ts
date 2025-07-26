@@ -1,7 +1,5 @@
 import type { Occurrence } from "@ms/types/occurrence.types";
 
-type EventType = Record<number, string>;
-
 interface EventOffering {
   id?: string;
   eventName: string;
@@ -10,17 +8,25 @@ interface EventOffering {
   leaders?: number[];
   duration?: number;
   price?: number;
-  eventType?: number;
-  fileUrl?: string;
+  eventType?: string;
+  thumbnailUrl?: string;
   occurences?: Occurrence[];
   meta?: Record<string, string | boolean | number>;
 }
 
 type CreateEventOffering = Omit<
   EventOffering,
-  "id" | "fileUrl | occurences"
+  "id" | "thumbnailUrl | occurences"
 > & {
-  imageFile: File;
+  thumbnailFile: File;
 };
 
-export { type EventOffering, type CreateEventOffering, type EventType };
+type UpdateEventOffering = Partial<CreateEventOffering> & {
+  id: string;
+};
+
+export {
+  type EventOffering,
+  type CreateEventOffering,
+  type UpdateEventOffering,
+};

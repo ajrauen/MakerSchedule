@@ -3,14 +3,11 @@ import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import { useEffect, useMemo, useState } from "react";
-import type {
-  CreateEventOffering,
-  EventOffering,
-  EventType,
-} from "@ms/types/event.types";
+import { useEffect, useMemo } from "react";
+import type { CreateEventOffering, EventOffering } from "@ms/types/event.types";
 import {
   createSaveForm,
+  createUpdateForm,
   durationOptions,
 } from "@ms/Pages/Admin/Events/utils/event.utils";
 import { ImageUpload } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/ImageUpload";
@@ -27,7 +24,10 @@ const createEventvalidationSchema = z.object({
     .min(3, { error: "Description must be at least 3 characters" }),
 
   duration: z.number().optional(),
-  imageFile: z.instanceof(File, { error: "Event Image is required" }),
+  thumbnailUrl: z.string().optional(),
+  thumbnailFile: z
+    .instanceof(File, { error: "Event Image is required" })
+    .optional(),
   eventType: z.string(),
 });
 
@@ -38,12 +38,14 @@ const createEventInitialFormData = {
   eventType: "",
   description: "",
   duration: undefined,
+  imageUrl: undefined,
+  thumbnailFile: undefined,
 };
 
 interface BasicEventDetailsProps {
   onClose: (refreshData: boolean) => void;
   selectedEvent: EventOffering;
-  eventTypes: EventType;
+  eventTypes: string[];
 }
 
 const BasicEventDetails = ({
@@ -51,13 +53,11 @@ const BasicEventDetails = ({
   selectedEvent,
   eventTypes,
 }: BasicEventDetailsProps) => {
-  const [newEventFileUrl, setNewEventFileUrl] = useState<string | null>(null);
-
   const {
     getValues,
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     reset,
     watch,
   } = useForm<CreateEventFormData>({
@@ -66,8 +66,6 @@ const BasicEventDetails = ({
   });
 
   useEffect(() => {
-    clearNewEventFileUrl();
-
     if (selectedEvent.meta?.isNew) {
       reset(createEventInitialFormData);
       return;
@@ -79,25 +77,16 @@ const BasicEventDetails = ({
         eventName: selectedEvent.eventName,
         duration: selectedEvent.duration,
         eventType: selectedEvent.eventType?.toString() ?? "",
-        imageFile: new File([], "tmp"),
+        thumbnailUrl: selectedEvent.thumbnailUrl,
+        thumbnailFile: undefined,
       };
-
       reset(editEvent);
     }
   }, [selectedEvent]);
 
   const handleOnClose = (refreshData = false) => {
-    clearNewEventFileUrl();
-
     onClose(refreshData);
     reset(createEventInitialFormData);
-  };
-
-  const clearNewEventFileUrl = () => {
-    if (newEventFileUrl) {
-      URL.revokeObjectURL(newEventFileUrl);
-      setNewEventFileUrl(null);
-    }
   };
 
   const { mutate: saveEventQuery, isPending: isSavePending } = useMutation({
@@ -114,48 +103,70 @@ const BasicEventDetails = ({
   });
 
   const handleSave = () => {
-    const { description, eventName, duration, imageFile, eventType } =
+    const { description, eventName, duration, thumbnailFile, eventType } =
       getValues();
 
-    const eventOffering: CreateEventOffering = {
-      description,
-      eventName,
-      duration: duration,
-      eventType: parseInt(eventType),
-      imageFile,
-    };
-    const formEvent = createSaveForm(eventOffering);
+    if (selectedEvent.meta?.isNew) {
+      if (!thumbnailFile) return;
+      const eventOffering: CreateEventOffering = {
+        description,
+        eventName,
+        duration: duration,
+        eventType: eventType,
+        thumbnailFile,
+      };
+      const formEvent = createSaveForm(eventOffering);
+      saveEventQuery(formEvent);
+      return;
+    }
 
     if (selectedEvent.id) {
+      const allValues = getValues();
+      const dirtyValues = Object.keys(dirtyFields).reduce(
+        (acc: CreateEventFormData, key) => {
+          (acc as any)[key] = allValues[key as keyof CreateEventFormData];
+          return acc;
+        },
+        {} as CreateEventFormData
+      );
+
+      if (dirtyValues.eventType) {
+        (dirtyValues as any).eventType = dirtyValues.eventType;
+      }
+
+      const dirtyValuesWithNumberEventType: Partial<CreateEventOffering> = {
+        ...dirtyValues,
+        eventType: dirtyValues.eventType ? dirtyValues.eventType : undefined,
+      };
+
+      const formEvent = createUpdateForm(dirtyValuesWithNumberEventType);
+
       patchEventQuery({
         event: formEvent,
         id: selectedEvent.id,
       });
-    } else {
-      saveEventQuery(formEvent);
     }
   };
 
   const eventTypeOptions = useMemo(() => {
-    const options = [];
-    for (const key in eventTypes) {
-      options.push({
-        value: key,
-        label: eventTypes[key],
-      });
-    }
+    const options = eventTypes.map((event) => ({
+      value: event,
+      label: event,
+    }));
+
     return options;
   }, [eventTypes]);
 
-  const fileUrlWatch = watch("imageFile");
+  const thumbnailUrl = watch("thumbnailUrl");
+  const thumbnailFile = watch("thumbnailFile");
 
-  useEffect(() => {
-    if (fileUrlWatch) {
-      const img = new Image();
-      img.src = URL.createObjectURL(fileUrlWatch);
-      setNewEventFileUrl(img.src);
-    }
-  }, [fileUrlWatch]);
+  const handleThunbnailReset = () => {
+    reset({
+      ...getValues(),
+      thumbnailFile: undefined,
+      thumbnailUrl: undefined,
+    });
+  };
 
   return (
     <form onSubmit={handleSubmit(handleSave)} className="flex flex-col h-full">
@@ -188,20 +199,32 @@ const BasicEventDetails = ({
           multiline
           rows={7}
         />
-        {selectedEvent.fileUrl ? (
-          <div>
-            <img
-              className="h-auto  object-fit w-full lg:w-1/3 lg-flex-shrink-0 lg:object-contain aspect-4/3 object-cover"
-              src={newEventFileUrl ?? selectedEvent.fileUrl}
-              alt="filter"
-            />
+        {thumbnailUrl || thumbnailFile ? (
+          <div className="flex flex-row">
+            <div className="flex flex-col">
+              <span className="">Image Preview</span>
+              <img
+                src={
+                  (thumbnailFile && URL.createObjectURL(thumbnailFile)) ||
+                  thumbnailUrl
+                }
+                alt="Event Preview"
+                className="w-48 h-full object-cover mb-4"
+              />
+            </div>
+
+            <span>
+              <Button variant="contained" onClick={handleThunbnailReset}>
+                Reset
+              </Button>
+            </span>
           </div>
         ) : (
           <div>
             <ImageUpload
               control={control}
-              name="imageFile"
-              error={errors.imageFile?.message}
+              name="thumbnailFile"
+              error={errors.thumbnailFile?.message}
             />
           </div>
         )}

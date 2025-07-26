@@ -31,7 +31,7 @@ const ClassCard = ({ event }: ClassCardProps) => {
       <div className="flex lg:flex-row gap-4 bg-gray-100 flex-col w-full">
         <img
           className="h-auto  object-fit w-full lg:w-1/3 lg-flex-shrink-0 lg:object-contain aspect-4/3 object-cover"
-          src={event.fileUrl}
+          src={event.thumbnailUrl}
           alt="filter"
         />
         <div className="flex flex-col gap-2 p-4 ">

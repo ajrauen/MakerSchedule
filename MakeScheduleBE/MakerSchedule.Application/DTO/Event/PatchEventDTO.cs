@@ -11,6 +11,6 @@ public class PatchEventDTO
     public string? EventName { get; set; }
     public string? Description { get; set; }
     public int? Duration { get; set; }
-    public EventTypeEnum? EventType { get; set; }
+    public string? EventType { get; set; }
     public IFormFile? FormFile { get; set; } 
 }

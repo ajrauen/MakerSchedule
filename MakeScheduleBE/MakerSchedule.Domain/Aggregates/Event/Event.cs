@@ -19,7 +19,7 @@ public class Event
     public Duration? Duration { get; set; }
     private readonly List<Occurrence> _occurrences = new();
     public IReadOnlyCollection<Occurrence> Occurrences => _occurrences.AsReadOnly();
-    public string? FileUrl { get; set; }
+    public string? ThumbnailUrl { get; set; }
 
     public Occurrence AddOccurrence(OccurrenceInfo info)
     {

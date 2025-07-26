@@ -67,7 +67,7 @@ const AdminEventsTable = ({
               <TableCell>
                 <img
                   src={
-                    row.fileUrl ??
+                    row.thumbnailUrl ??
                     "https://t3.ftcdn.net/jpg/03/37/46/98/360_F_337469861_iFRwd4Ia15Ihuwfa8fEDA9OKPhIVsgZR.jpg"
                   }
                   alt={row.eventName}

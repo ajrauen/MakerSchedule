@@ -11,7 +11,23 @@ const createSaveForm = (event: CreateEventOffering) => {
 
   if (event.duration) form.append("duration", event.duration.toString());
   form.append("eventType", event.eventType.toString());
-  form.append("FormFile", event.imageFile);
+  form.append("FormFile", event.thumbnailFile);
+
+  return form;
+};
+
+const createUpdateForm = (event: Partial<CreateEventOffering>) => {
+  if (!event.eventType) {
+    throw new Error("Missing event type");
+  }
+
+  const form = new FormData();
+  if (event.eventName) form.append("eventName", event.eventName);
+  if (event.description) form.append("description", event.description);
+  if (event.duration) form.append("duration", event.duration.toString());
+
+  if (event.eventType) form.append("eventType", event.eventType.toString());
+  if (event.thumbnailFile) form.append("FormFile", event.thumbnailFile);
 
   return form;
 };
@@ -34,4 +50,4 @@ const durationOptions = Object.entries(durationMap).map(([value, label]) => ({
   value: parseInt(value),
 }));
 
-export { durationOptions, createSaveForm, durationMap };
+export { durationOptions, createSaveForm, createUpdateForm, durationMap };

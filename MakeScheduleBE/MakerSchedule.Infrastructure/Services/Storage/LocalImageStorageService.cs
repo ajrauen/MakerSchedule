@@ -23,11 +23,11 @@ public class LocalImageStorageService(IHostEnvironment _env, IHttpContextAccesso
         return $"{baseUrl}/images/events/{fileName}";
     }
 
-    public Task<bool> DeleteImageAsync(string fileUrl)
+    public Task<bool> DeleteImageAsync(string thumbnailUrl)
     {
         try
         {
-            var fileName = Path.GetFileName(new Uri(fileUrl).LocalPath);
+            var fileName = Path.GetFileName(new Uri(thumbnailUrl).LocalPath);
             var wwwrootPath = Path.Combine(_env.ContentRootPath, "wwwroot");
             var uploads = Path.Combine(wwwrootPath, "images", "events");
             var filePath = Path.Combine(uploads, fileName);

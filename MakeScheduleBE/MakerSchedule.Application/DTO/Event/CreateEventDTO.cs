@@ -15,7 +15,7 @@ public class CreateEventDTO
     public required string Description { get; set; }
     public int Duration { get; set; }
     [Required]
-    public EventTypeEnum EventType { get; set; }
+    public required string EventType { get; set; }
     
     public required IFormFile FormFile{ get; set; }
 }
