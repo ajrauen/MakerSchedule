@@ -1,14 +1,13 @@
 import { deleteEvent } from "@ms/api/event.api";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmatoin";
 import { useAdminUsersData } from "@ms/hooks/useAdminUsersData";
-import { EventsHeader } from "@ms/Pages/Admin/Events/Header/Header";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import { useEffect, useState, type TransitionEvent } from "react";
 import { AdminUsersTable } from "./Table/Table";
-import { TextSearch } from "@ms/Components/TextSearch/TextSearch";
 import type { DomainUser } from "@ms/types/domain-user.types";
 import { UserDetails } from "./Details/UserDetails";
+import { UserHeader } from "@ms/Pages/Admin/User/Header/UserHeader";
 
 const Users = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -18,9 +17,10 @@ const Users = () => {
   );
   const [userToDelete, setUserToDelete] = useState<DomainUser | undefined>();
   const [filteredUsers, setFilteredUsers] = useState<DomainUser[]>([]);
+  const [searchString, setSearchString] = useState("");
+  const [filterValue, setFilterValue] = useState("");
 
-  const { users, appMetaData } = useAdminUsersData();
-  console.log("appMetaData", appMetaData);
+  const { users, userMetaData } = useAdminUsersData();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -103,22 +103,29 @@ const Users = () => {
   };
 
   const handleSearch = (value: string | undefined) => {
-    if (!value) {
-      setFilteredUsers(users || []);
-      return;
-    }
+    setSearchString(value || "");
+  };
 
-    const lowerCaseValue = value.toLowerCase();
-    const filtered =
+  const handleFilterChange = (value: string) => {
+    setFilterValue(value);
+  };
+
+  useEffect(() => {
+    let filtered =
       users?.filter((user) => {
         return (
-          user.firstName?.toLowerCase().includes(lowerCaseValue) ||
-          user.lastName?.toLowerCase().includes(lowerCaseValue) ||
-          user?.email?.toLowerCase().includes(lowerCaseValue)
+          user.firstName?.toLowerCase().includes(searchString.toLowerCase()) ||
+          user.lastName?.toLowerCase().includes(searchString.toLowerCase()) ||
+          user?.email?.toLowerCase().includes(searchString.toLowerCase())
         );
       }) || [];
+
+    if (filterValue) {
+      filtered = filtered.filter((user) => user.roles?.includes(filterValue));
+    }
+
     setFilteredUsers(filtered);
-  };
+  }, [searchString, filterValue, users]);
 
   return (
     <div className="flex w-full h-full overflow-hidden pb-12">
@@ -128,8 +135,12 @@ const Users = () => {
           marginRight: isDrawerOpen ? "var(--create-drawer-width)" : "",
         }}
       >
-        <EventsHeader onCreateEvent={handleUserCreate} />
-        <TextSearch onSearch={handleSearch} />
+        <UserHeader
+          onCreateEvent={handleUserCreate}
+          onSearch={handleSearch}
+          onFilterChange={handleFilterChange}
+          roles={userMetaData.roles}
+        />
         <AdminUsersTable
           users={filteredUsers}
           selectedUser={selectedUser}

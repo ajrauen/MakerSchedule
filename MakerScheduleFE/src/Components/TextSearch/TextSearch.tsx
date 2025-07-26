@@ -6,9 +6,14 @@ import { useState } from "react";
 interface TextSearchProps {
   onSearch: (value: string | undefined) => void;
   debounceEnabled?: boolean;
+  className?: string;
 }
 
-const TextSearch = ({ onSearch, debounceEnabled = false }: TextSearchProps) => {
+const TextSearch = ({
+  onSearch,
+  debounceEnabled = false,
+  className,
+}: TextSearchProps) => {
   const [searchValue, setSearchValue] = useState<string | undefined>();
 
   const handleSearch = (evt: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +35,7 @@ const TextSearch = ({ onSearch, debounceEnabled = false }: TextSearchProps) => {
   });
 
   return (
-    <div className="flex items-center">
+    <div className={`${className} flex items-center`}>
       <TextField
         variant="standard"
         placeholder="Search..."

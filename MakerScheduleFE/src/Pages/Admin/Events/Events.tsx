@@ -20,6 +20,8 @@ const AdminEvents = () => {
   >();
 
   const { events, appMetaData } = useAdminEventsData();
+  const [filteredUsers, setFilteredUsers] = useState<EventOffering[]>([]);
+
   const queryClient = useQueryClient();
 
   const { mutate: deleteEventMutation } = useMutation({
@@ -97,6 +99,20 @@ const AdminEvents = () => {
     deleteEventMutation(eventToDelete.id);
   };
 
+  const handleSearch = (searchValue: string | undefined) => {
+    let filteredEvents = events.filter((event) => {
+      return (
+        event.eventName
+          .toLowerCase()
+          .includes(searchValue?.toLowerCase() || "") ||
+        event.description
+          .toLowerCase()
+          .includes(searchValue?.toLowerCase() || "")
+      );
+    });
+    setFilteredUsers(filteredEvents);
+  };
+
   return (
     <div className="flex w-full h-full overflow-hidden pb-12">
       <div
@@ -105,7 +121,10 @@ const AdminEvents = () => {
           marginRight: isDrawerOpen ? "var(--create-drawer-width)" : "",
         }}
       >
-        <EventsHeader onCreateEvent={handleEventCreate} />
+        <EventsHeader
+          onCreateEvent={handleEventCreate}
+          onSearch={handleSearch}
+        />
         <AdminEventsTable
           events={events}
           onEdit={handleEventEdit}
