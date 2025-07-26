@@ -7,7 +7,7 @@ import { AdminEventsTable } from "@ms/Pages/Admin/Events/Table/Table";
 import type { EventOffering } from "@ms/types/event.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
-import { useState, type TransitionEvent } from "react";
+import { useEffect, useState, type TransitionEvent } from "react";
 
 const AdminEvents = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -20,9 +20,14 @@ const AdminEvents = () => {
   >();
 
   const { events, appMetaData } = useAdminEventsData();
-  const [filteredUsers, setFilteredUsers] = useState<EventOffering[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<EventOffering[]>([]);
 
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!events) return;
+    setFilteredEvents(events);
+  }, [events]);
 
   const { mutate: deleteEventMutation } = useMutation({
     mutationKey: ["deleteEvent"],
@@ -110,7 +115,7 @@ const AdminEvents = () => {
           .includes(searchValue?.toLowerCase() || "")
       );
     });
-    setFilteredUsers(filteredEvents);
+    setFilteredEvents(filteredEvents);
   };
 
   return (
@@ -126,7 +131,7 @@ const AdminEvents = () => {
           onSearch={handleSearch}
         />
         <AdminEventsTable
-          events={events}
+          events={filteredEvents}
           onEdit={handleEventEdit}
           eventTypes={appMetaData.eventTypes}
           selectedEvent={selectedEvent}
