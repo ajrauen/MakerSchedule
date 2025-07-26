@@ -55,7 +55,10 @@ const ImageUpload = ({ control, name, error }: ImageUploadProps) => {
           />
         ) : (
           <FormDropZone
-            accept={{ "image/*": [] }}
+            accept={{
+              "image/jpeg": [],
+              "image/png": [],
+            }}
             error={error || fieldError?.message}
             onDrop={(files) => {
               if (Array.isArray(files)) {

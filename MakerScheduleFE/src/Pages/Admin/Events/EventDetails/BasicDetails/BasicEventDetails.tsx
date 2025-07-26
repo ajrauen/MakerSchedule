@@ -202,7 +202,6 @@ const BasicEventDetails = ({
         {thumbnailUrl || thumbnailFile ? (
           <div className="flex flex-row">
             <div className="flex flex-col">
-              <span className="">Image Preview</span>
               <img
                 src={
                   (thumbnailFile && URL.createObjectURL(thumbnailFile)) ||
