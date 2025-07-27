@@ -24,7 +24,7 @@ public class EventTypeService(ILogger<EventTypeService> logger, IApplicationDbCo
     {
         var eventType = new EventType
         {
-            Name = new EventTypeName(eventTypeDTO.eventTypes)
+            Name = new EventTypeName(eventTypeDTO.Name)
         };
 
         context.EventTypes.Add(eventType);

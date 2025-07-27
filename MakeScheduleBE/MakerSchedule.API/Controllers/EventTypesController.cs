@@ -20,18 +20,17 @@ public class EventTypesController(IEventTypeService eventTypeService) : Controll
     }
 
     [HttpPost]
-    public async Task<ActionResult<Guid>> CreateEventType([FromBody] string name)
+    public async Task<ActionResult<Guid>> CreateEventType([FromBody] CreateEventTypeDTO createEventTypeDTO)
     {
-        var eventTypeDTO = new CreateEventTypeDTO { eventTypes = name };
-        var eventId = await eventTypeService.CreateEventTypeAsync(eventTypeDTO);
-        return CreatedAtAction(nameof(GetAllEventTypes), new { id = eventId }, eventId);
+        var eventTypeId = await eventTypeService.CreateEventTypeAsync(createEventTypeDTO);
+        return Ok(eventTypeId);
     }
 
 
-    [HttpDelete("{eventId}")]
-    public async Task<IActionResult> DeleteEvent(Guid eventId)
+    [HttpDelete("{eventTypeId}")]
+    public async Task<IActionResult> DeleteEvent(Guid eventTypeId)
     {
-        var deleted = await eventTypeService.DeleteEventTypeAsync(eventId);
+        var deleted = await eventTypeService.DeleteEventTypeAsync(eventTypeId);
         if (deleted)
         {
             return Ok(deleted);
