@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
 using MakerSchedule.Application.DTO.Occurrence;
-using MakerSchedule.Domain.Enums;
 
 namespace MakerSchedule.Application.DTO.Event;
 

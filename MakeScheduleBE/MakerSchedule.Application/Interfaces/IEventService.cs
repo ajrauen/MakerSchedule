@@ -14,4 +14,5 @@ public interface IEventService
     Task<bool> UpdateOccuranceAsync(UpdateOccurenceDTO updateOccurenceDTO);
     Task<bool> DeleteOccuranceAsync(Guid occurrenceGUID);
 
+
 }

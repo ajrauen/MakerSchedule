@@ -2,6 +2,7 @@ namespace MakerSchedule.Domain.Aggregates.Event;
 
 using System.ComponentModel.DataAnnotations;
 
+using MakerSchedule.Domain.Enums;
 using MakerSchedule.Domain.ValueObjects;
 
 public class Occurrence

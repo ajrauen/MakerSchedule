@@ -6,9 +6,14 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Text.Json;
 
 namespace MakerSchedule.Infrastructure.Data;
+
+using System.Runtime.CompilerServices;
+
+
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.Aggregates.Event;
+using MakerSchedule.Domain.Aggregates.EventType;
 using MakerSchedule.Domain.Aggregates.User;
 using MakerSchedule.Domain.ValueObjects;
 
@@ -22,20 +27,34 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<EventType>()
+            .Property(e => e.Name)
+            .HasConversion(
+                name => name.Value,
+                value => new EventTypeName(value)
+            )
+            .HasColumnType("nvarchar(max)");
+
+       modelBuilder.Entity<EventType>().HasData(SeedData.SeedEventTypes.ToArray());
+        
+        // Then seed Events that reference those types
         modelBuilder.Entity<Event>().HasData(SeedData.SeedEvents.ToArray());
         modelBuilder.Entity<Occurrence>().HasData(SeedData.SeedOccurrences.ToArray());
 
-        // Configure Event entity to include EventType
+        // Configure Event entity to include EventType relationship
         modelBuilder.Entity<Event>(entity =>
         {
-            entity.Property(e => e.EventType).IsRequired();
-            
-       
+            // Configure foreign key and navigation property
+            entity.HasOne(e => e.EventType)
+                  .WithMany()
+                  .HasForeignKey("EventTypeId")
+                  .IsRequired();
+
             // Configure Duration value object to be stored as int
             entity.Property(e => e.Duration)
                 .HasConversion(Duration.Converter)
                 .HasColumnType("int");
-            
+
             // Configure EventName value object to be stored as string
             entity.Property(e => e.EventName)
                 .HasConversion(
@@ -67,6 +86,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
                 .HasForeignKey(ol => ol.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
+
+        // EventType owned entity already configured above
 
         // Configure many-to-many: Users attend Occurrences
         modelBuilder.Entity<OccurrenceAttendee>(entity =>
@@ -114,4 +135,5 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Occurrence> Occurrences { get; set; }
     public DbSet<OccurrenceLeader> OccurrenceLeaders { get; set; }
     public DbSet<OccurrenceAttendee> OccurrenceAttendees { get; set; }
+    public DbSet<EventType> EventTypes { get; set; }
 }

@@ -1,17 +1,17 @@
-using System.ComponentModel.Design;
-
 using MakerSchedule.Application.DTO.Event;
+using MakerSchedule.Application.DTO.EventType;
 using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.Event;
-using MakerSchedule.Domain.Enums;
 using MakerSchedule.Domain.Exceptions;
 using MakerSchedule.Domain.Utilties.ImageUtilities;
 using MakerSchedule.Domain.ValueObjects;
+using MakerSchedule.Domain.Enums;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using MakerSchedule.Domain.Aggregates.EventType;
 
 namespace MakerSchedule.Application.Services;
 
@@ -26,18 +26,17 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
     public async Task<IEnumerable<EventListDTO>> GetAllEventsAsync()
     {
-
-
-
-        return await _context.Events.Select(e => new EventListDTO
-        {
-            Id = e.Id,
-            EventName = e.EventName.ToString(),
-            Description = e.Description,
-            EventType = e.EventType.ToString(),
-            Duration = e.Duration,
-            ThumbnailUrl = e.ThumbnailUrl,
-        }).ToListAsync();
+        return await _context.Events
+            .Include(e => e.EventType)
+            .Select(e => new EventListDTO
+            {
+                Id = e.Id,
+                EventName = e.EventName.ToString(),
+                Description = e.Description,
+                EventType = e.EventType != null ? e.EventType.Name.Value : "",
+                Duration = e.Duration,
+                ThumbnailUrl = e.ThumbnailUrl,
+            }).ToListAsync();
     }
 
     public async Task<EventDTO> GetEventAsync(Guid id)
@@ -55,14 +54,15 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
         if (e == null) throw new NotFoundException("Event", id);
 
-        var eventType  = EventTypeEnum.Unknown;
-        if (Enum.TryParse<EventTypeEnum>(e.EventType.ToString(), out var eventTypeEnum))
+        // Get the event type name using the EventTypeId from the event
+        var eventTypeName = await _context.EventTypes
+            .Where(et => et.Id == e.EventTypeId)
+            .Select(et => et.Name.Value)
+            .FirstOrDefaultAsync();
+
+        if (eventTypeName == null)
         {
-            eventType = eventTypeEnum;
-        }
-        else
-        {
-            throw new ArgumentException($"Invalid event type: {e.EventType.ToString()}", nameof(e.EventType));
+            throw new NotFoundException("EventType", e.EventTypeId);
         }
 
         return new EventDTO
@@ -70,7 +70,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Id = e.Id,
             EventName = e.EventName.ToString(),
             Description = e.Description,
-            EventType = eventType.ToString(),
+            EventType = eventTypeName,
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
             Occurences = e.Occurrences
@@ -105,24 +105,19 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         {
             throw new ArgumentException("Image file is required for event creation", nameof(dto.FormFile));
         }
-
-        var eventType  = EventTypeEnum.Unknown;
-        if (Enum.TryParse<MakerSchedule.Domain.Enums.EventTypeEnum>(dto.EventType, out var eventTypeEnum))
+        // Find the EventType by name
+        var eventType = await _context.EventTypes.FirstOrDefaultAsync(et => et.Name.Value == dto.EventType);
+        if (eventType == null)
         {
-            eventType = eventTypeEnum;
-        }
-        else
-        {
-            throw new ArgumentException($"Invalid event type: {dto.EventType}", nameof(dto.EventType));
+            throw new NotFoundException("EventType", dto.EventType);
         }
 
         var e = new Event
         {
             EventName = new EventName(dto.EventName),
             Description = dto.Description,
-            EventType = eventType,
+            EventTypeId = eventType.Id,
             Duration = dto.Duration > 0 ? new Duration(dto.Duration) : null,
-
         };
         _context.Events.Add(e);
         await _context.SaveChangesAsync();
@@ -184,60 +179,57 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             e.Duration = new Duration(dto.Duration.Value);
         if (dto.EventType != null)
         {
-            if (Enum.TryParse<MakerSchedule.Domain.Enums.EventTypeEnum>(dto.EventType, out var eventTypeEnum))
+            var eventType = await _context.EventTypes.FirstOrDefaultAsync(et => et.Name.Value == dto.EventType);
+            if (eventType == null)
             {
-                e.EventType = eventTypeEnum;
-            }
-            else
-            {
-                throw new ArgumentException($"Invalid event type: {dto.EventType}", nameof(dto.EventType));
+                throw new NotFoundException($"EventType with name {dto.EventType} not found", dto.EventType);
             }
         }
         if (dto.FormFile != null && dto.FormFile.Length > 0)
-        {
-            if (!string.IsNullOrEmpty(e.ThumbnailUrl))
             {
+                if (!string.IsNullOrEmpty(e.ThumbnailUrl))
+                {
+                    try
+                    {
+                        await _imageStorageService.DeleteImageAsync(e.ThumbnailUrl);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Failed to delete previous image for event {EventName}", e.EventName);
+                    }
+                }
+
+                string thumbnailUrl;
                 try
                 {
-                    await _imageStorageService.DeleteImageAsync(e.ThumbnailUrl);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Failed to delete previous image for event {EventName}", e.EventName);
-                }
-            }
-
-            string thumbnailUrl;
-            try
-            {
-                using (var stream = dto.FormFile.OpenReadStream())
-                {
-                    if (ImageUtilities.IsSvg(stream))
+                    using (var stream = dto.FormFile.OpenReadStream())
                     {
-                        if (!ImageUtilities.IsSvgAspectRatioValid(stream, RequiredAspectRatio))
+                        if (ImageUtilities.IsSvg(stream))
+                        {
+                            if (!ImageUtilities.IsSvgAspectRatioValid(stream, RequiredAspectRatio))
+                            {
+                                throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
+                            }
+                        }
+                        else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
                         {
                             throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
                         }
                     }
-                    else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
-                    {
-                        throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
-                    }
+                    var fileName = $"{e.EventName}_{e.Id}{Path.GetExtension(dto.FormFile.FileName)}";
+                    thumbnailUrl = await _imageStorageService.SaveImageAsync(dto.FormFile, fileName);
+                    e.ThumbnailUrl = thumbnailUrl;
                 }
-                var fileName = $"{e.EventName}_{e.Id}{Path.GetExtension(dto.FormFile.FileName)}";
-                thumbnailUrl = await _imageStorageService.SaveImageAsync(dto.FormFile, fileName);
-                e.ThumbnailUrl = thumbnailUrl;
+                catch (InvalidImageAspectRatioException)
+                {
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to save image for event {EventName}", e.EventName);
+                    throw new InvalidOperationException("Failed to save event image", ex);
+                }
             }
-            catch (InvalidImageAspectRatioException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to save image for event {EventName}", e.EventName);
-                throw new InvalidOperationException("Failed to save event image", ex);
-            }
-        }
 
         await _context.SaveChangesAsync();
         return e.Id;
@@ -385,12 +377,10 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         var occurrence = await _context.Occurrences.FirstOrDefaultAsync(o => o.Id == occurrenceid);
         if (occurrence == null)
             throw new NotFoundException($"Occurrence with id {occurrenceid} not found", occurrenceid);
-            occurrence.isDeleted = true;
+        occurrence.isDeleted = true;
         _context.Occurrences.Update(occurrence);
 
         await _context.SaveChangesAsync();
         return true;
     }
-
-
 }

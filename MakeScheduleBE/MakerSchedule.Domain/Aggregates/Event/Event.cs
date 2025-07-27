@@ -1,8 +1,9 @@
 namespace MakerSchedule.Domain.Aggregates.Event;
 
-using MakerSchedule.Domain.Enums;
 
 using System.ComponentModel.DataAnnotations;
+
+using MakerSchedule.Domain.Aggregates.EventType;
 using MakerSchedule.Domain.ValueObjects;
 
 /// <summary>
@@ -15,7 +16,9 @@ public class Event
     public EventName EventName { get; set; } = null!;
     [Required]
     public required string Description { get; set; }
-    public EventTypeEnum EventType { get; set; }
+
+    public required Guid EventTypeId { get; set; }
+    public  EventType? EventType { get; set; }
     public Duration? Duration { get; set; }
     private readonly List<Occurrence> _occurrences = new();
     public IReadOnlyCollection<Occurrence> Occurrences => _occurrences.AsReadOnly();
@@ -28,7 +31,6 @@ public class Event
         return occurrence;
     }
 
-    // Remove an occurrence by ID
     public void RemoveOccurrence(Guid occurrenceId)
     {
         var occ = _occurrences.Find(o => o.Id == occurrenceId);

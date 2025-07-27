@@ -1,7 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 
-using MakerSchedule.Domain.Enums;
-
 using Microsoft.AspNetCore.Http;
 
 namespace MakerSchedule.Application.DTO.Event;

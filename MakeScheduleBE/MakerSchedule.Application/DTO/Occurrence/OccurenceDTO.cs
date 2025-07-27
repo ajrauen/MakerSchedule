@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using MakerSchedule.Domain.Enums;
 
 namespace MakerSchedule.Application.DTO.Occurrence;
 

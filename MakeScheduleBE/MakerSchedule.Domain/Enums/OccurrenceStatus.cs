@@ -1,3 +1,4 @@
+namespace MakerSchedule.Domain.Enums;
 public enum OccurrenceStatus
 {
     Pending = 1,
