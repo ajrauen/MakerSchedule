@@ -4,12 +4,12 @@ import { useAdminUsersData } from "@ms/hooks/useAdminUsersData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import { useEffect, useState, type TransitionEvent } from "react";
-import { AdminUsersTable } from "./Table/Table";
 import type { DomainUser } from "@ms/types/domain-user.types";
-import { UserDetails } from "./Details/UserDetails";
 import { UserHeader } from "@ms/Pages/Admin/User/Header/UserHeader";
+import { AdminUsersTable } from "@ms/Pages/Admin/User/Table/Table";
+import { UserDetails } from "@ms/Pages/Admin/User/Details/UserDetails";
 
-const Users = () => {
+const AdminUsers = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [refreshData, setRefreshData] = useState(false);
   const [selectedUser, setSelectedUser] = useState<DomainUser | undefined>(
@@ -171,4 +171,4 @@ const Users = () => {
   );
 };
 
-export { Users };
+export { AdminUsers };

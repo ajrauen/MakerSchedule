@@ -2,13 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Text.Json;
 
 namespace MakerSchedule.Infrastructure.Data;
-
-using System.Runtime.CompilerServices;
-
 
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.DomainUser;
@@ -26,6 +21,8 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+ 
 
         modelBuilder.Entity<EventType>()
             .Property(e => e.Name)

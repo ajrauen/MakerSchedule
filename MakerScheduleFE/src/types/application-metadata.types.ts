@@ -4,7 +4,11 @@ type Duration = Record<number, string>;
 
 interface AdminEventsMetaData {
   durations: Duration;
-  eventTypes: EventType;
+  eventTypes: EventType[];
 }
 
-export { type AdminEventsMetaData };
+interface AdminEventTypesMetaData {
+  eventTypes: EventType[];
+}
+
+export { type AdminEventsMetaData, type AdminEventTypesMetaData };

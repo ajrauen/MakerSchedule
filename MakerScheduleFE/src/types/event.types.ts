@@ -25,8 +25,25 @@ type UpdateEventOffering = Partial<CreateEventOffering> & {
   id: string;
 };
 
+interface EventType {
+  id?: string;
+  name: string;
+  meta?: Record<string, string | boolean | number>;
+}
+
+type CreateEventType = Omit<EventType, "id"> & {
+  name: string;
+};
+
+type PatchEventType = Omit<EventType, "id"> & {
+  name: string;
+};
+
 export {
   type EventOffering,
+  type EventType,
   type CreateEventOffering,
   type UpdateEventOffering,
+  type CreateEventType,
+  type PatchEventType,
 };

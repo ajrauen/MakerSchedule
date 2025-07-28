@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 const useAdminEventsData = () => {
   const defaultAppMetaData: AdminEventsMetaData = {
     durations: {},
-    eventTypes: {},
+    eventTypes: [],
   };
 
   const {

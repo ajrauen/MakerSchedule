@@ -1,6 +1,5 @@
 
 using Microsoft.AspNetCore.Mvc;
-using MakerSchedule.Application.DTO.Event;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.DTO.EventType;
 
@@ -34,6 +33,17 @@ public class EventTypesController(IEventTypeService eventTypeService) : Controll
         if (deleted)
         {
             return Ok(deleted);
+        }
+        return NotFound();
+    }
+
+    [HttpPatch("{eventTypeId}")]
+    public async Task<IActionResult> PatchEventType(Guid eventTypeId, [FromBody] PatchEventTypeDTO eventTypeDTO)
+    {
+        var updated = await eventTypeService.PatchEventTypeAsync(eventTypeId, eventTypeDTO);
+        if (updated)
+        {
+            return Ok(updated);
         }
         return NotFound();
     }

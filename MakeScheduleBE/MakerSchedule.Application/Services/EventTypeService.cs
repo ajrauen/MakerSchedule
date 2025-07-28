@@ -41,5 +41,16 @@ public class EventTypeService(ILogger<EventTypeService> logger, IApplicationDbCo
         context.EventTypes.Remove(eventType);
         return await context.SaveChangesAsync() > 0;
     }
-    
+
+    public async Task<bool> PatchEventTypeAsync(Guid eventTypeId, PatchEventTypeDTO eventTypeDTO)
+    {
+        var eventType = await context.EventTypes.FindAsync(eventTypeId);
+        if (eventType == null) return false;
+
+        if (eventTypeDTO.Name != null)
+            eventType.Name = new EventTypeName(eventTypeDTO.Name);
+
+        return await context.SaveChangesAsync() > 0;
+    }
+
 }

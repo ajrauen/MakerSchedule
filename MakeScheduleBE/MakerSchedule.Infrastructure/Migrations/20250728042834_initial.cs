@@ -322,23 +322,23 @@ namespace MakerSchedule.Infrastructure.Migrations
                 columns: new[] { "Id", "Duration", "EventId", "ScheduleStart", "Status", "isDeleted" },
                 values: new object[,]
                 {
-                    { new Guid("0fc47864-8de7-4c62-a870-f32b9339d0a6"), 1800000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 7, 13, 19, 45, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("32fb47f3-456e-4d98-9372-9493fc3f910a"), 1800000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 7, 14, 14, 30, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("39f4cdc5-8d8f-42c6-b6e8-bdc9e7a60b6b"), 8100000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 7, 25, 20, 0, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("446476c1-fd5d-47b9-9190-e3cd1c064303"), 7200000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 8, 3, 14, 30, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("45ed2fd1-a21c-4829-b293-abb2e0aa658d"), 5400000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 8, 26, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("8280c3f1-f062-4a01-ae24-fb39ae13ea8a"), 4500000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 8, 21, 21, 30, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("86424577-1281-448e-8612-9963a71c8c17"), 2700000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 8, 8, 20, 30, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("aa16611c-b10e-4e19-b77d-8e229f7e5306"), 1800000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 8, 28, 18, 0, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("ab20b5f7-0564-4106-9bb8-88ba2c4b85cd"), 5400000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 8, 11, 17, 15, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("c0d9b8f4-0da5-4ec2-9389-f62d1f181ea1"), 2700000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 7, 20, 15, 30, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("d1b309f5-49cb-4fd9-8db1-f027e4a989ee"), 3600000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 7, 21, 16, 45, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("d7997b53-ee36-4cc2-8683-6017191773b6"), 4500000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 8, 17, 14, 45, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("d801ca5f-31ca-41e0-a8d4-0d0105a4c2ea"), 7200000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 7, 20, 14, 0, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("e90fda5a-273d-4dfd-85f9-6f76a8b57ae1"), 3600000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 8, 25, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
-                    { new Guid("efc70e2a-2707-410d-9563-36cf0dfd1238"), 6300000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 7, 3, 14, 15, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("f0512477-cabb-4739-ac73-255a21383efb"), 4500000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 7, 25, 21, 30, 0, 0, DateTimeKind.Utc), 2, false },
-                    { new Guid("f2b4bbc8-0fa1-4329-8b41-50fc0aa382df"), 5400000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 6, 22, 16, 15, 0, 0, DateTimeKind.Utc), 2, false }
+                    { new Guid("055be1d2-a34d-47e1-b16b-78ed702b989b"), 7200000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 8, 4, 14, 30, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("0de04608-682a-4380-a38d-c11df9e4ec81"), 5400000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 6, 23, 16, 15, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("17b9ffd6-02bf-4f80-a519-b7fdc4f0b94d"), 6300000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 7, 4, 14, 15, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("266f8d97-85ef-456b-a0e6-7e6b403badb7"), 4500000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 8, 22, 21, 30, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("38782003-9caf-4f97-8c12-8f2e98bb48e6"), 2700000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 7, 21, 15, 30, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("57a6f9ed-c3e3-42c3-8c9b-107810168b31"), 1800000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 7, 14, 19, 45, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("6f8c709c-a573-44f9-a860-52818aa643b6"), 5400000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 8, 27, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("745d8dad-0d5b-40cf-8ffc-fba81524113e"), 7200000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 7, 21, 14, 0, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("9149a8bf-7e7d-4a63-9cee-cac88d218362"), 3600000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 7, 22, 16, 45, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("9a1f9f98-c8f6-492f-88a4-6f91a3fdf8ac"), 5400000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 8, 12, 17, 15, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("bb9c2e59-d2a1-415f-bb18-200c2fb8aca0"), 1800000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 8, 29, 18, 0, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("c0b218f1-6c05-4dfc-8c82-a636c35a776d"), 4500000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 8, 18, 14, 45, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("d4e27ff7-e924-4fac-af6d-f35770ebcf3c"), 8100000, new Guid("3709300b-3c35-4350-9f3c-277759214bbb"), new DateTime(2025, 7, 26, 20, 0, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("db659c39-811e-4ce0-9b1d-ce8c53fe7fa6"), 1800000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 7, 15, 14, 30, 0, 0, DateTimeKind.Utc), 2, false },
+                    { new Guid("e498ff8c-9e7b-4af1-887c-0c2d83195e93"), 3600000, new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"), new DateTime(2025, 8, 26, 15, 0, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("e7d90da0-30f4-462b-870e-17dc605d33bf"), 2700000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 8, 9, 20, 30, 0, 0, DateTimeKind.Utc), 1, false },
+                    { new Guid("f5ffa7cf-49f1-4e60-8443-18aa70605d27"), 4500000, new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"), new DateTime(2025, 7, 26, 21, 30, 0, 0, DateTimeKind.Utc), 2, false }
                 });
 
             migrationBuilder.CreateIndex(

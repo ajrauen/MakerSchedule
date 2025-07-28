@@ -14,6 +14,7 @@ import { ImageUpload } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/Ima
 import { useMutation } from "@tanstack/react-query";
 import { createEvent, patchEvent } from "@ms/api/event.api";
 import { z } from "zod";
+import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
 
 const createEventvalidationSchema = z.object({
   eventName: z
@@ -228,23 +229,11 @@ const BasicEventDetails = ({
           </div>
         )}
       </div>
-      <div className="pt-4 ml-auto gap-3 flex">
-        <Button
-          type="button"
-          onClick={() => handleOnClose(false)}
-          disabled={isSavePending}
-        >
-          Cancel
-        </Button>
-        <Button
-          type="submit"
-          variant="outlined"
-          disabled={isSavePending || isPatchPending}
-          loading={isSavePending || isPatchPending}
-        >
-          Save
-        </Button>
-      </div>
+      <FormFooter
+        onCancel={handleOnClose}
+        areActionsDisabled={isSavePending || isPatchPending}
+        isLoading={isSavePending || isPatchPending}
+      />
     </form>
   );
 };

@@ -1,8 +1,9 @@
 import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import { AdminEvents } from "@ms/Pages/Admin/Events/Events";
+import { AdminEventTypes } from "@ms/Pages/Admin/EventTypes/EventTypes";
+import { AdminUsers } from "@ms/Pages/Admin/User/User";
 import { Tab, Tabs } from "@mui/material";
 import { useState } from "react";
-import { Users } from "./User/User";
 
 const Admin = () => {
   const [value, setValue] = useState(0);
@@ -29,12 +30,16 @@ const Admin = () => {
       >
         <Tab label="Events" {...a11yProps(0)} />
         <Tab label="Users" {...a11yProps(1)} />
+        <Tab label="Event Types" {...a11yProps(2)} />
       </Tabs>
       <TabPanel index={0} value={value}>
         <AdminEvents />
       </TabPanel>
       <TabPanel index={1} value={value}>
-        <Users />
+        <AdminUsers />
+      </TabPanel>
+      <TabPanel index={2} value={value}>
+        <AdminEventTypes />
       </TabPanel>
     </div>
   );

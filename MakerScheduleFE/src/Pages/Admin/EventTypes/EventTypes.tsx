@@ -1,56 +1,57 @@
-import { deleteEvent } from "@ms/api/event.api";
+import { deleteEventType } from "@ms/api/eventTypes.api";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmatoin";
-import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
-import { EventDetails } from "@ms/Pages/Admin/Events/EventDetails/EventDetails";
-import { EventsHeader } from "@ms/Pages/Admin/Events/Header/Header";
-import { AdminEventsTable } from "@ms/Pages/Admin/Events/Table/Table";
-import type { EventOffering } from "@ms/types/event.types";
+import { useAdminEventTypeData } from "@ms/hooks/useAdminEventTypesData";
+import { EventTypeDetails } from "@ms/Pages/Admin/EventTypes/EventTypeDetails/EventTypeDetails";
+
+import { EventTypesHeader } from "@ms/Pages/Admin/EventTypes/Header/Header";
+import { AdminEventTypesTable } from "@ms/Pages/Admin/EventTypes/Table/Table";
+import type { EventType } from "@ms/types/event.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import { useEffect, useState, type TransitionEvent } from "react";
 
-const AdminEvents = () => {
+const AdminEventTypes = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [refreshData, setRefreshData] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<EventOffering | undefined>(
-    undefined
-  );
-  const [eventToDelete, setEventToDelete] = useState<
-    EventOffering | undefined
+  const [selectedEventType, setSelectedEventType] = useState<
+    EventType | undefined
+  >(undefined);
+  const [eventTypeToDelete, setEventTypeToDelete] = useState<
+    EventType | undefined
   >();
 
-  const { events, appMetaData } = useAdminEventsData();
-  const [filteredEvents, setFilteredEvents] = useState<EventOffering[]>([]);
+  const { eventTypes } = useAdminEventTypeData();
+  const [filteredEventTypes, setFilteredEventTypes] = useState<EventType[]>([]);
 
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!events) return;
-    setFilteredEvents(structuredClone(events));
-  }, [events]);
+    if (!eventTypes) return;
+    setFilteredEventTypes(structuredClone(eventTypes));
+  }, [eventTypes]);
 
   const { mutate: deleteEventMutation } = useMutation({
     mutationKey: ["deleteEvent"],
-    mutationFn: deleteEvent,
-    onSuccess: () => {
-      if (!eventToDelete) return;
+    mutationFn: deleteEventType,
+    onSuccess: (res, deleteEventId) => {
+      if (!eventTypeToDelete) return;
 
       queryClient.setQueryData(
-        ["events"],
-        (oldEvents: AxiosResponse<EventOffering[]>) => {
+        ["eventTypes"],
+        (oldEvents: AxiosResponse<EventType[]>) => {
           if (!oldEvents) return oldEvents;
           return {
             ...oldEvents,
-            data: oldEvents.data.filter((evt) => evt.id !== eventToDelete.id),
+            data: oldEvents.data.filter((evt) => evt.id !== deleteEventId),
           };
         }
       );
 
-      if (selectedEvent?.id === eventToDelete.id) {
-        setSelectedEvent(undefined);
+      if (selectedEventType?.id === deleteEventId) {
+        setSelectedEventType(undefined);
       }
 
-      setEventToDelete(undefined);
+      setEventTypeToDelete(undefined);
     },
   });
 
@@ -59,21 +60,19 @@ const AdminEvents = () => {
     setIsDrawerOpen(false);
   };
 
-  const handleEventEdit = (event: EventOffering) => {
-    setSelectedEvent(event);
+  const handleEventEdit = (event: EventType) => {
+    setSelectedEventType(event);
     handleDrawerOpen();
   };
 
-  const handleEventCreate = () => {
-    const newEvent: EventOffering = {
-      description: "",
-      eventName: "",
-
+  const handleEventTypeCreate = () => {
+    const newEvent: EventType = {
+      name: "",
       meta: {
         isNew: true,
       },
     };
-    setSelectedEvent(newEvent);
+    setSelectedEventType(newEvent);
     handleDrawerOpen();
   };
   const handleDrawerOpen = () => {
@@ -93,29 +92,23 @@ const AdminEvents = () => {
     }
   };
 
-  const handleDeletClick = (event: EventOffering) => {
-    setEventToDelete(event);
+  const handleDeletClick = (event: EventType) => {
+    setEventTypeToDelete(event);
   };
 
-  const handleCancelDeleteEvent = () => setEventToDelete(undefined);
+  const handleCancelDeleteEvent = () => setEventTypeToDelete(undefined);
   const handleConfirmDeleteEvent = () => {
-    if (!eventToDelete?.id) return;
-
-    deleteEventMutation(eventToDelete.id);
+    if (!eventTypeToDelete?.id) return;
+    deleteEventMutation(eventTypeToDelete.id);
   };
 
   const handleSearch = (searchValue: string | undefined) => {
-    let filteredEvents = events.filter((event) => {
-      return (
-        event.eventName
-          .toLowerCase()
-          .includes(searchValue?.toLowerCase() || "") ||
-        event.description
-          .toLowerCase()
-          .includes(searchValue?.toLowerCase() || "")
-      );
+    let filteredEvents = filteredEventTypes.filter((eventType) => {
+      return eventType.name
+        .toLowerCase()
+        .includes(searchValue?.toLowerCase() || "");
     });
-    setFilteredEvents(filteredEvents);
+    setFilteredEventTypes(filteredEvents);
   };
 
   return (
@@ -126,16 +119,15 @@ const AdminEvents = () => {
           marginRight: isDrawerOpen ? "var(--create-drawer-width)" : "",
         }}
       >
-        <EventsHeader
-          onCreateEvent={handleEventCreate}
+        <EventTypesHeader
+          onCreateEventType={handleEventTypeCreate}
           onSearch={handleSearch}
         />
-        <AdminEventsTable
-          events={filteredEvents}
+        <AdminEventTypesTable
+          eventTypes={filteredEventTypes}
           onEdit={handleEventEdit}
-          eventTypes={appMetaData.eventTypes}
-          selectedEvent={selectedEvent}
-          onEventDelete={handleDeletClick}
+          selectedEventType={selectedEventType}
+          onEventTypeDelete={handleDeletClick}
         />
       </div>
       <div
@@ -147,17 +139,17 @@ const AdminEvents = () => {
         onTransitionEnd={handlePanelTransitionEnd}
       >
         <div className="p-6 h-full">
-          {selectedEvent && (
-            <EventDetails
+          {selectedEventType && (
+            <EventTypeDetails
               onClose={handleDrawerClose}
-              selectedEvent={selectedEvent}
-              eventTypes={appMetaData.eventTypes}
+              selectedEventType={selectedEventType}
+              eventTypes={eventTypes}
             />
           )}
         </div>
       </div>
       <ConfirmationDialog
-        open={!!eventToDelete}
+        open={!!eventTypeToDelete}
         onCancel={handleCancelDeleteEvent}
         onConfirm={handleConfirmDeleteEvent}
         title="Delete Event"
@@ -167,4 +159,4 @@ const AdminEvents = () => {
   );
 };
 
-export { AdminEvents };
+export { AdminEventTypes };

@@ -105,8 +105,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         {
             throw new ArgumentException("Image file is required for event creation", nameof(dto.FormFile));
         }
-        // Find the EventType by name
-        var eventType = await _context.EventTypes.FirstOrDefaultAsync(et => et.Name.Value == dto.EventType);
+        var eventType = await _context.EventTypes.FirstOrDefaultAsync(et => et.Name == new EventTypeName(dto.EventType));
         if (eventType == null)
         {
             throw new NotFoundException("EventType", dto.EventType);

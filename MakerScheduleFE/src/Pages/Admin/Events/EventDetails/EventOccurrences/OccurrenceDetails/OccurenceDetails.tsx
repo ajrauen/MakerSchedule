@@ -14,7 +14,6 @@ import type {
   Occurrence,
   UpdateOccurrence,
 } from "@ms/types/occurrence.types";
-import { Button } from "@mui/material";
 import type { PickerValidDate } from "@mui/x-date-pickers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -22,6 +21,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "react-toastify";
 import type { DomainUser } from "@ms/types/domain-user.types";
+import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
 
 interface OccurenceDetailsProps {
   selectedEvent: EventOffering;
@@ -96,30 +96,32 @@ const OccurenceDetails = ({
     enabled: false,
   });
 
-  const { mutate: createOccurrenceMutation } = useMutation({
-    mutationKey: ["createMutation"],
-    mutationFn: ({ occurrence }: { occurrence: CreateOccurrence }) =>
-      createOccurrence(occurrence),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["event", selectedEvent?.id],
-      });
-      toast("Occurrence Created Successfully");
-      onCancel();
-    },
-  });
+  const { mutate: createOccurrenceMutation, isPending: isCreatePending } =
+    useMutation({
+      mutationKey: ["createMutation"],
+      mutationFn: ({ occurrence }: { occurrence: CreateOccurrence }) =>
+        createOccurrence(occurrence),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["event", selectedEvent?.id],
+        });
+        toast("Occurrence Created Successfully");
+        onCancel();
+      },
+    });
 
-  const { mutate: updateOccurrenceMutation } = useMutation({
-    mutationKey: ["updateMutation"],
-    mutationFn: ({ occurrence }: { occurrence: UpdateOccurrence }) =>
-      updateOccurrence(occurrence),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["event", selectedEvent?.id],
-      });
-      toast("Occurrence Saved Successfully");
-    },
-  });
+  const { mutate: updateOccurrenceMutation, isPending: isUpdatePending } =
+    useMutation({
+      mutationKey: ["updateMutation"],
+      mutationFn: ({ occurrence }: { occurrence: UpdateOccurrence }) =>
+        updateOccurrence(occurrence),
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: ["event", selectedEvent?.id],
+        });
+        toast("Occurrence Saved Successfully");
+      },
+    });
 
   useEffect(() => {
     if (occurrence?.meta?.isNew) {
@@ -288,23 +290,15 @@ const OccurenceDetails = ({
           </div>
         )}
 
-        <div className="flex gap-4">
-          <Button
-            className=" px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 !ml-auto"
-            onClick={onCancel}
-          >
-            {occurrence?.status.toLowerCase() === "pending" ? "Cancel" : "Back"}
-          </Button>
-          {occurrence?.status.toLowerCase() === "pending" && (
-            <Button
-              variant="contained"
-              type="submit"
-              className=" px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 "
-            >
-              {occurrence?.id ? "Update" : "Save"}
-            </Button>
-          )}
-        </div>
+        <FormFooter
+          handleOnClose={onCancel}
+          areActionsDisabled={isCreatePending || isUpdatePending}
+          isLoading={isCreatePending || isUpdatePending}
+          cancelButtonText={
+            occurrence?.status.toLowerCase() === "pending" ? "Cancel" : "Back"
+          }
+          saveButtonText={occurrence?.id ? "Update" : "Save"}
+        />
       </div>
     </form>
   );
