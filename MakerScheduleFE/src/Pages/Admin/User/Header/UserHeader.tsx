@@ -1,4 +1,4 @@
-import Select from "@ms/Components/FormComponents/FormSelect/Select/Select";
+import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { TextSearch } from "@ms/Components/TextSearch/TextSearch";
 import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
@@ -26,11 +26,10 @@ const UserHeader = ({
   }, [roles]);
 
   return (
-    <div className="flex items-end gap-6">
+    <div className="flex items-end gap-6  mt-2">
       <TextSearch onSearch={onSearch} />
-      <Select
+      <FormSelect
         autoWidth={true}
-        name="userType"
         label="User Type"
         variant="standard"
         className="w-64"

@@ -12,7 +12,7 @@ import { EventOccurrences } from "@ms/Pages/Admin/Events/EventDetails/EventOccur
 interface CreateEventProps {
   onClose: (refreshData: boolean) => void;
   selectedEvent: EventOffering;
-  eventTypes: string[];
+  eventTypes: EventType[];
 }
 
 const EventDetails = ({
@@ -64,8 +64,6 @@ const EventDetails = ({
       ...eventResponse?.data,
     };
   }, [eventResponse?.data, selectedEvent]);
-
-  console.log(eventTypes);
 
   return (
     <div className="flex flex-col h-full w-full">

@@ -10,14 +10,12 @@ import { durationMap } from "@ms/Pages/Admin/Events/utils/event.utils";
 
 interface AdminEventTableProps {
   events: EventOffering[];
-  eventTypes: string[];
   onEdit: (event: EventOffering) => void;
   selectedEvent?: EventOffering;
   onEventDelete: (event: EventOffering) => void;
 }
 
 const AdminEventsTable = ({
-  eventTypes,
   onEdit,
   selectedEvent,
   onEventDelete,

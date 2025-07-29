@@ -1,3 +1,4 @@
+using MakerSchedule.Application.DTO.EventType;
 using MakerSchedule.Application.DTO.Metadata;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Constants;
@@ -22,7 +23,12 @@ public class MetadataService(IApplicationDbContext context) : IMetadataService
 
     public Task<EventsMetadataDTO> GetEventsMetadata()
     {
-        var eventTypeArray = context.EventTypes.Select(e => e.Name.ToString()).ToArray();
+        var eventTypeArray = context.EventTypes.Select(e => new EventTypeDTO
+        {
+            Id = e.Id,
+            Name = e.Name.Value,
+
+        }).ToArray();
 
         var dto = new EventsMetadataDTO
         {

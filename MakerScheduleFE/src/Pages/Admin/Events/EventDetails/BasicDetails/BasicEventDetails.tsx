@@ -4,7 +4,11 @@ import { useForm } from "react-hook-form";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { useEffect, useMemo } from "react";
-import type { CreateEventOffering, EventOffering } from "@ms/types/event.types";
+import type {
+  CreateEventOffering,
+  EventOffering,
+  EventType,
+} from "@ms/types/event.types";
 import {
   createSaveForm,
   createUpdateForm,
@@ -46,7 +50,7 @@ const createEventInitialFormData = {
 interface BasicEventDetailsProps {
   onClose: (refreshData: boolean) => void;
   selectedEvent: EventOffering;
-  eventTypes: string[];
+  eventTypes: EventType[];
 }
 
 const BasicEventDetails = ({
@@ -151,8 +155,8 @@ const BasicEventDetails = ({
 
   const eventTypeOptions = useMemo(() => {
     const options = eventTypes.map((event) => ({
-      value: event,
-      label: event,
+      value: event.id,
+      label: event.name,
     }));
 
     return options;

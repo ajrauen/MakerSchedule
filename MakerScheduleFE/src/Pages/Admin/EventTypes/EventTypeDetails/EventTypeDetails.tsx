@@ -45,6 +45,9 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
     mutationKey: ["createEventType"],
     mutationFn: createEventType,
     onSuccess: (res, createdEventType) => {
+      queryClient.invalidateQueries({
+        queryKey: ["event"],
+      });
       queryClient.setQueryData(
         ["eventTypes"],
         (oldEventsTypes: AxiosResponse<EventType[]>) => {
@@ -65,6 +68,17 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
     mutationKey: ["patchEvent"],
     mutationFn: (event: EventType) => patchEventType(event),
     onSuccess: (res, savedEvent) => {
+      //
+      queryClient.invalidateQueries({
+        queryKey: ["events"],
+        type: "all",
+        refetchType: "all",
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["events-metadata"],
+        type: "all",
+        refetchType: "all",
+      });
       queryClient.setQueryData(
         ["eventTypes"],
         (oldEventsTypes: AxiosResponse<EventType[]>) => {

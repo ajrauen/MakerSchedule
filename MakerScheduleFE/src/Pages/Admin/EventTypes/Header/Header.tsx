@@ -12,7 +12,7 @@ const EventTypesHeader = ({
   onSearch,
 }: EventTypesHeaderProps) => {
   return (
-    <div className="flex items-end gap-6">
+    <div className="flex items-end gap-6  mt-3">
       <div className="grow">
         <TextSearch onSearch={onSearch} />
       </div>
@@ -21,7 +21,7 @@ const EventTypesHeader = ({
         startIcon={<AddIcon />}
         variant="text"
       >
-        Event
+        Event Type
       </Button>
     </div>
   );

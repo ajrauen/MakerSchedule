@@ -3,7 +3,6 @@ import { RouterProvider } from "@tanstack/react-router";
 import "./App.css";
 import { getRouterTree } from "@ms/configs/router.config";
 import { CircularProgress, createTheme, ThemeProvider } from "@mui/material";
-import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -33,7 +32,7 @@ const App = () => {
     },
   });
 
-  const { isLoading } = useAdminEventsData();
+  const isLoading = false;
 
   return (
     <ThemeProvider theme={theme}>

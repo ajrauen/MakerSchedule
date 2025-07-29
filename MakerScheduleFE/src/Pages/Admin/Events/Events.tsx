@@ -21,6 +21,8 @@ const AdminEvents = () => {
 
   const { events, appMetaData } = useAdminEventsData();
   const [filteredEvents, setFilteredEvents] = useState<EventOffering[]>([]);
+  const [searchString, setSearchString] = useState("");
+  const [filterValue, setFilterValue] = useState("");
 
   const queryClient = useQueryClient();
 
@@ -104,18 +106,30 @@ const AdminEvents = () => {
     deleteEventMutation(eventToDelete.id);
   };
 
-  const handleSearch = (searchValue: string | undefined) => {
-    let filteredEvents = events.filter((event) => {
-      return (
-        event.eventName
-          .toLowerCase()
-          .includes(searchValue?.toLowerCase() || "") ||
-        event.description
-          .toLowerCase()
-          .includes(searchValue?.toLowerCase() || "")
+  useEffect(() => {
+    let filtered =
+      events?.filter((event) => {
+        return (
+          event.eventName.toLowerCase().includes(searchString.toLowerCase()) ||
+          event.description.toLowerCase().includes(searchString.toLowerCase())
+        );
+      }) || [];
+
+    if (filterValue) {
+      filtered = filtered.filter((event) =>
+        event.eventType?.includes(filterValue)
       );
-    });
-    setFilteredEvents(filteredEvents);
+    }
+
+    setFilteredEvents(filtered);
+  }, [searchString, filterValue, events]);
+
+  const handleSearch = (value: string | undefined) => {
+    setSearchString(value || "");
+  };
+
+  const handleFilterChange = (value: string) => {
+    setFilterValue(value);
   };
 
   return (
@@ -129,11 +143,12 @@ const AdminEvents = () => {
         <EventsHeader
           onCreateEvent={handleEventCreate}
           onSearch={handleSearch}
+          eventTypes={appMetaData.eventTypes || []}
+          onFilterChange={handleFilterChange}
         />
         <AdminEventsTable
           events={filteredEvents}
           onEdit={handleEventEdit}
-          eventTypes={appMetaData.eventTypes}
           selectedEvent={selectedEvent}
           onEventDelete={handleDeletClick}
         />

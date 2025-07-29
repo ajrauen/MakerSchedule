@@ -51,7 +51,7 @@ const OccurenceDetails = ({
   >([]);
 
   const creatOccurrenceFormData = {
-    duration: undefined,
+    duration: selectedEvent.duration,
     leaders: [],
   };
 
