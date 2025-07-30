@@ -1,5 +1,5 @@
 import { deleteEvent } from "@ms/api/event.api";
-import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmatoin";
+import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { useAdminUsersData } from "@ms/hooks/useAdminUsersData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";

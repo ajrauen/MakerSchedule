@@ -17,8 +17,7 @@ import { z } from "zod";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
 import { useAppSelector } from "@ms/redux/hooks";
 import { selectAdminState } from "@ms/redux/slices/adminSlice";
-import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
-
+import RestoreIcon from "@mui/icons-material/Restore";
 const createEventvalidationSchema = z.object({
   eventName: z
     .string()
@@ -203,6 +202,39 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
               options={eventTypeOptions}
             />
           </div>
+          <div className="flex flex-col gap-3 w-1/2">
+            {thumbnailUrl || thumbnailFile ? (
+              <div className="flex flex-row ">
+                <div className="flex flex-col ">
+                  <img
+                    className="w-18 h-full object-cover mb-4"
+                    src={
+                      (thumbnailFile && URL.createObjectURL(thumbnailFile)) ||
+                      thumbnailUrl
+                    }
+                    alt="Event Preview"
+                  />
+                </div>
+
+                <span className="">
+                  <Button
+                    startIcon={<RestoreIcon />}
+                    onClick={handleThunbnailReset}
+                  >
+                    Reset
+                  </Button>
+                </span>
+              </div>
+            ) : (
+              <div>
+                <ImageUpload
+                  control={control}
+                  name="thumbnailFile"
+                  error={errors.thumbnailFile?.message}
+                />
+              </div>
+            )}
+          </div>
         </div>
         <FormTextField
           name="description"
@@ -211,34 +243,6 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
           multiline
           rows={7}
         />
-        {thumbnailUrl || thumbnailFile ? (
-          <div className="flex flex-row">
-            <div className="flex flex-col">
-              <img
-                src={
-                  (thumbnailFile && URL.createObjectURL(thumbnailFile)) ||
-                  thumbnailUrl
-                }
-                alt="Event Preview"
-                className="w-48 h-full object-cover mb-4"
-              />
-            </div>
-
-            <span>
-              <Button variant="contained" onClick={handleThunbnailReset}>
-                Reset
-              </Button>
-            </span>
-          </div>
-        ) : (
-          <div>
-            <ImageUpload
-              control={control}
-              name="thumbnailFile"
-              error={errors.thumbnailFile?.message}
-            />
-          </div>
-        )}
       </div>
       <FormFooter
         onCancel={handleOnClose}

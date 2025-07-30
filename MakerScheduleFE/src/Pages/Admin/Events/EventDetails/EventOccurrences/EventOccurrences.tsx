@@ -27,10 +27,6 @@ const EventOccurrences = ({}: EventOccurrencesProps) => {
     }
   }, [selectedEventOccurrence]);
 
-  const handleOccurrenceSelection = (occ: Occurrence) => {
-    handleViewChange(dispatch(setSelectedEventOccurrence(occ)));
-  };
-
   useEffect(() => {
     if (selectedEvent && !selectedEventOccurrence) {
       setShowDetails(false);

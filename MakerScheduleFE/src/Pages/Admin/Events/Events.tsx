@@ -1,5 +1,5 @@
 import { deleteEvent } from "@ms/api/event.api";
-import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmatoin";
+import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { EventCalendar } from "@ms/Pages/Admin/Events/Calendar/EventsCalendar";
 import { EventDetails } from "@ms/Pages/Admin/Events/EventDetails/EventDetails";

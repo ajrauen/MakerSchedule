@@ -1,5 +1,5 @@
 import { deleteEventType } from "@ms/api/eventTypes.api";
-import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmatoin";
+import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { useAdminEventTypeData } from "@ms/hooks/useAdminEventTypesData";
 import { EventTypeDetails } from "@ms/Pages/Admin/EventTypes/EventTypeDetails/EventTypeDetails";
 

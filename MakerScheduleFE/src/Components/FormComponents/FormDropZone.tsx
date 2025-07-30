@@ -9,6 +9,9 @@ interface FormDropZoneProps {
   control?: Control<any>;
   name?: string;
   error?: string;
+  showFileNames?: boolean;
+  value?: File | File[];
+  onChange?: (value: File | File[]) => void;
 }
 
 const DropZoneInner = ({
@@ -18,14 +21,8 @@ const DropZoneInner = ({
   value,
   onChange,
   error,
-}: {
-  onDrop?: (files: File[]) => void;
-  accept?: Accept;
-  multiple?: boolean;
-  value?: File | File[];
-  onChange?: (value: File | File[]) => void;
-  error?: string;
-}) => {
+  showFileNames = false,
+}: FormDropZoneProps) => {
   const [rejectedFiles, setRejectedFiles] = React.useState<File[]>([]);
 
   const handleDrop = React.useCallback(
@@ -81,12 +78,8 @@ const DropZoneInner = ({
         <input
           {...(getInputProps() as React.InputHTMLAttributes<HTMLInputElement>)}
         />
-        <p className="text-gray-500">
-          {isDragActive
-            ? "Drop the files here..."
-            : "Drag & drop files here, or click to select files"}
-        </p>
-        {filesToShow.length > 0 && (
+        <p className="text-gray-500">"Drop the files here..."</p>
+        {showFileNames && filesToShow.length > 0 && (
           <ul className="mt-2 text-left text-sm text-gray-700">
             {filesToShow.map((file) => (
               <li key={file.name}>{file.name}</li>
