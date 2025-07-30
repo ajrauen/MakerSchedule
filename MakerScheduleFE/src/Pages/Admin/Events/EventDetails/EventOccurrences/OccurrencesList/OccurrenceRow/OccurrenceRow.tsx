@@ -2,6 +2,11 @@ import { getAvailableDomainUserLeaders } from "@ms/api/domain-user.api";
 import { deleteOccurrence } from "@ms/api/occurrence.api";
 import { queryClient } from "@ms/common/query-client";
 import { OccurrenceTime } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrenceTime/OccurrenceTime";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import {
+  selectAdminState,
+  setSelectedEventOccurrence,
+} from "@ms/redux/slices/adminSlice";
 import type { EventOffering } from "@ms/types/event.types";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -11,25 +16,22 @@ import { toast } from "react-toastify";
 
 interface OccurenceRowProps {
   occurrence: Occurrence;
-  onOccurenceSelect: (occurrence: Occurrence) => void;
-  selectedEvent: EventOffering;
 }
 
-const OccurenceRow = ({
-  occurrence,
-  onOccurenceSelect,
-  selectedEvent,
-}: OccurenceRowProps) => {
+const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
   const query = queryClient
     .getQueryCache()
     .find({ queryKey: ["available-leaders", occurrence.id] });
+
+  const { selectedEvent } = useAppSelector(selectAdminState);
+  const dispatch = useAppDispatch();
 
   const { refetch: fetchAvailAbleLeaders } = useQuery({
     queryKey: ["available-leaders", occurrence.id],
     queryFn: () => {
       const isoString = occurrence.scheduleStart;
 
-      const apiDuration = occurrence.duration ?? selectedEvent.duration;
+      const apiDuration = occurrence.duration ?? selectedEvent?.duration ?? 0;
 
       if (!apiDuration) return;
 
@@ -74,13 +76,17 @@ const OccurenceRow = ({
     });
   };
 
+  const handleRowSelect = (occ: Occurrence) => {
+    dispatch(setSelectedEventOccurrence(occ));
+  };
+
   const isPastOccurrence = new Date(occurrence.scheduleStart) < new Date();
 
   return (
     <li
       key={occurrence.id}
       className="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer"
-      onClick={() => onOccurenceSelect(occurrence)}
+      onClick={() => handleRowSelect(occurrence)}
     >
       <div className="flex grow" onMouseOver={handleRowHover}>
         <div className="flex-1 flex  items-center">

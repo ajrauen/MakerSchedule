@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+using MakerSchedule.Application.DTO.EventType;
+
 using MakerSchedule.Application.DTO.Occurrence;
 
 namespace MakerSchedule.Application.DTO.Event;
@@ -14,11 +16,11 @@ public class EventDTO
     [Required]
     public required string Description { get; set; }
 
-    public required string EventType { get; set; }
+    public required EventTypeDTO EventType { get; set; }
 
     public int? Duration { get; set; }
     public string? ThumbnailUrl { get; set; }
-    public IEnumerable<OccurenceDTO> Occurences { get; set; } = new List<OccurenceDTO>();
+    public IEnumerable<OccurenceDTO> occurrences { get; set; } = new List<OccurenceDTO>();
 
 } 
 

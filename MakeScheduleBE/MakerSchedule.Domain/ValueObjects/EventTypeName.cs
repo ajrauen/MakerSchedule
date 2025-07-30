@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+namespace MakerSchedule.Domain.ValueObjects;
+
 public record EventTypeName
 {
     public string Value { get; }
@@ -8,6 +11,12 @@ public record EventTypeName
         Value = value.Trim();
     }
 
-    
-    public override string ToString() => Value;
+    public static ValueConverter<EventTypeName?, string?> Converter =>
+      new ValueConverter<EventTypeName?, string?>(
+          eventType => eventType == null ? (string?)null : eventType.Value,
+          value => value != null ? new EventTypeName(value) : null);
+
+    public static implicit operator string?(EventTypeName? eventTypeName) => eventTypeName?.Value;
+    public static implicit operator EventTypeName(string eventTypeName) => new EventTypeName(eventTypeName);
+
 }

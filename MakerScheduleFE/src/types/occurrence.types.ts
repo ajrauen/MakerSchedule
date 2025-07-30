@@ -6,6 +6,7 @@ interface OccurranceUsers {
 
 interface Occurrence {
   eventId: string;
+  eventName?: string;
   id?: string;
   scheduleStart: string;
   duration?: number;

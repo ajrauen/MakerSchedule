@@ -3,6 +3,8 @@ import { RouterProvider } from "@tanstack/react-router";
 import "./App.css";
 import { getRouterTree } from "@ms/configs/router.config";
 import { CircularProgress, createTheme, ThemeProvider } from "@mui/material";
+import { Provider } from "react-redux";
+import { store } from "@ms/redux/store";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -36,13 +38,15 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      {isLoading ? (
-        <div className="flex">
-          <CircularProgress size={"6rem"} className="mx-auto mt-[20%]" />
-        </div>
-      ) : (
-        <RouterProvider router={getRouterTree()} />
-      )}
+      <Provider store={store}>
+        {isLoading ? (
+          <div className="flex">
+            <CircularProgress size={"6rem"} className="mx-auto mt-[20%]" />
+          </div>
+        ) : (
+          <RouterProvider router={getRouterTree()} />
+        )}
+      </Provider>
     </ThemeProvider>
   );
 };

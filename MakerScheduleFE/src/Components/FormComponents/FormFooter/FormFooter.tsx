@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 
 interface FormFooterProps {
-  onCancel: (value: boolean) => void;
+  onCancel: () => void;
   onSubmit?: () => void;
   areActionsDisabled: boolean;
   isLoading: boolean;
@@ -19,11 +19,7 @@ const FormFooter = ({
 }: FormFooterProps) => {
   return (
     <div className="pt-4 ml-auto gap-3 flex">
-      <Button
-        type="button"
-        onClick={() => onCancel(false)}
-        disabled={areActionsDisabled}
-      >
+      <Button type="button" onClick={onCancel} disabled={areActionsDisabled}>
         {cancelButtonText}
       </Button>
       <Button

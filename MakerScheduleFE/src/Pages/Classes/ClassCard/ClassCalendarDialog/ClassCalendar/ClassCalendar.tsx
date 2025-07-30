@@ -17,8 +17,8 @@ interface ClassCalendarProps {
 export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
   // Only allow the event's day to be selected
   const eventDate = useMemo(() => {
-    if (!event?.occurences?.[0]?.scheduleStart) return undefined;
-    const d = new Date(event.occurences[0].scheduleStart);
+    if (!event?.occurrences?.[0]?.scheduleStart) return undefined;
+    const d = new Date(event.occurrences[0].scheduleStart);
     d.setHours(0, 0, 0, 0);
     return d;
   }, [event]);

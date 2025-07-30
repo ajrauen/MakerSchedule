@@ -2,7 +2,7 @@ namespace MakerSchedule.Domain.ValueObjects;
 
 public record EventName
 {
-    private string Value { get; init; }
+    public string Value { get; init; }
     public EventName(string name)
     {
         if (string.IsNullOrEmpty(name))

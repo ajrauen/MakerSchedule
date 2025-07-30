@@ -4,21 +4,20 @@ import { useForm } from "react-hook-form";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { useEffect, useMemo } from "react";
-import type {
-  CreateEventOffering,
-  EventOffering,
-  EventType,
-} from "@ms/types/event.types";
+import type { CreateEventOffering, EventType } from "@ms/types/event.types";
 import {
   createSaveForm,
   createUpdateForm,
   durationOptions,
 } from "@ms/Pages/Admin/Events/utils/event.utils";
 import { ImageUpload } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/ImageUpload";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createEvent, patchEvent } from "@ms/api/event.api";
 import { z } from "zod";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
+import { useAppSelector } from "@ms/redux/hooks";
+import { selectAdminState } from "@ms/redux/slices/adminSlice";
+import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 
 const createEventvalidationSchema = z.object({
   eventName: z
@@ -33,14 +32,14 @@ const createEventvalidationSchema = z.object({
   thumbnailFile: z
     .instanceof(File, { error: "Event Image is required" })
     .optional(),
-  eventType: z.string(),
+  eventTypeId: z.string(),
 });
 
 type CreateEventFormData = z.infer<typeof createEventvalidationSchema>;
 
 const createEventInitialFormData = {
   eventName: "",
-  eventType: "",
+  eventTypeId: "",
   description: "",
   duration: undefined,
   imageUrl: undefined,
@@ -49,15 +48,13 @@ const createEventInitialFormData = {
 
 interface BasicEventDetailsProps {
   onClose: (refreshData: boolean) => void;
-  selectedEvent: EventOffering;
   eventTypes: EventType[];
 }
 
-const BasicEventDetails = ({
-  onClose,
-  selectedEvent,
-  eventTypes,
-}: BasicEventDetailsProps) => {
+const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
+  const { selectedEvent } = useAppSelector(selectAdminState);
+  const queryClicent = useQueryClient();
+
   const {
     getValues,
     control,
@@ -71,8 +68,10 @@ const BasicEventDetails = ({
   });
 
   useEffect(() => {
+    if (!selectedEvent) return;
+
     if (selectedEvent.meta?.isNew) {
-      reset(createEventInitialFormData);
+      reset(structuredClone(createEventInitialFormData));
       return;
     }
 
@@ -81,17 +80,20 @@ const BasicEventDetails = ({
         description: selectedEvent.description,
         eventName: selectedEvent.eventName,
         duration: selectedEvent.duration,
-        eventType: selectedEvent.eventType?.toString() ?? "",
+        eventTypeId: selectedEvent.eventType?.id || "",
         thumbnailUrl: selectedEvent.thumbnailUrl,
         thumbnailFile: undefined,
       };
-      reset(editEvent);
+      reset(structuredClone(editEvent));
     }
   }, [selectedEvent]);
 
   const handleOnClose = (refreshData = false) => {
     onClose(refreshData);
     reset(createEventInitialFormData);
+    queryClicent.invalidateQueries({
+      queryKey: ["events"],
+    });
   };
 
   const { mutate: saveEventQuery, isPending: isSavePending } = useMutation({
@@ -108,16 +110,19 @@ const BasicEventDetails = ({
   });
 
   const handleSave = () => {
-    const { description, eventName, duration, thumbnailFile, eventType } =
+    if (!selectedEvent) return;
+
+    const { description, eventName, duration, thumbnailFile, eventTypeId } =
       getValues();
 
     if (selectedEvent.meta?.isNew) {
       if (!thumbnailFile) return;
+
       const eventOffering: CreateEventOffering = {
         description,
         eventName,
         duration: duration,
-        eventType: eventType,
+        eventTypeId: eventTypeId,
         thumbnailFile,
       };
       const formEvent = createSaveForm(eventOffering);
@@ -135,13 +140,15 @@ const BasicEventDetails = ({
         {} as CreateEventFormData
       );
 
-      if (dirtyValues.eventType) {
-        (dirtyValues as any).eventType = dirtyValues.eventType;
+      if (dirtyValues.eventTypeId) {
+        (dirtyValues as any).eventType = dirtyValues.eventTypeId;
       }
 
       const dirtyValuesWithNumberEventType: Partial<CreateEventOffering> = {
         ...dirtyValues,
-        eventType: dirtyValues.eventType ? dirtyValues.eventType : undefined,
+        eventTypeId: dirtyValues.eventTypeId
+          ? dirtyValues.eventTypeId
+          : undefined,
       };
 
       const formEvent = createUpdateForm(dirtyValuesWithNumberEventType);
@@ -155,7 +162,7 @@ const BasicEventDetails = ({
 
   const eventTypeOptions = useMemo(() => {
     const options = eventTypes.map((event) => ({
-      value: event.id,
+      value: event.id ?? "",
       label: event.name,
     }));
 
@@ -191,7 +198,7 @@ const BasicEventDetails = ({
         <div className="flex flex-row gap-3 ">
           <div className="flex flex-col gap-3 w-1/2">
             <FormSelect
-              name="eventType"
+              name="eventTypeId"
               control={control}
               options={eventTypeOptions}
             />

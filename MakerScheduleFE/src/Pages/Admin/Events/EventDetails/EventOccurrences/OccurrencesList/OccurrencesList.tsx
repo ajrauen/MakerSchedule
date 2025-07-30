@@ -7,31 +7,24 @@ import { useMemo, useState } from "react";
 import { OccurrenceCalendarContext } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/context/occurrence-context";
 import { OccurenceCalendarDate } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurenceCalendarDate/OccurenceCalendarDate";
 import { OccurenceRow } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrenceRow/OccurrenceRow";
-import type { Occurrence } from "@ms/types/occurrence.types";
 import { IconButton } from "@mui/material";
 import { AddCircle } from "@mui/icons-material";
-import type { EventOffering } from "@ms/types/event.types";
+import { selectAdminState } from "@ms/redux/slices/adminSlice";
+import { useAppSelector } from "@ms/redux/hooks";
 
-interface OccurencesListProps {
-  occurences?: Occurrence[];
-  onOccurenceSelect: (occurrence: Occurrence) => void;
-  onOccurenceCreate: (selectedDate: Date) => void;
-  selectedEvent: EventOffering;
+interface OccurrencesListProps {
+  onOccurrenceCreate: (selectedDate: Date) => void;
 }
 
-const OccurencesList = ({
-  occurences = [],
-  onOccurenceSelect,
-  onOccurenceCreate,
-  selectedEvent,
-}: OccurencesListProps) => {
+const OccurrencesList = ({ onOccurrenceCreate }: OccurrencesListProps) => {
   const today = startOfDay(new Date());
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(today);
+  const { selectedEvent } = useAppSelector(selectAdminState);
 
   const occurrencesForDay = useMemo(() => {
-    if (!selectedDate) return [];
-    return occurences
+    if (!selectedDate || !selectedEvent?.occurrences) return [];
+    return selectedEvent.occurrences
       .filter(
         (o) =>
           startOfDay(selectedDate).getTime() ===
@@ -49,12 +42,12 @@ const OccurencesList = ({
     if (!date) {
       date = new Date();
     }
-    onOccurenceCreate(date);
+    onOccurrenceCreate(date);
   };
 
   return (
     <OccurrenceCalendarContext.Provider
-      value={{ today, occurences: occurences }}
+      value={{ today, occurrences: selectedEvent?.occurrences ?? [] }}
     >
       <div className="flex flex-col items-center gap-4 overflow-y-auto h-full pb-8">
         <div className=" min-h-[255px]">
@@ -78,12 +71,7 @@ const OccurencesList = ({
           {occurrencesForDay.length > 0 ? (
             <ul className="divide-y divide-gray-200 bg-white rounded shadow">
               {occurrencesForDay.map((occ) => (
-                <OccurenceRow
-                  occurrence={occ}
-                  selectedEvent={selectedEvent}
-                  onOccurenceSelect={onOccurenceSelect}
-                  key={occ.id}
-                />
+                <OccurenceRow occurrence={occ} key={occ.id} />
               ))}
             </ul>
           ) : (
@@ -97,4 +85,4 @@ const OccurencesList = ({
   );
 };
 
-export { OccurencesList };
+export { OccurrencesList };

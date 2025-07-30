@@ -116,6 +116,10 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
     }
   };
 
+  const handleClose = () => {
+    onClose(false);
+  };
+
   return (
     <div>
       <form
@@ -124,7 +128,7 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
       >
         <FormTextField name="eventTypeName" label="Name" control={control} />
         <FormFooter
-          onCancel={onClose}
+          onCancel={handleClose}
           areActionsDisabled={isSavePending || isPatchPending}
           isLoading={isSavePending || isPatchPending}
           cancelButtonText={isNew ? "Cancel" : "Back"}

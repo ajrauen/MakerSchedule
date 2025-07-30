@@ -4,9 +4,9 @@ import { startOfDay } from "date-fns";
 import { useContext, useState } from "react";
 
 const OccurenceCalendarDate = (props: PickersDayProps) => {
-  const { occurences, today } = useContext(OccurrenceCalendarContext);
+  const { occurrences, today } = useContext(OccurrenceCalendarContext);
 
-  const occurenceDates = occurences.map((o) =>
+  const occurenceDates = occurrences.map((o) =>
     startOfDay(new Date(o.scheduleStart)).getTime()
   );
 

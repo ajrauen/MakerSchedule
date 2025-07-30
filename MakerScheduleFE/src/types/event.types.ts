@@ -8,17 +8,18 @@ interface EventOffering {
   leaders?: number[];
   duration?: number;
   price?: number;
-  eventType?: string;
+  eventType?: EventType;
   thumbnailUrl?: string;
-  occurences?: Occurrence[];
+  occurrences?: Occurrence[];
   meta?: Record<string, string | boolean | number>;
 }
 
 type CreateEventOffering = Omit<
   EventOffering,
-  "id" | "thumbnailUrl | occurences"
+  "id" | "thumbnailUrl" | "occurrences" | "eventType"
 > & {
   thumbnailFile: File;
+  eventTypeId: string;
 };
 
 type UpdateEventOffering = Partial<CreateEventOffering> & {
@@ -26,7 +27,7 @@ type UpdateEventOffering = Partial<CreateEventOffering> & {
 };
 
 interface EventType {
-  id?: string;
+  id: string;
   name: string;
   meta?: Record<string, string | boolean | number>;
 }

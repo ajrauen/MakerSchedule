@@ -1,20 +1,21 @@
 import { deleteEvent } from "@ms/api/event.api";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmatoin";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
+import { EventCalendar } from "@ms/Pages/Admin/Events/Calendar/EventsCalendar";
 import { EventDetails } from "@ms/Pages/Admin/Events/EventDetails/EventDetails";
 import { EventsHeader } from "@ms/Pages/Admin/Events/Header/Header";
 import { AdminEventsTable } from "@ms/Pages/Admin/Events/Table/Table";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import {
+  selectAdminState,
+  setSelectedEvent,
+} from "@ms/redux/slices/adminSlice";
 import type { EventOffering } from "@ms/types/event.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import { useEffect, useState, type TransitionEvent } from "react";
 
 const AdminEvents = () => {
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [refreshData, setRefreshData] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<EventOffering | undefined>(
-    undefined
-  );
   const [eventToDelete, setEventToDelete] = useState<
     EventOffering | undefined
   >();
@@ -23,8 +24,11 @@ const AdminEvents = () => {
   const [filteredEvents, setFilteredEvents] = useState<EventOffering[]>([]);
   const [searchString, setSearchString] = useState("");
   const [filterValue, setFilterValue] = useState("");
+  const [viewState, setViewState] = useState("table");
 
   const queryClient = useQueryClient();
+  const { selectedEvent, adminDrawerOpen } = useAppSelector(selectAdminState);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!events) return;
@@ -49,51 +53,12 @@ const AdminEvents = () => {
       );
 
       if (selectedEvent?.id === eventToDelete.id) {
-        setSelectedEvent(undefined);
+        dispatch(setSelectedEvent(undefined));
       }
 
       setEventToDelete(undefined);
     },
   });
-
-  const handleDrawerClose = (refreshData: boolean) => {
-    setRefreshData(refreshData);
-    setIsDrawerOpen(false);
-  };
-
-  const handleEventEdit = (event: EventOffering) => {
-    setSelectedEvent(event);
-    handleDrawerOpen();
-  };
-
-  const handleEventCreate = () => {
-    const newEvent: EventOffering = {
-      description: "",
-      eventName: "",
-
-      meta: {
-        isNew: true,
-      },
-    };
-    setSelectedEvent(newEvent);
-    handleDrawerOpen();
-  };
-  const handleDrawerOpen = () => {
-    setRefreshData(false);
-    setIsDrawerOpen(true);
-  };
-
-  const handlePanelTransitionEnd = (event: TransitionEvent<HTMLDivElement>) => {
-    if (
-      event.propertyName === "transform" &&
-      event.target === event.currentTarget &&
-      refreshData
-    ) {
-      queryClient.invalidateQueries({
-        queryKey: ["events"],
-      });
-    }
-  };
 
   const handleDeletClick = (event: EventOffering) => {
     setEventToDelete(event);
@@ -116,8 +81,8 @@ const AdminEvents = () => {
       }) || [];
 
     if (filterValue) {
-      filtered = filtered.filter((event) =>
-        event.eventType?.includes(filterValue)
+      filtered = filtered.filter(
+        (event) => event.eventType?.id === filterValue
       );
     }
 
@@ -135,39 +100,37 @@ const AdminEvents = () => {
   return (
     <div className="flex w-full h-full overflow-hidden pb-12">
       <div
-        className={`flex-grow basis-0 transition-all duration-300  flex-col ${isDrawerOpen ? "hidden md:flex" : ""}`}
+        className={`flex-grow basis-0 transition-all duration-300  flex-col ${adminDrawerOpen ? "hidden md:flex" : ""}`}
         style={{
-          marginRight: isDrawerOpen ? "var(--create-drawer-width)" : "",
+          marginRight: adminDrawerOpen ? "var(--create-drawer-width)" : "",
         }}
       >
         <EventsHeader
-          onCreateEvent={handleEventCreate}
           onSearch={handleSearch}
           eventTypes={appMetaData.eventTypes || []}
           onFilterChange={handleFilterChange}
+          onSetViewState={setViewState}
+          viewState={viewState}
         />
-        <AdminEventsTable
-          events={filteredEvents}
-          onEdit={handleEventEdit}
-          selectedEvent={selectedEvent}
-          onEventDelete={handleDeletClick}
-        />
+        {viewState === "calendar" ? (
+          <EventCalendar selectedEventType={filterValue} />
+        ) : (
+          <AdminEventsTable
+            events={filteredEvents}
+            onEventDelete={handleDeletClick}
+          />
+        )}
       </div>
       <div
         className="fixed top-0 right-0 h-full bg-white shadow-lg z-50 transition-transform duration-300 w-full md:w-[var(--create-drawer-width)]"
         style={{
           willChange: "transform",
-          transform: isDrawerOpen ? "translateX(0)" : "translateX(100%)",
+          transform: adminDrawerOpen ? "translateX(0)" : "translateX(100%)",
         }}
-        onTransitionEnd={handlePanelTransitionEnd}
       >
         <div className="p-6 h-full">
           {selectedEvent && (
-            <EventDetails
-              onClose={handleDrawerClose}
-              selectedEvent={selectedEvent}
-              eventTypes={appMetaData.eventTypes}
-            />
+            <EventDetails eventTypes={appMetaData.eventTypes} />
           )}
         </div>
       </div>

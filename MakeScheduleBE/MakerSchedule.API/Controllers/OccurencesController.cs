@@ -1,13 +1,16 @@
 using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Interfaces;
-
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Mime;
+
 
 namespace MakerSchedule.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Produces("application/json")]
+[Produces(MediaTypeNames.Application.Json)]
+[Consumes(MediaTypeNames.Application.Json)]
 public class OccurrencesController(IEventService eventService) : ControllerBase
 {
     [HttpPost]
@@ -30,7 +33,14 @@ public class OccurrencesController(IEventService eventService) : ControllerBase
         var isSuccess = await eventService.DeleteOccuranceAsync(id);
         return Ok(isSuccess);
     }
-}
 
-    // [HttpGet("{id}")]
-    // public async Task<ActionResult<EventDTO>> GetEvent(Guid id)
+    [HttpGet()]
+
+    public async Task<ActionResult> GetOccurancesByDateAsync([FromQuery] SearchOccurrenceDTO search)
+        
+    {
+        var occurrences = await eventService.GetOccurancesByDateAsync(search);
+        return Ok(occurrences);
+    }   
+
+}

@@ -1,6 +1,7 @@
 using MakerSchedule.Application.DTO.EventType;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Domain.Aggregates.EventType;
+using MakerSchedule.Domain.ValueObjects;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

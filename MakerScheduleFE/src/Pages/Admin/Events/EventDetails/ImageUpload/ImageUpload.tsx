@@ -12,7 +12,6 @@ interface ImageUploadProps {
 
 const ImageUpload = ({ control, name, error }: ImageUploadProps) => {
   const [showCropper, setShowCropper] = useState(false);
-  const [newEventFileUrl, setNewEventFileUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
 
   let img = new window.Image();

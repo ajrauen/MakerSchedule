@@ -1,9 +1,11 @@
 import { sendRequest } from "@ms/api/api.utils";
 import type {
   CreateOccurrence,
+  Occurrence,
   UpdateOccurrence,
 } from "@ms/types/occurrence.types";
 import type { AxiosRequestConfig } from "axios";
+import { start } from "repl";
 
 const BASE_OCCURRENCE_ENDPOINT = "api/Occurrences";
 
@@ -39,4 +41,27 @@ const deleteOccurrence = async (occurrenceId: string) => {
   return await sendRequest<number>(req);
 };
 
-export { createOccurrence, updateOccurrence, deleteOccurrence };
+const getOccurrences = async (
+  startDate: Date,
+  endDate: Date,
+  eventType: string | undefined
+) => {
+  let url = `${BASE_OCCURRENCE_ENDPOINT}?`;
+  if (startDate && endDate) {
+    url += `startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
+  }
+
+  if (eventType) {
+    url += `&eventType=${eventType}`;
+  }
+
+  const req: AxiosRequestConfig = {
+    method: "GET",
+    url: url,
+    withCredentials: true,
+  };
+
+  return await sendRequest<Occurrence[]>(req);
+};
+
+export { createOccurrence, updateOccurrence, deleteOccurrence, getOccurrences };

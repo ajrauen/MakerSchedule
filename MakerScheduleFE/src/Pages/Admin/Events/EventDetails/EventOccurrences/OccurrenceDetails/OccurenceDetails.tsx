@@ -7,11 +7,9 @@ import { createOccurrence, updateOccurrence } from "@ms/api/occurrence.api";
 import { FormDateTime } from "@ms/Components/FormComponents/FormDateTime/FormDateTime";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { durationOptions } from "@ms/Pages/Admin/Events/utils/event.utils";
-import type { EventOffering } from "@ms/types/event.types";
 import type { SelectOption } from "@ms/types/form.types";
 import type {
   CreateOccurrence,
-  Occurrence,
   UpdateOccurrence,
 } from "@ms/types/occurrence.types";
 import type { PickerValidDate } from "@mui/x-date-pickers";
@@ -22,10 +20,10 @@ import { z } from "zod";
 import { toast } from "react-toastify";
 import type { DomainUser } from "@ms/types/domain-user.types";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
+import { selectAdminState } from "@ms/redux/slices/adminSlice";
+import { useAppSelector } from "@ms/redux/hooks";
 
 interface OccurenceDetailsProps {
-  selectedEvent: EventOffering;
-  occurrence?: Occurrence;
   onCancel: () => void;
 }
 
@@ -39,28 +37,21 @@ type CreateOccurrenceFormData = z.infer<
   typeof createOccurrenceValidationSchema
 >;
 
-const OccurenceDetails = ({
-  occurrence,
-  selectedEvent,
-  onCancel,
-}: OccurenceDetailsProps) => {
-  const [isFormDataSet, setIsFormDataSet] = useState(false);
+const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
   const [removedLeaders, setRemovedLeaders] = useState<DomainUser[]>([]);
   const [availableLeaderOptions, setAvailableLeaderOptions] = useState<
     SelectOption[]
   >([]);
 
-  const creatOccurrenceFormData = {
-    duration: selectedEvent.duration,
-    leaders: [],
-  };
+  const { selectedEvent, selectedEventOccurrence } =
+    useAppSelector(selectAdminState);
 
   const queryClient = useQueryClient();
 
   const { control, handleSubmit, reset, watch, getValues, setValue } =
     useForm<CreateOccurrenceFormData>({
       resolver: zodResolver(createOccurrenceValidationSchema),
-      defaultValues: creatOccurrenceFormData,
+      defaultValues: undefined,
     });
 
   const { data: domainLeaderResponse } = useQuery({
@@ -77,19 +68,19 @@ const OccurenceDetails = ({
     data: availableLeaderResponse,
     isFetching: isLoadingAvailableLeaders,
   } = useQuery({
-    queryKey: ["available-leaders", selectedEvent.id],
+    queryKey: ["available-leaders", selectedEvent?.id],
     queryFn: () => {
       const isoString = time.toISOString();
 
-      const apiDuration = duration ?? selectedEvent.duration;
+      const apiDuration = duration ?? selectedEvent?.duration;
 
       if (!apiDuration) return;
 
       return getAvailableDomainUserLeaders(
         isoString,
         apiDuration,
-        occurrence?.id ?? "",
-        occurrence?.leaders?.map((leader) => leader.id)
+        selectedEventOccurrence?.id ?? "",
+        selectedEventOccurrence?.leaders?.map((leader) => leader.id)
       );
     },
     staleTime: 4000,
@@ -124,43 +115,49 @@ const OccurenceDetails = ({
     });
 
   useEffect(() => {
-    if (occurrence?.meta?.isNew) {
-      let defaultDate = new Date(occurrence.scheduleStart);
+    if (selectedEventOccurrence?.meta?.isNew) {
+      let defaultDate = new Date(selectedEventOccurrence.scheduleStart);
       if (defaultDate < new Date()) {
         defaultDate = new Date();
         defaultDate.setHours(10, 0, 0, 0);
       }
 
       reset({
-        ...creatOccurrenceFormData,
         scheduleStart: defaultDate,
-        leaders: occurrence?.leaders?.map((leader) => leader.id) ?? [],
+        duration: selectedEvent?.duration,
+        leaders:
+          selectedEventOccurrence?.leaders?.map((leader) => leader.id) ?? [],
       });
-      setIsFormDataSet(true);
+      setAvailableLeader();
     } else {
       let scheduleStartDate: Date;
-      if (occurrence?.scheduleStart) {
-        scheduleStartDate = new Date(occurrence.scheduleStart);
+      if (selectedEventOccurrence?.scheduleStart) {
+        scheduleStartDate = new Date(selectedEventOccurrence.scheduleStart);
       } else {
         scheduleStartDate = new Date();
       }
       reset({
         scheduleStart: scheduleStartDate,
-        duration: occurrence?.duration,
-        leaders: occurrence?.leaders?.map((leader) => leader.id) ?? [],
+        duration: selectedEventOccurrence?.duration,
+        leaders:
+          selectedEventOccurrence?.leaders?.map((leader) => leader.id) ?? [],
       });
-      setIsFormDataSet(true);
+      setAvailableLeader();
     }
-  }, [occurrence]);
+  }, [selectedEventOccurrence]);
 
   useEffect(() => {
-    if (!availableLeaderResponse?.data || !isFormDataSet) return;
+    if (!availableLeaderResponse?.data) return;
 
+    setAvailableLeader();
+  }, [availableLeaderResponse?.data]);
+
+  const setAvailableLeader = () => {
     let availableLeaderOptions: SelectOption[] = [];
     //get the default leader options.
-    if (occurrence?.status.toLowerCase() === "complete") {
+    if (selectedEventOccurrence?.status.toLowerCase() === "complete") {
       const leaders: SelectOption[] =
-        occurrence.leaders?.map((leader) => ({
+        selectedEventOccurrence.leaders?.map((leader) => ({
           label: `${leader.firstName} ${leader.lastName}`,
           value: leader.id,
         })) ?? [];
@@ -208,10 +205,10 @@ const OccurenceDetails = ({
     setAvailableLeaderOptions(availableLeaderOptions);
     setRemovedLeaders(unavailableLeaderObjectArray);
     setValue("leaders", availableLeaders);
-  }, [availableLeaderResponse?.data, isFormDataSet]);
+  };
 
   useEffect(() => {
-    if (occurrence?.status.toLowerCase() === "complete") return;
+    if (selectedEventOccurrence?.status.toLowerCase() === "complete") return;
 
     if (time && duration) {
       getAvailableLeaders();
@@ -225,11 +222,11 @@ const OccurenceDetails = ({
   };
 
   const onSave = () => {
-    if (!selectedEvent.id || !occurrence) return;
+    if (!selectedEvent?.id || !selectedEventOccurrence) return;
 
     const { scheduleStart, duration, leaders } = getValues();
 
-    if (occurrence?.meta?.isNew) {
+    if (selectedEventOccurrence?.meta?.isNew) {
       const createOccurrenceObj: CreateOccurrence = {
         eventId: selectedEvent.id,
         scheduleStart: scheduleStart.toISOString(),
@@ -243,7 +240,7 @@ const OccurenceDetails = ({
         scheduleStart: scheduleStart.toISOString(),
         duration,
         leaders: leaders ?? [],
-        id: occurrence.id,
+        id: selectedEventOccurrence.id,
       };
 
       updateOccurrenceMutation({ occurrence: updateOccurrenceObj });
@@ -271,7 +268,7 @@ const OccurenceDetails = ({
           control={control}
           options={availableLeaderOptions}
           label={
-            occurrence?.status.toLowerCase() === "complete"
+            selectedEventOccurrence?.status.toLowerCase() === "complete"
               ? "Assigned Leanders"
               : "Assign Leaders"
           }
@@ -291,13 +288,15 @@ const OccurenceDetails = ({
         )}
 
         <FormFooter
-          handleOnClose={onCancel}
+          onCancel={onCancel}
           areActionsDisabled={isCreatePending || isUpdatePending}
           isLoading={isCreatePending || isUpdatePending}
           cancelButtonText={
-            occurrence?.status.toLowerCase() === "pending" ? "Cancel" : "Back"
+            selectedEventOccurrence?.status.toLowerCase() === "pending"
+              ? "Cancel"
+              : "Back"
           }
-          saveButtonText={occurrence?.id ? "Update" : "Save"}
+          saveButtonText={selectedEventOccurrence?.id ? "Update" : "Save"}
         />
       </div>
     </form>

@@ -2,7 +2,7 @@ import { createContext } from "react";
 
 const OccurrenceCalendarContext = createContext<{
   today: Date;
-  occurences: any[];
-}>({ today: new Date(), occurences: [] });
+  occurrences: any[];
+}>({ today: new Date(), occurrences: [] });
 
 export { OccurrenceCalendarContext };
