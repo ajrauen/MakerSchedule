@@ -103,7 +103,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         };
     }
 
-    public async Task<Guid> CreateEventAsync(CreateEventDTO dto)
+    public async Task<EventDTO> CreateEventAsync(CreateEventDTO dto)
     {
 
         if (dto.FormFile == null || dto.FormFile.Length == 0)
@@ -163,13 +163,34 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             throw new InvalidOperationException("Failed to save event image", ex);
         }
 
-        return e.Id;
+        return new EventDTO
+        {
+            Id = e.Id,
+            EventName = e.EventName.ToString(),
+            Description = e.Description,
+            EventType = new EventTypeDTO
+            {
+                Id = eventType.Id,
+                Name = eventType.Name.Value
+            },
+            Duration = e.Duration,
+            ThumbnailUrl = e.ThumbnailUrl,
+            occurrences = new List<OccurenceDTO>()
+        };
     }
 
 
-    public async Task<Guid> PatchEventAsync(Guid eventId, PatchEventDTO dto)
+    public async Task<EventDTO> PatchEventAsync(Guid eventId, PatchEventDTO dto)
     {
-        var e = await _context.Events.FindAsync(eventId);
+        var e = await _context.Events
+            .Include(ev => ev.EventType)
+            .Include(ev => ev.Occurrences)
+                .ThenInclude(o => o.Attendees)
+                    .ThenInclude(a => a.User)
+            .Include(ev => ev.Occurrences)
+                .ThenInclude(o => o.Leaders)
+                    .ThenInclude(l => l.User)
+            .FirstOrDefaultAsync(ev => ev.Id == eventId);
         if (e == null)
         {
             throw new NotFoundException($"Event with id {eventId} not found", eventId);
@@ -236,7 +257,48 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         }
 
         await _context.SaveChangesAsync();
-        return e.Id;
+        
+        if (e.EventType == null)
+        {
+            throw new InvalidOperationException($"Event {e.Id} has no associated EventType");
+        }
+        
+        return new EventDTO
+        {
+            Id = e.Id,
+            EventName = e.EventName.ToString(),
+            Description = e.Description,
+            EventType = new EventTypeDTO
+            {
+                Id = e.EventType.Id,
+                Name = e.EventType.Name.Value
+            },
+            Duration = e.Duration,
+            ThumbnailUrl = e.ThumbnailUrl,
+            occurrences = e.Occurrences
+                .Where(o => !o.isDeleted)
+                .Select(o => new OccurenceDTO
+                {
+                    Id = o.Id,
+                    Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
+                    {
+                        Id = a.UserId.ToString().ToLower(),
+                        FirstName = a.User?.FirstName ?? "",
+                        LastName = a.User?.LastName ?? ""
+                    }).ToList(),
+                    Duration = o.Duration,
+                    EventId = o.EventId,
+                    Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
+                    {
+                        Id = l.UserId.ToString().ToLower(),
+                        FirstName = l.User?.FirstName ?? "",
+                        LastName = l.User?.LastName ?? ""
+                    }).ToList(),
+                    ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
+                    Status = o.Status
+                }).ToList()
+        };
+
     }
 
 

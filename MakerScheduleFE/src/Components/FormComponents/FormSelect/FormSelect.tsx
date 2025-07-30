@@ -45,13 +45,13 @@ const FormSelect = <T extends FieldValues, C>({
           name={name as Path<T>}
           control={control}
           render={({ field, fieldState }) => (
-            <>
+            <FormControl fullWidth error={!!fieldState.error}>
               <Select
                 options={options}
                 multiSelect={multiSelect}
                 label={label}
-                helperText={fieldState.error?.message || helperText}
                 isLoading={isLoading}
+                error={!!fieldState.error?.message}
                 {...field}
                 value={
                   multiSelect
@@ -73,22 +73,25 @@ const FormSelect = <T extends FieldValues, C>({
                   }
                 }}
               />
-            </>
+              {(fieldState.error?.message || helperText) && (
+                <FormHelperText>
+                  {fieldState.error?.message ?? helperText}
+                </FormHelperText>
+              )}
+            </FormControl>
           )}
         />
       ) : (
-        <>
-          <Select
-            name={name}
-            options={options}
-            multiSelect={multiSelect}
-            label={label}
-            helperText={helperText}
-            isLoading={isLoading}
-            {...props}
-          />
-          {helperText && <FormHelperText>{helperText}</FormHelperText>}
-        </>
+        <Select
+          name={name}
+          options={options}
+          multiSelect={multiSelect}
+          label={label}
+          helperText={helperText}
+          isLoading={isLoading}
+          {...props}
+          error={!!helperText}
+        />
       )}
     </FormControl>
   );

@@ -7,7 +7,6 @@ import {
   selectAdminState,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
-import type { EventOffering } from "@ms/types/event.types";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { IconButton } from "@mui/material";

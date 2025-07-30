@@ -8,18 +8,8 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class EventsController : ControllerBase
+public class EventsController(IEventService _eventService) : ControllerBase
 {
-    private readonly IEventService _eventService;
-    private ILogger<EventsController> _logger;
-
-    public EventsController(IEventService eventService, ILogger<EventsController> logger)
-    {
-        _eventService = eventService;
-        _logger = logger;
-    }
-
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EventListDTO>>> GetAllEvents()
     {
@@ -37,18 +27,18 @@ public class EventsController : ControllerBase
 
     [HttpPost]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> CreateEvent([FromForm] CreateEventDTO dto)
+    public async Task<ActionResult<EventDTO>> CreateEvent([FromForm] CreateEventDTO dto)
     {
-        var eventId = await _eventService.CreateEventAsync(dto);
-        return Ok(eventId);
+        var eventDto = await _eventService.CreateEventAsync(dto);
+        return Ok(eventDto);
     }
-
+    
     [HttpPatch("{id}")]
     [Consumes("multipart/form-data")]
-    public async Task<IActionResult> PathchEvent([FromForm] PatchEventDTO dto, Guid id)
+    public async Task<ActionResult<EventDTO>> PathchEvent([FromForm] PatchEventDTO dto, Guid id)
     {
-        var eventId = await _eventService.PatchEventAsync(id, dto);
-        return Ok(eventId);
+        var eventDto = await _eventService.PatchEventAsync(id, dto);
+        return Ok(eventDto);
     }
 
     [HttpDelete("{eventId}")]

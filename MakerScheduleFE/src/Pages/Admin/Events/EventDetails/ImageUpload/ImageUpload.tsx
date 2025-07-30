@@ -19,23 +19,6 @@ const ImageUpload = ({ control, name, error }: ImageUploadProps) => {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (file && file.type?.startsWith("image/")) {
-      const img = new window.Image();
-      img.onload = () => {
-        const aspect = img.width / img.height;
-        if (Math.abs(aspect - 4 / 3) < 0.01) {
-          setShowCropper(false);
-        } else {
-          setShowCropper(true);
-        }
-        URL.revokeObjectURL(img.src);
-      };
-      img.src = URL.createObjectURL(file);
-    }
-  }, [file]);
-
-  // Handler for cropping and updating form value
   const handleCropConfirm = async (onChange: (file: File) => void) => {
     if (!file || !croppedAreaPixels) return;
     const croppedBlob = await getCroppedImg(
@@ -65,10 +48,7 @@ const ImageUpload = ({ control, name, error }: ImageUploadProps) => {
     <Controller
       name={name}
       control={control}
-      render={({
-        field: { value, onChange },
-        fieldState: { error: fieldError },
-      }) => (
+      render={({ field: { onChange }, fieldState: { error: fieldError } }) => (
         <>
           <FormDropZone
             accept={{
@@ -77,10 +57,21 @@ const ImageUpload = ({ control, name, error }: ImageUploadProps) => {
             }}
             error={error || fieldError?.message}
             onDrop={(files) => {
-              if (Array.isArray(files)) {
-                setFile(files[0]);
-              } else {
-                setFile(files);
+              const selectedFile = Array.isArray(files) ? files[0] : files;
+              setFile(selectedFile);
+              if (selectedFile && selectedFile.type?.startsWith("image/")) {
+                const img = new window.Image();
+                img.onload = () => {
+                  const aspect = img.width / img.height;
+                  if (Math.abs(aspect - 4 / 3) < 0.01) {
+                    setShowCropper(false);
+                    onChange(selectedFile);
+                  } else {
+                    setShowCropper(true);
+                  }
+                  URL.revokeObjectURL(img.src);
+                };
+                img.src = URL.createObjectURL(selectedFile);
               }
             }}
             dropText="Add Thumbnail"

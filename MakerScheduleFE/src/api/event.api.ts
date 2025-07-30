@@ -12,7 +12,7 @@ const createEvent = async (event: FormData) => {
     data: event,
   };
 
-  return await sendRequest<number>(req);
+  return await sendRequest<EventOffering>(req);
 };
 
 const updateEvent = async (id: string, event: FormData) => {
@@ -34,7 +34,7 @@ const patchEvent = async (id: string, event: FormData) => {
     data: event,
   };
 
-  return await sendRequest<number>(req);
+  return await sendRequest<EventOffering>(req);
 };
 
 const getEvents = async () => {

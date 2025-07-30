@@ -11,8 +11,8 @@ import { ToastContainer } from "react-toastify";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ErrorBoundary>
+      <ToastContainer />
       <QueryClientProvider client={queryClient}>
-        <ToastContainer />
         <App />
       </QueryClientProvider>
     </ErrorBoundary>

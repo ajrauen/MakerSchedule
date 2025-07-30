@@ -31,14 +31,8 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!selectedEvent) return;
-
-    if (selectedEvent.meta?.isNew) {
-      setValue(0);
-    } else {
-      setValue(1);
-    }
-  }, [selectedEvent?.meta?.isNew]);
+    setValue(0);
+  }, [selectedEvent]);
 
   useEffect(() => {
     if (selectedEventOccurrence) {
@@ -49,13 +43,9 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
   const { data: eventResponse } = useQuery({
     queryKey: ["event", selectedEvent?.id],
     queryFn: async () => {
-      if (!selectedEvent?.id) {
-        throw new Error("Query should not run without userId");
-      }
-
-      return getEvent(selectedEvent.id);
+      return getEvent(selectedEvent!.id!);
     },
-    enabled: !!selectedEvent?.id || !!selectedEvent?.meta?.isNew,
+    enabled: !!selectedEvent?.id,
   });
 
   function a11yProps(index: number) {
@@ -79,7 +69,7 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
 
     dispatch(setSelectedEvent(updatedEvent));
     return updatedEvent;
-  }, [eventResponse?.data]);
+  }, [eventResponse?.data || selectedEvent]);
 
   const handleClose = () => {
     if (selectedEvent?.meta?.isNew) {

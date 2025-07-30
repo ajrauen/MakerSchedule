@@ -4,7 +4,11 @@ import { useForm } from "react-hook-form";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { useEffect, useMemo } from "react";
-import type { CreateEventOffering, EventType } from "@ms/types/event.types";
+import type {
+  CreateEventOffering,
+  EventOffering,
+  EventType,
+} from "@ms/types/event.types";
 import {
   createSaveForm,
   createUpdateForm,
@@ -15,24 +19,35 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createEvent, patchEvent } from "@ms/api/event.api";
 import { z } from "zod";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
-import { useAppSelector } from "@ms/redux/hooks";
-import { selectAdminState } from "@ms/redux/slices/adminSlice";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import {
+  selectAdminState,
+  setSelectedEvent,
+} from "@ms/redux/slices/adminSlice";
 import RestoreIcon from "@mui/icons-material/Restore";
-const createEventvalidationSchema = z.object({
-  eventName: z
-    .string()
-    .min(3, { error: "Event name must be at least 3 characters" }),
-  description: z
-    .string()
-    .min(3, { error: "Description must be at least 3 characters" }),
+import type { AxiosResponse } from "axios";
+const createEventvalidationSchema = z
+  .object({
+    eventName: z
+      .string()
+      .min(3, { error: "Event name must be at least 3 characters" }),
+    description: z
+      .string()
+      .min(3, { error: "Description must be at least 3 characters" }),
 
-  duration: z.number().optional(),
-  thumbnailUrl: z.string().optional(),
-  thumbnailFile: z
-    .instanceof(File, { error: "Event Image is required" })
-    .optional(),
-  eventTypeId: z.string(),
-});
+    duration: z.number().optional(),
+    thumbnailUrl: z.string().optional(),
+    thumbnailFile: z
+      .instanceof(File, { error: "Event Image is required" })
+      .optional(),
+    eventTypeId: z.string().min(1, {
+      error: "Event Type is required",
+    }),
+  })
+  .refine((data) => data.thumbnailUrl || data.thumbnailFile, {
+    message: "A Thumbnail is required",
+    path: ["thumbnailFile"], // This will show the error on the thumbnailFile field
+  });
 
 type CreateEventFormData = z.infer<typeof createEventvalidationSchema>;
 
@@ -52,7 +67,8 @@ interface BasicEventDetailsProps {
 
 const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
   const { selectedEvent } = useAppSelector(selectAdminState);
-  const queryClicent = useQueryClient();
+  const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
 
   const {
     getValues,
@@ -90,22 +106,54 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
   const handleOnClose = (refreshData = false) => {
     onClose(refreshData);
     reset(createEventInitialFormData);
-    queryClicent.invalidateQueries({
+    queryClient.invalidateQueries({
       queryKey: ["events"],
     });
+  };
+
+  const handleSaveSuccess = (data: AxiosResponse<EventOffering>) => {
+    queryClient.setQueryData(["events"], (oldData: any) => {
+      if (!oldData) return undefined;
+      return {
+        ...oldData,
+        data: [...oldData.data, data.data],
+      };
+    });
+    dispatch(setSelectedEvent(data.data));
+  };
+
+  const handleUpdateSuccess = (data: AxiosResponse<EventOffering>) => {
+    queryClient.setQueryData(["events"], (oldData: any) => {
+      if (!oldData) return undefined;
+      return {
+        ...oldData,
+        data: oldData.data.map((event: any) =>
+          event.id === data.data.id ? data.data : event
+        ),
+      };
+    });
+    dispatch(setSelectedEvent(data.data));
   };
 
   const { mutate: saveEventQuery, isPending: isSavePending } = useMutation({
     mutationKey: ["createEvent"],
     mutationFn: createEvent,
-    onSuccess: () => handleOnClose(true),
+    onSuccess: handleSaveSuccess,
+    meta: {
+      successMessage: "Event Created",
+      errorMessage: "Error Creating Event",
+    },
   });
 
   const { mutate: patchEventQuery, isPending: isPatchPending } = useMutation({
     mutationKey: ["patchEvent"],
     mutationFn: ({ id, event }: { id: string; event: FormData }) =>
       patchEvent(id, event),
-    onSuccess: () => handleOnClose(true),
+    onSuccess: handleUpdateSuccess,
+    meta: {
+      successMessage: "Event Update",
+      errorMessage: "Error Updating Event",
+    },
   });
 
   const handleSave = () => {
@@ -189,6 +237,7 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
           <div className="flex flex-col gap-3 w-1/2">
             <FormSelect
               name="duration"
+              label={"Duration"}
               control={control}
               options={durationOptions}
             />
@@ -198,6 +247,7 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
           <div className="flex flex-col gap-3 w-1/2">
             <FormSelect
               name="eventTypeId"
+              label="Event Type"
               control={control}
               options={eventTypeOptions}
             />
