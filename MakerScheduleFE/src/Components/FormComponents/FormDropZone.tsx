@@ -12,6 +12,7 @@ interface FormDropZoneProps {
   showFileNames?: boolean;
   value?: File | File[];
   onChange?: (value: File | File[]) => void;
+  dropText?: string;
 }
 
 const DropZoneInner = ({
@@ -21,6 +22,7 @@ const DropZoneInner = ({
   value,
   onChange,
   error,
+  dropText,
   showFileNames = false,
 }: FormDropZoneProps) => {
   const [rejectedFiles, setRejectedFiles] = React.useState<File[]>([]);
@@ -78,7 +80,7 @@ const DropZoneInner = ({
         <input
           {...(getInputProps() as React.InputHTMLAttributes<HTMLInputElement>)}
         />
-        <p className="text-gray-500">"Drop the files here..."</p>
+        <p className="text-gray-500">{dropText}</p>
         {showFileNames && filesToShow.length > 0 && (
           <ul className="mt-2 text-left text-sm text-gray-700">
             {filesToShow.map((file) => (
@@ -99,6 +101,7 @@ const FormDropZone = ({
   control,
   name,
   error,
+  dropText = "Drop the files here...",
 }: FormDropZoneProps) => {
   if (control && name) {
     return (
@@ -117,6 +120,7 @@ const FormDropZone = ({
               value={value}
               onChange={onChange}
               error={error || fieldError?.message}
+              dropText={dropText}
             />
           );
         }}
@@ -129,6 +133,7 @@ const FormDropZone = ({
       accept={accept}
       multiple={multiple}
       error={error}
+      dropText={dropText}
     />
   );
 };

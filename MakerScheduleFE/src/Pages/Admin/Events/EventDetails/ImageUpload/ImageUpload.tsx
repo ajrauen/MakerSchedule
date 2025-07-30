@@ -83,6 +83,7 @@ const ImageUpload = ({ control, name, error }: ImageUploadProps) => {
                 setFile(files);
               }
             }}
+            dropText="Add Thumbnail"
           />
           {showCropper && file && (
             <ConfirmationDialog
