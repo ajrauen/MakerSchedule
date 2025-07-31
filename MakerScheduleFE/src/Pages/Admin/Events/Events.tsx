@@ -13,7 +13,7 @@ import {
 import type { EventOffering } from "@ms/types/event.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
-import { useEffect, useState, type TransitionEvent } from "react";
+import { useEffect, useState } from "react";
 
 const AdminEvents = () => {
   const [eventToDelete, setEventToDelete] = useState<

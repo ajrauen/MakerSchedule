@@ -80,7 +80,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             ThumbnailUrl = e.ThumbnailUrl,
             occurrences = e.Occurrences
                 .Where(o => !o.isDeleted)
-                .Select(o => new OccurenceDTO
+                .Select(o => new OccurrenceDTO
                 {
                     Id = o.Id,
                     Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
@@ -175,7 +175,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             },
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
-            occurrences = new List<OccurenceDTO>()
+            occurrences = new List<OccurrenceDTO>()
         };
     }
 
@@ -277,7 +277,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             ThumbnailUrl = e.ThumbnailUrl,
             occurrences = e.Occurrences
                 .Where(o => !o.isDeleted)
-                .Select(o => new OccurenceDTO
+                .Select(o => new OccurrenceDTO
                 {
                     Id = o.Id,
                     Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
@@ -312,7 +312,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return true;
     }
 
-    public async Task<Guid> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO)
+    public async Task<OccurrenceDTO> CreateOccurrenceAsync(CreateOccurrenceDTO occurrenceDTO)
     {
 
         var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
@@ -343,10 +343,17 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         await _context.SaveChangesAsync();
 
         var uniqueLeaderIds = occurrenceDTO.Leaders.Distinct().ToList();
+        var leaderDTOs = new List<OccurrenceUserDTO>();
+        var attendeeDTOs = new List<OccurrenceUserDTO>();
+
+        var allUserIds = uniqueLeaderIds.Concat(occurrenceDTO.Attendees).Distinct().ToList();
+        var users = await _context.DomainUsers
+            .Where(u => allUserIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u);
+
         foreach (var leaderId in uniqueLeaderIds)
         {
-            var leader = await _context.DomainUsers.FindAsync(leaderId);
-            if (leader != null)
+            if (users.TryGetValue(leaderId, out var leader))
             {
                 var occurrenceLeader = new OccurrenceLeader
                 {
@@ -355,13 +362,19 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     AssignedAt = DateTime.UtcNow
                 };
                 _context.OccurrenceLeaders.Add(occurrenceLeader);
+                
+                leaderDTOs.Add(new OccurrenceUserDTO
+                {
+                    Id = leaderId.ToString().ToLower(),
+                    FirstName = leader.FirstName ?? "",
+                    LastName = leader.LastName ?? ""
+                });
             }
         }
 
         foreach (var attendeeId in occurrenceDTO.Attendees)
         {
-            var attendee = await _context.DomainUsers.FindAsync(attendeeId);
-            if (attendee != null)
+            if (users.TryGetValue(attendeeId, out var attendee))
             {
                 var occurrenceAttendee = new OccurrenceAttendee
                 {
@@ -370,15 +383,32 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     RegisteredAt = DateTime.UtcNow
                 };
                 _context.OccurrenceAttendees.Add(occurrenceAttendee);
+                
+                attendeeDTOs.Add(new OccurrenceUserDTO
+                {
+                    Id = attendeeId.ToString().ToLower(),
+                    FirstName = attendee.FirstName ?? "",
+                    LastName = attendee.LastName ?? ""
+                });
             }
         }
 
         await _context.SaveChangesAsync();
         _logger.LogInformation("Successfully created occurrence with {OccurrenceId}", newOccurrence.Id);
-        return newOccurrence.Id;
+        
+        return new OccurrenceDTO
+        {
+            Id = newOccurrence.Id,
+            EventId = newOccurrence.EventId,
+            ScheduleStart = DateTime.SpecifyKind(newOccurrence.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
+            Duration = newOccurrence.Duration,
+            Status = newOccurrence.Status,
+            Attendees = attendeeDTOs,
+            Leaders = leaderDTOs
+        };
     }
 
-    public async Task<bool> UpdateOccuranceAsync(UpdateOccurenceDTO occurrenceDTO)
+    public async Task<OccurrenceDTO> UpdateOccuranceAsync(UpdateOccurrenceDTO occurrenceDTO)
     {
 
 
@@ -404,10 +434,21 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         _context.OccurrenceAttendees.RemoveRange(existingAttendees);
 
         var uniqueLeaderIds = occurrenceDTO.Leaders.Distinct().ToList();
+        var uniqueAttendeeIds = occurrenceDTO.Attendees.Distinct().ToList();
+        
+        var leaderDTOs = new List<OccurrenceUserDTO>();
+        var attendeeDTOs = new List<OccurrenceUserDTO>();
+
+        
+        // Fetch all users at once to avoid multiple DB calls
+        var allUserIds = uniqueLeaderIds.Concat(uniqueAttendeeIds).Distinct().ToList();
+        var users = await _context.DomainUsers
+            .Where(u => allUserIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => u);
+
         foreach (var leaderId in uniqueLeaderIds)
         {
-            var leader = await _context.DomainUsers.FindAsync(leaderId);
-            if (leader != null)
+            if (users.TryGetValue(leaderId, out var leader))
             {
                 var occurrenceLeader = new OccurrenceLeader
                 {
@@ -415,14 +456,19 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     UserId = leaderId,
                     AssignedAt = DateTime.UtcNow
                 };
+                leaderDTOs.Add(new OccurrenceUserDTO
+                {
+                    Id = leaderId.ToString().ToLower(),
+                    FirstName = leader.FirstName ?? "",
+                    LastName = leader.LastName ?? ""
+                });
                 _context.OccurrenceLeaders.Add(occurrenceLeader);
             }
         }
 
-        foreach (var attendeeId in occurrenceDTO.Attendees.Distinct())
+        foreach (var attendeeId in uniqueAttendeeIds)
         {
-            var attendee = await _context.DomainUsers.FindAsync(attendeeId);
-            if (attendee != null)
+            if (users.TryGetValue(attendeeId, out var attendee))
             {
                 var occurrenceAttendee = new OccurrenceAttendee
                 {
@@ -430,12 +476,28 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     UserId = attendeeId,
                     RegisteredAt = DateTime.UtcNow
                 };
+                attendeeDTOs.Add(new OccurrenceUserDTO
+                {
+                    Id = attendeeId.ToString().ToLower(),
+                    FirstName = attendee.FirstName ?? "",
+                    LastName = attendee.LastName ?? ""
+                });
                 _context.OccurrenceAttendees.Add(occurrenceAttendee);
             }
         }
 
         await _context.SaveChangesAsync();
-        return true;
+        return new OccurrenceDTO
+        {
+            Attendees = attendeeDTOs,
+            Leaders = leaderDTOs,
+            Id = occurrence.Id,
+            EventId = occurrence.EventId,
+            ScheduleStart = DateTime.SpecifyKind(occurrence.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
+            Duration = occurrence.Duration,
+            Status = occurrence.Status
+            
+        };
     }
 
     public async Task<bool> DeleteOccuranceAsync(Guid occurrenceid)

@@ -18,14 +18,10 @@ interface OccurenceRowProps {
 }
 
 const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
-  const query = queryClient
-    .getQueryCache()
-    .find({ queryKey: ["available-leaders", occurrence.id] });
-
   const { selectedEvent } = useAppSelector(selectAdminState);
   const dispatch = useAppDispatch();
 
-  const { refetch: fetchAvailAbleLeaders } = useQuery({
+  const { refetch: fetchAvailableLeaders } = useQuery({
     queryKey: ["available-leaders", occurrence.id],
     queryFn: () => {
       const isoString = occurrence.scheduleStart;
@@ -57,16 +53,6 @@ const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
     },
   });
 
-  const handleRowHover = () => {
-    // only fetch if date isnt stale and the occurrence isnt in the past
-    if (
-      (query?.state.status === "pending" || query?.isStale()) &&
-      occurrence.status.toLowerCase() === "pending"
-    ) {
-      fetchAvailAbleLeaders();
-    }
-  };
-
   const handleRowDelete = (evt: React.MouseEvent<HTMLButtonElement>) => {
     evt.stopPropagation();
     if (!occurrence.id) return;
@@ -77,6 +63,7 @@ const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
 
   const handleRowSelect = (occ: Occurrence) => {
     dispatch(setSelectedEventOccurrence(occ));
+    fetchAvailableLeaders();
   };
 
   const isPastOccurrence = new Date(occurrence.scheduleStart) < new Date();
@@ -87,7 +74,7 @@ const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
       className="flex items-center px-4 py-3 hover:bg-gray-50 cursor-pointer"
       onClick={() => handleRowSelect(occurrence)}
     >
-      <div className="flex grow" onMouseOver={handleRowHover}>
+      <div className="flex grow">
         <div className="flex-1 flex  items-center">
           <OccurrenceTime
             start={occurrence.scheduleStart}

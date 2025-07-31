@@ -5,7 +5,6 @@ import type {
   UpdateOccurrence,
 } from "@ms/types/occurrence.types";
 import type { AxiosRequestConfig } from "axios";
-import { start } from "repl";
 
 const BASE_OCCURRENCE_ENDPOINT = "api/Occurrences";
 
@@ -17,7 +16,7 @@ const createOccurrence = async (occurrence: CreateOccurrence) => {
     data: occurrence,
   };
 
-  return await sendRequest<number>(req);
+  return await sendRequest<Occurrence>(req);
 };
 
 const updateOccurrence = async (occurrence: UpdateOccurrence) => {
@@ -28,7 +27,7 @@ const updateOccurrence = async (occurrence: UpdateOccurrence) => {
     data: occurrence,
   };
 
-  return await sendRequest<number>(req);
+  return await sendRequest<Occurrence>(req);
 };
 
 const deleteOccurrence = async (occurrenceId: string) => {

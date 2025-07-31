@@ -1,5 +1,4 @@
 import { OccurenceDetails } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceDetails/OccurenceDetails";
-import type { EventOffering } from "@ms/types/event.types";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import { useEffect, useState } from "react";
 import { OccurrenceView } from "./OccurrencView/OccurrencView";
@@ -62,7 +61,7 @@ const EventOccurrences = ({}: EventOccurrencesProps) => {
   const handleBack = () => {
     setAnimating(true);
     setTimeout(() => {
-      setSelectedEventOccurrence(undefined);
+      dispatch(setSelectedEventOccurrence(undefined));
       setShowDetails(false);
       setAnimating(false);
     }, 200);
@@ -71,8 +70,6 @@ const EventOccurrences = ({}: EventOccurrencesProps) => {
   const isSelectedOccurrenceInPast = selectedEventOccurrence
     ? new Date(selectedEventOccurrence.scheduleStart) < new Date()
     : false;
-
-  console.log(showDetails, "showDetails");
 
   return (
     <div className="relative w-full h-full overflow-hidden">

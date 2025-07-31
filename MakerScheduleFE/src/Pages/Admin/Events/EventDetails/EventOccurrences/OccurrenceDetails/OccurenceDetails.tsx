@@ -10,6 +10,7 @@ import { durationOptions } from "@ms/Pages/Admin/Events/utils/event.utils";
 import type { SelectOption } from "@ms/types/form.types";
 import type {
   CreateOccurrence,
+  Occurrence,
   UpdateOccurrence,
 } from "@ms/types/occurrence.types";
 import type { PickerValidDate } from "@mui/x-date-pickers";
@@ -20,8 +21,12 @@ import { z } from "zod";
 import { toast } from "react-toastify";
 import type { DomainUser } from "@ms/types/domain-user.types";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
-import { selectAdminState } from "@ms/redux/slices/adminSlice";
-import { useAppSelector } from "@ms/redux/hooks";
+import {
+  selectAdminState,
+  setSelectedEventOccurrence,
+} from "@ms/redux/slices/adminSlice";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import type { AxiosResponse } from "axios";
 
 interface OccurenceDetailsProps {
   onCancel: () => void;
@@ -47,6 +52,7 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
     useAppSelector(selectAdminState);
 
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
 
   const { control, handleSubmit, reset, watch, getValues, setValue } =
     useForm<CreateOccurrenceFormData>({
@@ -63,12 +69,44 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
   const time = watch("scheduleStart");
   const duration = watch("duration");
 
+  const handleSaveSuccess = (data: AxiosResponse<Occurrence>) => {
+    queryClient.setQueryData(["event", data.data.eventId], (oldData: any) => {
+      if (!oldData) return undefined;
+      return {
+        ...oldData,
+        data: {
+          ...oldData.data,
+          occurrences: [...oldData.data.occurrences, data.data],
+        },
+      };
+    });
+    dispatch(setSelectedEventOccurrence(data.data));
+    toast.success("Occurrence Created");
+  };
+
+  const handleUpdateSuccess = (data: AxiosResponse<Occurrence>) => {
+    queryClient.setQueryData(["event", data.data.eventId], (oldData: any) => {
+      if (!oldData) return undefined;
+      return {
+        ...oldData,
+        data: {
+          ...oldData.data,
+          occurrences: oldData.data.occurrences.map((occurrence: any) =>
+            occurrence.id === data.data.id ? data.data : occurrence
+          ),
+        },
+      };
+    });
+    dispatch(setSelectedEventOccurrence(data.data));
+    toast.success("Occurrence Updated");
+  };
+
   const {
     refetch: getAvailableLeaders,
     data: availableLeaderResponse,
     isFetching: isLoadingAvailableLeaders,
   } = useQuery({
-    queryKey: ["available-leaders", selectedEvent?.id],
+    queryKey: ["available-leaders", selectedEventOccurrence?.id],
     queryFn: () => {
       const isoString = time.toISOString();
 
@@ -92,13 +130,7 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
       mutationKey: ["createMutation"],
       mutationFn: ({ occurrence }: { occurrence: CreateOccurrence }) =>
         createOccurrence(occurrence),
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["event", selectedEvent?.id],
-        });
-        toast("Occurrence Created Successfully");
-        onCancel();
-      },
+      onSuccess: handleSaveSuccess,
     });
 
   const { mutate: updateOccurrenceMutation, isPending: isUpdatePending } =
@@ -106,15 +138,11 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
       mutationKey: ["updateMutation"],
       mutationFn: ({ occurrence }: { occurrence: UpdateOccurrence }) =>
         updateOccurrence(occurrence),
-      onSuccess: () => {
-        queryClient.invalidateQueries({
-          queryKey: ["event", selectedEvent?.id],
-        });
-        toast("Occurrence Saved Successfully");
-      },
+      onSuccess: handleUpdateSuccess,
     });
 
   useEffect(() => {
+    console.log("asdf");
     if (selectedEventOccurrence?.meta?.isNew) {
       let defaultDate = new Date(selectedEventOccurrence.scheduleStart);
       if (defaultDate < new Date()) {

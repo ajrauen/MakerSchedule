@@ -1,6 +1,6 @@
 namespace MakerSchedule.Application.DTO.Occurrence;
 
-public class CreateOccurenceDTO
+public class CreateOccurrenceDTO
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public ICollection<Guid> Attendees { get; set; } = Array.Empty<Guid>();

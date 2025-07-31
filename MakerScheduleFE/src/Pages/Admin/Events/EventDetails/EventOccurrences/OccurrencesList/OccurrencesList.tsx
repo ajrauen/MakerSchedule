@@ -9,8 +9,11 @@ import { OccurenceCalendarDate } from "@ms/Pages/Admin/Events/EventDetails/Event
 import { OccurenceRow } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrenceRow/OccurrenceRow";
 import { IconButton } from "@mui/material";
 import { AddCircle } from "@mui/icons-material";
-import { selectAdminState } from "@ms/redux/slices/adminSlice";
-import { useAppSelector } from "@ms/redux/hooks";
+import {
+  selectAdminState,
+  setSelectedEventOccurrence,
+} from "@ms/redux/slices/adminSlice";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 
 interface OccurrencesListProps {
   onOccurrenceCreate: (selectedDate: Date) => void;
@@ -21,9 +24,12 @@ const OccurrencesList = ({ onOccurrenceCreate }: OccurrencesListProps) => {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(today);
   const { selectedEvent } = useAppSelector(selectAdminState);
+  const dispatch = useAppDispatch();
 
   const occurrencesForDay = useMemo(() => {
     if (!selectedDate || !selectedEvent?.occurrences) return [];
+    dispatch(setSelectedEventOccurrence(undefined));
+
     return selectedEvent.occurrences
       .filter(
         (o) =>

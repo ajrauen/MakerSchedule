@@ -4,7 +4,7 @@ namespace MakerSchedule.Application.DTO.Occurrence;
 
 
 
-public class OccurenceDTO
+public class OccurrenceDTO
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid EventId { get; set; } = Guid.NewGuid();

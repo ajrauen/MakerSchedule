@@ -10,8 +10,8 @@ public interface IEventService
     Task<EventDTO> CreateEventAsync(CreateEventDTO eventDTO);
     Task<EventDTO> PatchEventAsync(Guid eventId, PatchEventDTO eventDTO);
     Task<bool> DeleteEventAsync(Guid eventId);
-    Task<Guid> CreateOccurrenceAsync(CreateOccurenceDTO occurrenceDTO);
-    Task<bool> UpdateOccuranceAsync(UpdateOccurenceDTO updateOccurenceDTO);
+    Task<OccurrenceDTO> CreateOccurrenceAsync(CreateOccurrenceDTO occurrenceDTO);
+    Task<OccurrenceDTO> UpdateOccuranceAsync(UpdateOccurrenceDTO updateOccurrenceDTO);
     Task<bool> DeleteOccuranceAsync(Guid occurrenceGUID);
     Task<IEnumerable<OccurenceDateDTO>> GetOccurancesByDateAsync(SearchOccurrenceDTO searchDTO);
 

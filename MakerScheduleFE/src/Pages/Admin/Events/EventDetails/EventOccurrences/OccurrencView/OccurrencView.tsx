@@ -1,5 +1,5 @@
 import type { Occurrence } from "@ms/types/occurrence.types";
-import { Box, Button, Chip, Stack } from "@mui/material";
+import { Button } from "@mui/material";
 import { format } from "date-fns";
 
 interface OccurrenceViewProps {

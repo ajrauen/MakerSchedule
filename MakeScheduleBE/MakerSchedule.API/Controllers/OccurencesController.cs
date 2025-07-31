@@ -14,17 +14,17 @@ namespace MakerSchedule.API.Controllers;
 public class OccurrencesController(IEventService eventService) : ControllerBase
 {
     [HttpPost]
-    public async Task<ActionResult<string>> CreateOccuranceAsync([FromBody] CreateOccurenceDTO createOccurenceDTO)
+    public async Task<ActionResult<OccurrenceDTO>> CreateOccuranceAsync([FromBody] CreateOccurrenceDTO createOccurrenceDTO)
     {
-        var occurrence = await eventService.CreateOccurrenceAsync(createOccurenceDTO);
+        var occurrence = await eventService.CreateOccurrenceAsync(createOccurrenceDTO);
         return Ok(occurrence);
     }
 
     [HttpPut]
-    public async Task<ActionResult<string>> UpdateOccuranceAsync([FromBody] UpdateOccurenceDTO updateOccurenceDTO)
+    public async Task<ActionResult<OccurrenceDTO>> UpdateOccuranceAsync([FromBody] UpdateOccurrenceDTO updateOccurrenceDTO)
     {
-        var isSuccess = await eventService.UpdateOccuranceAsync(updateOccurenceDTO);
-        return Ok(isSuccess);
+        var occurrence = await eventService.UpdateOccuranceAsync(updateOccurrenceDTO);
+        return Ok(occurrence);
     }
 
     [HttpDelete("{id}")]
@@ -35,12 +35,9 @@ public class OccurrencesController(IEventService eventService) : ControllerBase
     }
 
     [HttpGet()]
-
     public async Task<ActionResult> GetOccurancesByDateAsync([FromQuery] SearchOccurrenceDTO search)
-        
     {
         var occurrences = await eventService.GetOccurancesByDateAsync(search);
         return Ok(occurrences);
     }   
-
 }

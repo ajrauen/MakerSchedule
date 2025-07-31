@@ -20,7 +20,7 @@ public class EventDTO
 
     public int? Duration { get; set; }
     public string? ThumbnailUrl { get; set; }
-    public IEnumerable<OccurenceDTO> occurrences { get; set; } = new List<OccurenceDTO>();
+    public IEnumerable<OccurrenceDTO> occurrences { get; set; } = new List<OccurrenceDTO>();
 
 } 
 
