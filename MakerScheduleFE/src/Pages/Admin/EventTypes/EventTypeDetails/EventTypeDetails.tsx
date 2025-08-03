@@ -1,10 +1,4 @@
-import type {
-  CreateEventType,
-  EventType,
-  PatchEventType,
-} from "@ms/types/event.types";
-import { IconButton, TextField, Box } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import type { CreateEventType, EventType } from "@ms/types/event.types";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,19 +8,25 @@ import { useEffect } from "react";
 import { createEventType, patchEventType } from "@ms/api/eventTypes.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import {
+  selectAdminState,
+  setAdminDrawerOpen,
+  setSelectedEventType,
+} from "@ms/redux/slices/adminSlice";
 
-interface CreateEventProps {
-  onClose: (refreshData: boolean) => void;
-  selectedEventType: EventType;
-}
+interface CreateEventProps {}
 
 const schema = z.object({
   eventTypeName: z.string().min(3, "Name is required"),
 });
 
-const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
+const EventTypeDetails = ({}: CreateEventProps) => {
+  const { selectedEventType } = useAppSelector(selectAdminState);
+
   const isNew = selectedEventType?.meta?.isNew;
   const queryClient = useQueryClient();
+  const dispatch = useAppDispatch();
 
   const { handleSubmit, control, reset, getValues } = useForm<
     z.infer<typeof schema>
@@ -56,15 +56,21 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
         ["eventTypes"],
         (oldEventsTypes: AxiosResponse<EventType[]>) => {
           if (!oldEventsTypes) return oldEventsTypes;
+          const newEventType: EventType = {
+            id: res.data,
+            name: createdEventType.name,
+          };
+          dispatch(setSelectedEventType(newEventType));
           return {
             ...oldEventsTypes,
-            data: [
-              ...oldEventsTypes.data,
-              { id: res.data, name: createdEventType.name },
-            ],
+            data: [...oldEventsTypes.data, newEventType],
           };
         }
       );
+    },
+    meta: {
+      successMessage: "Event Type Created",
+      errorMessage: "Failed to create Event Type",
     },
   });
 
@@ -90,11 +96,15 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
           return {
             ...oldEventsTypes,
             data: oldEventsTypes.data.map((et) =>
-              et.id === selectedEventType.id ? { ...et, ...savedEvent } : et
+              et.id === selectedEventType?.id ? { ...et, ...savedEvent } : et
             ),
           };
         }
       );
+    },
+    meta: {
+      successMessage: "Event Type Updated",
+      errorMessage: "Failed to update Event Type",
     },
   });
 
@@ -109,7 +119,7 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
       saveEventTypeQuery(newEventType);
       return;
     } else {
-      if (!selectedEventType.id) return;
+      if (!selectedEventType?.id) return;
 
       const updatedEventType: EventType = {
         id: selectedEventType.id,
@@ -121,7 +131,9 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
   };
 
   const handleClose = () => {
-    onClose(false);
+    dispatch(setSelectedEventType());
+    dispatch(setAdminDrawerOpen(false));
+    reset();
   };
 
   return (

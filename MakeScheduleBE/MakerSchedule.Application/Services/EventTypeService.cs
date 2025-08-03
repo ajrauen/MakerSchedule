@@ -15,7 +15,7 @@ public class EventTypeService(ILogger<EventTypeService> logger, IApplicationDbCo
         var types = await context.EventTypes.Select(e => new EventTypeDTO
         {
             Id = e.Id,
-            Name = e.Name.ToString()
+            Name = e.Name.Value
         }).ToListAsync();
 
         return types;

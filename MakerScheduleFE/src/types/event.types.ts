@@ -27,9 +27,11 @@ type UpdateEventOffering = Partial<CreateEventOffering> & {
 };
 
 interface EventType {
-  id: string;
+  id?: string;
   name: string;
-  meta?: Record<string, string | boolean | number>;
+  meta?: {
+    isNew?: boolean;
+  };
 }
 
 type CreateEventType = Omit<EventType, "id"> & {
