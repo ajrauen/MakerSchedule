@@ -13,7 +13,10 @@ interface Occurrence {
   attendees?: OccurranceUsers[];
   leaders?: OccurranceUsers[];
   status: OccurrenceStaus;
-  meta?: Record<string | number, string | number | boolean>;
+  meta?: {
+    isNew?: boolean;
+    componentOrigin?: "occurrenceList" | "occurrenceCalendar";
+  };
 }
 
 type OccurrenceStaus = "pending" | "complete" | "canceled";

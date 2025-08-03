@@ -1,13 +1,12 @@
-import { OccurenceDetails } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceDetails/OccurenceDetails";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import { useEffect, useState } from "react";
-import { OccurrenceView } from "./OccurrencView/OccurrencView";
 import { OccurrencesList } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrencesList";
 import {
   selectAdminState,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import { OccurrenceView } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceView/OccurrenceView";
 
 interface EventOccurrencesProps {}
 
@@ -67,10 +66,6 @@ const EventOccurrences = ({}: EventOccurrencesProps) => {
     }, 200);
   };
 
-  const isSelectedOccurrenceInPast = selectedEventOccurrence
-    ? new Date(selectedEventOccurrence.scheduleStart) < new Date()
-    : false;
-
   return (
     <div className="relative w-full h-full overflow-hidden">
       <div
@@ -85,15 +80,7 @@ const EventOccurrences = ({}: EventOccurrencesProps) => {
           ${showDetails ? "opacity-100 translate-x-0 z-20" : "opacity-0 translate-x-10 pointer-events-none"}
         `}
       >
-        {selectedEventOccurrence &&
-          (isSelectedOccurrenceInPast ? (
-            <OccurrenceView
-              occurrence={selectedEventOccurrence}
-              onBack={handleBack}
-            />
-          ) : (
-            <OccurenceDetails onCancel={handleBack} />
-          ))}
+        <OccurrenceView onBack={handleBack} />
       </div>
     </div>
   );

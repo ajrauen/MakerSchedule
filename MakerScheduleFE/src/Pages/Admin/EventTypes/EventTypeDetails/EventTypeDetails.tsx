@@ -1,4 +1,8 @@
-import type { EventType, PatchEventType } from "@ms/types/event.types";
+import type {
+  CreateEventType,
+  EventType,
+  PatchEventType,
+} from "@ms/types/event.types";
 import { IconButton, TextField, Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
@@ -98,7 +102,7 @@ const EventTypeDetails = ({ onClose, selectedEventType }: CreateEventProps) => {
     const { eventTypeName } = getValues();
 
     if (isNew) {
-      const newEventType: EventType = {
+      const newEventType: CreateEventType = {
         name: eventTypeName,
       };
 

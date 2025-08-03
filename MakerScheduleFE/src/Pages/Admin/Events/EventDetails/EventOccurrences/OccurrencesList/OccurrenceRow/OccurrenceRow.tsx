@@ -1,6 +1,7 @@
 import { getAvailableDomainUserLeaders } from "@ms/api/domain-user.api";
 import { deleteOccurrence } from "@ms/api/occurrence.api";
 import { queryClient } from "@ms/common/query-client";
+import { isOccurrenceInPast } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/Occurrence.utils";
 import { OccurrenceTime } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrenceTime/OccurrenceTime";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
@@ -63,10 +64,12 @@ const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
 
   const handleRowSelect = (occ: Occurrence) => {
     dispatch(setSelectedEventOccurrence(occ));
-    fetchAvailableLeaders();
+    if (!isOccurrenceInPast(occ)) {
+      fetchAvailableLeaders();
+    }
   };
 
-  const isPastOccurrence = new Date(occurrence.scheduleStart) < new Date();
+  const isPastOccurrence = isOccurrenceInPast(occurrence);
 
   return (
     <li

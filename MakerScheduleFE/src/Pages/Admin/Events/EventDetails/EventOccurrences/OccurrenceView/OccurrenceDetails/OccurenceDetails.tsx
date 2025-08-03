@@ -18,7 +18,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "react-toastify";
 import type { DomainUser } from "@ms/types/domain-user.types";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
 import {
@@ -28,7 +27,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import type { AxiosResponse } from "axios";
 
-interface OccurenceDetailsProps {
+interface OccurrenceDetailsProps {
   onCancel: () => void;
 }
 
@@ -42,7 +41,7 @@ type CreateOccurrenceFormData = z.infer<
   typeof createOccurrenceValidationSchema
 >;
 
-const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
+const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
   const [removedLeaders, setRemovedLeaders] = useState<DomainUser[]>([]);
   const [availableLeaderOptions, setAvailableLeaderOptions] = useState<
     SelectOption[]
@@ -80,8 +79,13 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
         },
       };
     });
-    dispatch(setSelectedEventOccurrence(data.data));
-    toast.success("Occurrence Created");
+    // Preserve meta (such as componentOrigin) so UI stays in correct view
+    dispatch(
+      setSelectedEventOccurrence({
+        ...data.data,
+        meta: { ...selectedEventOccurrence?.meta },
+      })
+    );
   };
 
   const handleUpdateSuccess = (data: AxiosResponse<Occurrence>) => {
@@ -97,8 +101,13 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
         },
       };
     });
-    dispatch(setSelectedEventOccurrence(data.data));
-    toast.success("Occurrence Updated");
+    // Preserve meta (such as componentOrigin) so UI stays in correct view
+    dispatch(
+      setSelectedEventOccurrence({
+        ...data.data,
+        meta: { ...selectedEventOccurrence?.meta },
+      })
+    );
   };
 
   const {
@@ -131,6 +140,10 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
       mutationFn: ({ occurrence }: { occurrence: CreateOccurrence }) =>
         createOccurrence(occurrence),
       onSuccess: handleSaveSuccess,
+      meta: {
+        successMessage: "Occurrence Created",
+        errorMessage: "Failed to create occurrence",
+      },
     });
 
   const { mutate: updateOccurrenceMutation, isPending: isUpdatePending } =
@@ -139,10 +152,13 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
       mutationFn: ({ occurrence }: { occurrence: UpdateOccurrence }) =>
         updateOccurrence(occurrence),
       onSuccess: handleUpdateSuccess,
+      meta: {
+        successMessage: "Occurrence Updated",
+        errorMessage: "Failed to update occurrence",
+      },
     });
 
   useEffect(() => {
-    console.log("asdf");
     if (selectedEventOccurrence?.meta?.isNew) {
       let defaultDate = new Date(selectedEventOccurrence.scheduleStart);
       if (defaultDate < new Date()) {
@@ -176,7 +192,6 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
 
   useEffect(() => {
     if (!availableLeaderResponse?.data) return;
-
     setAvailableLeader();
   }, [availableLeaderResponse?.data]);
 
@@ -250,13 +265,13 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
   };
 
   const onSave = () => {
-    if (!selectedEvent?.id || !selectedEventOccurrence) return;
+    if (!selectedEventOccurrence || !selectedEventOccurrence.id) return;
 
     const { scheduleStart, duration, leaders } = getValues();
 
     if (selectedEventOccurrence?.meta?.isNew) {
       const createOccurrenceObj: CreateOccurrence = {
-        eventId: selectedEvent.id,
+        eventId: selectedEventOccurrence.eventId,
         scheduleStart: scheduleStart.toISOString(),
         duration,
         leaders: leaders ?? [],
@@ -264,7 +279,7 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
       createOccurrenceMutation({ occurrence: createOccurrenceObj });
     } else {
       const updateOccurrenceObj: UpdateOccurrence = {
-        eventId: selectedEvent.id,
+        eventId: selectedEventOccurrence.eventId,
         scheduleStart: scheduleStart.toISOString(),
         duration,
         leaders: leaders ?? [],
@@ -276,59 +291,60 @@ const OccurenceDetails = ({ onCancel }: OccurenceDetailsProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSave)}>
-      <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
-        <FormDateTime
-          control={control}
-          name="scheduleStart"
-          label="Start Time"
-          shouldDisableDate={shouldDisableDate}
-        />
-        <FormSelect
-          name="duration"
-          control={control}
-          options={durationOptions}
-          label={"Duration"}
-        />
+    <>
+      {selectedEventOccurrence?.meta?.componentOrigin ===
+        "occurrenceCalendar" && <h2>{selectedEventOccurrence.eventName}</h2>}
+      <form onSubmit={handleSubmit(onSave)}>
+        <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
+          <FormDateTime
+            control={control}
+            name="scheduleStart"
+            label="Start Time"
+            shouldDisableDate={shouldDisableDate}
+          />
+          <FormSelect
+            name="duration"
+            control={control}
+            options={durationOptions}
+            label={"Duration"}
+          />
 
-        <FormSelect
-          name="leaders"
-          control={control}
-          options={availableLeaderOptions}
-          label={
-            selectedEventOccurrence?.status.toLowerCase() === "complete"
-              ? "Assigned Leanders"
-              : "Assign Leaders"
-          }
-          multiSelect
-          helperText={
-            !availableLeaderResponse ? "Select Time and Duration" : ""
-          }
-          isLoading={isLoadingAvailableLeaders}
-        />
-        {removedLeaders && removedLeaders.length > 0 && (
-          <div>
-            Leaders removed due to unavailability:
-            {removedLeaders.map((leader, idx) => (
-              <span className="pl-2">{`${leader.lastName}${idx === removedLeaders.length - 1 ? "" : ", "}`}</span>
-            ))}
-          </div>
-        )}
+          <FormSelect
+            name="leaders"
+            control={control}
+            options={availableLeaderOptions}
+            label={
+              selectedEventOccurrence?.status.toLowerCase() === "complete"
+                ? "Assigned Leanders"
+                : "Assign Leaders"
+            }
+            multiSelect
+            isLoading={isLoadingAvailableLeaders}
+          />
+          {removedLeaders && removedLeaders.length > 0 && (
+            <div>
+              Leaders removed due to unavailability:
+              {removedLeaders.map((leader, idx) => (
+                <span className="pl-2">{`${leader.lastName}${idx === removedLeaders.length - 1 ? "" : ", "}`}</span>
+              ))}
+            </div>
+          )}
 
-        <FormFooter
-          onCancel={onCancel}
-          areActionsDisabled={isCreatePending || isUpdatePending}
-          isLoading={isCreatePending || isUpdatePending}
-          cancelButtonText={
-            selectedEventOccurrence?.status.toLowerCase() === "pending"
-              ? "Cancel"
-              : "Back"
-          }
-          saveButtonText={selectedEventOccurrence?.id ? "Update" : "Save"}
-        />
-      </div>
-    </form>
+          <FormFooter
+            onCancel={onCancel}
+            areActionsDisabled={isCreatePending || isUpdatePending}
+            isLoading={isCreatePending || isUpdatePending}
+            cancelButtonText={
+              selectedEventOccurrence?.status.toLowerCase() === "pending"
+                ? "Cancel"
+                : "Back"
+            }
+            saveButtonText={selectedEventOccurrence?.id ? "Update" : "Save"}
+          />
+        </div>
+      </form>
+    </>
   );
 };
 
-export { OccurenceDetails };
+export { OccurrenceDetails };

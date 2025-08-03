@@ -1,3 +1,5 @@
+using MakerSchedule.Domain.Enums;
+
 namespace MakerSchedule.Application.DTO.Occurrence;
 
 public class OccurenceListDTO
