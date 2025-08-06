@@ -7,13 +7,13 @@ import { getOccurrences } from "@ms/api/occurrence.api";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
-import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import { useAppDispatch } from "@ms/redux/hooks";
 import {
-  selectAdminState,
   setAdminDrawerOpen,
   setSelectedEvent,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
+import type { DatesSetArg, EventClickArg } from "@fullcalendar/core/index.js";
 
 interface EventCalendarProps {
   selectedEventType?: string;
@@ -31,7 +31,7 @@ function calculateEndTime(
 const EventCalendar = ({ selectedEventType }: EventCalendarProps) => {
   const { events } = useAdminEventsData();
 
-  const calendarRef = useRef<any>(null);
+  const calendarRef = useRef<FullCalendar>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const EventCalendar = ({ selectedEventType }: EventCalendarProps) => {
     };
   }, []);
 
-  const handleDatesSet = (arg: any) => {
+  const handleDatesSet = (arg: DatesSetArg) => {
     setCalendarStartDate(arg.start);
     setCalendarEndDate(arg.end);
   };
@@ -86,7 +86,7 @@ const EventCalendar = ({ selectedEventType }: EventCalendarProps) => {
     }));
   };
 
-  const handleEventClick = (info: any) => {
+  const handleEventClick = (info: EventClickArg) => {
     const occurrence = occurrences?.data.find(
       (occ) => occ.id === info.event.extendedProps.occurrenceId
     );

@@ -1,8 +1,7 @@
-import { deleteEvent } from "@ms/api/event.api";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { useAdminUsersData } from "@ms/hooks/useAdminUsersData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { AxiosResponse } from "axios";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useEffect, useState, type TransitionEvent } from "react";
 import type { DomainUser } from "@ms/types/domain-user.types";
 import { UserHeader } from "@ms/Pages/Admin/User/Header/UserHeader";
@@ -27,36 +26,6 @@ const AdminUsers = () => {
     if (!users) return;
     setFilteredUsers(users);
   }, [users]);
-
-  const { mutate: deleteEventMutation } = useMutation({
-    mutationKey: ["deleteEvent"],
-    mutationFn: deleteEvent,
-    onSuccess: () => {
-      if (!userToDelete) return;
-
-      queryClient.setQueryData(
-        ["users"],
-        (oldUsers: AxiosResponse<DomainUser[]>) => {
-          if (!oldUsers) return oldUsers;
-          return {
-            ...oldUsers,
-            data: oldUsers.data.filter((user) => user.id !== userToDelete.id),
-          };
-        }
-      );
-
-      if (selectedUser?.id === userToDelete.id) {
-        setSelectedUser(undefined);
-      }
-
-      setUserToDelete(undefined);
-    },
-  });
-
-  const handleDrawerClose = (refreshData: boolean) => {
-    setRefreshData(refreshData);
-    setIsDrawerOpen(false);
-  };
 
   const handleUserEdit = (user: DomainUser) => {
     setSelectedUser(user);

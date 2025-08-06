@@ -21,58 +21,42 @@ interface RegisterUserProps {
 const BASE_AUTH_ENDPOINT = "api/Auth";
 
 const login = async ({ creds }: LoginApiProps) => {
-  try {
-    const req: AxiosRequestConfig = {
-      method: "POST",
-      url: `${BASE_AUTH_ENDPOINT}/login`,
-      data: creds,
-      withCredentials: true,
-    };
-    const response = await sendRequest(req);
-    const data = response.data as { accessToken: string };
-    setToken(data.accessToken);
-    return response;
-  } catch (error) {
-    throw error;
-  }
+  const req: AxiosRequestConfig = {
+    method: "POST",
+    url: `${BASE_AUTH_ENDPOINT}/login`,
+    data: creds,
+    withCredentials: true,
+  };
+  const response = await sendRequest(req);
+  const data = response.data as { accessToken: string };
+  setToken(data.accessToken);
+  return response;
 };
 
 const refreshToken = async () => {
-  try {
-    const req: AxiosRequestConfig = {
-      method: "POST",
-      url: `${BASE_AUTH_ENDPOINT}/refresh`,
-    };
-    return await sendRequest(req);
-  } catch (error) {
-    throw error;
-  }
+  const req: AxiosRequestConfig = {
+    method: "POST",
+    url: `${BASE_AUTH_ENDPOINT}/refresh`,
+  };
+  return await sendRequest(req);
 };
 
 const logout = async () => {
-  try {
-    const req: AxiosRequestConfig = {
-      method: "POST",
-      url: `${BASE_AUTH_ENDPOINT}/logout`,
-    };
-    return await sendRequest(req);
-  } catch (error) {
-    throw error;
-  }
+  const req: AxiosRequestConfig = {
+    method: "POST",
+    url: `${BASE_AUTH_ENDPOINT}/logout`,
+  };
+  return await sendRequest(req);
 };
 
 const registerUser = async (user: RegisterUserProps) => {
-  try {
-    const req: AxiosRequestConfig = {
-      method: "POST",
-      url: `${BASE_AUTH_ENDPOINT}/register`,
-      data: user,
-      withCredentials: true,
-    };
-    return await sendRequest(req);
-  } catch (error) {
-    throw error;
-  }
+  const req: AxiosRequestConfig = {
+    method: "POST",
+    url: `${BASE_AUTH_ENDPOINT}/register`,
+    data: user,
+    withCredentials: true,
+  };
+  return await sendRequest(req);
 };
 
 export { login, refreshToken, logout, registerUser };

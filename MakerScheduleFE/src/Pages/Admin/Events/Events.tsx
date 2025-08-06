@@ -3,7 +3,6 @@ import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { EventCalendar } from "@ms/Pages/Admin/Events/Calendar/EventsCalendar";
 import { EventDetails } from "@ms/Pages/Admin/Events/EventDetails/EventDetails";
-import { OccurrenceDetails } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceView/OccurrenceDetails/OccurenceDetails";
 import { OccurrenceView } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceView/OccurrenceView";
 import { EventsHeader } from "@ms/Pages/Admin/Events/Header/Header";
 import { AdminEventsTable } from "@ms/Pages/Admin/Events/Table/Table";
@@ -18,6 +17,8 @@ import type { EventOffering } from "@ms/types/event.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
+
+type ViewState = "table" | "calendar";
 
 const AdminEvents = () => {
   const [eventToDelete, setEventToDelete] = useState<

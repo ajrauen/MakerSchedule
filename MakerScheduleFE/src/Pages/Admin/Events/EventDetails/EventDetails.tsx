@@ -69,7 +69,7 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
 
     dispatch(setSelectedEvent(updatedEvent));
     return updatedEvent;
-  }, [eventResponse?.data || selectedEvent]);
+  }, [eventResponse?.data, selectedEvent, dispatch]);
 
   const handleClose = () => {
     if (selectedEvent?.meta?.isNew) {

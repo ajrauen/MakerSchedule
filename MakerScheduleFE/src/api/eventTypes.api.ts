@@ -1,9 +1,5 @@
 import { sendAxiosRequest } from "@ms/api/api";
-import type {
-  CreateEventType,
-  EventType,
-  PatchEventType,
-} from "@ms/types/event.types";
+import type { CreateEventType, EventType } from "@ms/types/event.types";
 
 const BASE_METADATA_ENDPOINT = "api/EventTypes";
 

@@ -15,13 +15,11 @@ import {
   setSelectedEventType,
 } from "@ms/redux/slices/adminSlice";
 
-interface CreateEventProps {}
-
 const schema = z.object({
   eventTypeName: z.string().min(3, "Name is required"),
 });
 
-const EventTypeDetails = ({}: CreateEventProps) => {
+const EventTypeDetails = () => {
   const { selectedEventType } = useAppSelector(selectAdminState);
 
   const isNew = selectedEventType?.meta?.isNew;
@@ -43,7 +41,7 @@ const EventTypeDetails = ({}: CreateEventProps) => {
     reset({
       eventTypeName: selectedEventType.name,
     });
-  }, [selectedEventType]);
+  }, [selectedEventType, reset]);
 
   const { mutate: saveEventTypeQuery, isPending: isSavePending } = useMutation({
     mutationKey: ["createEventType"],

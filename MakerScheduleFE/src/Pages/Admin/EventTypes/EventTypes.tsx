@@ -59,7 +59,7 @@ const AdminEventTypes = () => {
   };
 
   const handleSearch = (searchValue: string | undefined) => {
-    let filteredEvents = filteredEventTypes.filter((eventType) => {
+    const filteredEvents = filteredEventTypes.filter((eventType) => {
       return eventType.name
         .toLowerCase()
         .includes(searchValue?.toLowerCase() || "");
@@ -90,9 +90,7 @@ const AdminEventTypes = () => {
         onTransitionEnd={handlePanelTransitionEnd}
       >
         <div className="p-6 h-full">
-          {selectedEventType && (
-            <EventTypeDetails selectedEventType={selectedEventType} />
-          )}
+          {selectedEventType && <EventTypeDetails />}
         </div>
       </div>
     </div>

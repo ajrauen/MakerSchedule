@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Controller, type Control } from "react-hook-form";
+import { Controller, type Control, type FieldValues } from "react-hook-form";
 
 import { FormDropZone } from "@ms/Components/FormComponents/FormDropZone";
 import { ImageCropper } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/ImageCropper/ImageCropper";
@@ -7,13 +7,17 @@ import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { getCroppedImg } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/getCroppedImg.utils";
 import type { Area } from "react-easy-crop";
 
-interface ImageUploadProps {
-  control: Control<any>;
+interface ImageUploadProps<T extends FieldValues = FieldValues> {
+  control: Control<T>;
   name: string;
   error?: string;
 }
 
-const ImageUpload = ({ control, name, error }: ImageUploadProps) => {
+const ImageUpload = <T extends FieldValues = FieldValues>({
+  control,
+  name,
+  error,
+}: ImageUploadProps<T>) => {
   const [showCropper, setShowCropper] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);

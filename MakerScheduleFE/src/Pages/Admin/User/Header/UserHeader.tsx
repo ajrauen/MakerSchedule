@@ -19,7 +19,7 @@ const UserHeader = ({
 }: UsersHeaderProps) => {
   const roleOptions = useMemo(() => {
     if (!roles) return [];
-    let roleOptions = roles.map((role) => ({ value: role, label: role }));
+    const roleOptions = roles.map((role) => ({ value: role, label: role }));
     roleOptions.unshift({ value: "", label: "All Roles" });
 
     return roleOptions;

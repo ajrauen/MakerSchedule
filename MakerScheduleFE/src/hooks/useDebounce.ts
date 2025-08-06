@@ -30,7 +30,7 @@ const useDebounce = <T>({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [callback, delay, value]);
+  }, [callback, delay, value, enabled]);
 };
 
 export { useDebounce };

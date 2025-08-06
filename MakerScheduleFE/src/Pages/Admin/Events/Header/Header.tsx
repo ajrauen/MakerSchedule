@@ -8,11 +8,15 @@ import type { EventOffering, EventType } from "@ms/types/event.types";
 import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
 import { useMemo } from "react";
-import { useAppDispatch } from "@ms/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
+  selectAdminState,
   setAdminDrawerOpen,
   setSelectedEvent,
+  setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
+import type { Occurrence } from "@ms/types/occurrence.types";
+import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 
 interface EventsHeaderProps {
   onSearch: (value: string | undefined) => void;
@@ -30,11 +34,12 @@ const EventsHeader = ({
   viewState,
 }: EventsHeaderProps) => {
   const dispatch = useAppDispatch();
+  const { selectedEvent } = useAppSelector(selectAdminState);
 
   const eventTypeOptions = useMemo(() => {
     if (!eventTypes) return [];
-    let eventTypeOptions = eventTypes.map((eventType) => ({
-      value: eventType.id,
+    const eventTypeOptions = eventTypes.map((eventType) => ({
+      value: eventType.id ?? "",
       label: eventType.name,
     }));
     eventTypeOptions.unshift({ value: "", label: "All Event Types" });
@@ -49,10 +54,39 @@ const EventsHeader = ({
 
       meta: {
         isNew: true,
+        componentOrigin: "occurrenceCalendar",
       },
     };
     dispatch(setAdminDrawerOpen(true));
     dispatch(setSelectedEvent(newEvent));
+  };
+
+  const handleCreateOccurrence = () => {
+    if (!selectedEvent?.id) return;
+
+    const newOccurrence: Occurrence = {
+      eventId: selectedEvent.id,
+      scheduleStart: new Date().toISOString(),
+      attendees: [],
+      leaders: [],
+      status: "pending",
+      meta: {
+        isNew: true,
+        componentOrigin: "occurrenceCalendar",
+      },
+    };
+
+    dispatch(setSelectedEventOccurrence(newOccurrence));
+    dispatch(setAdminDrawerOpen(true));
+  };
+
+  const handleCreateClick = () => {
+    debugger;
+    if (viewState === "calendar") {
+      handleCreateOccurrence();
+    } else {
+      handleCreateEvent();
+    }
   };
 
   return (
@@ -92,11 +126,11 @@ const EventsHeader = ({
         </ToggleButtonGroup>
       </div>
       <Button
-        onClick={handleCreateEvent}
+        onClick={handleCreateClick}
         startIcon={<AddIcon />}
         variant="text"
       >
-        Event
+        {viewState === "calendar" ? "Occurrence" : "Event"}
       </Button>
     </div>
   );

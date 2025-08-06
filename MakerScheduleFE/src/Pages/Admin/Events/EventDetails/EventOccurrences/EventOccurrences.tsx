@@ -8,9 +8,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import { OccurrenceView } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceView/OccurrenceView";
 
-interface EventOccurrencesProps {}
-
-const EventOccurrences = ({}: EventOccurrencesProps) => {
+const EventOccurrences = () => {
   const [animating, setAnimating] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
   const { selectedEvent, selectedEventOccurrence } =
@@ -29,7 +27,7 @@ const EventOccurrences = ({}: EventOccurrencesProps) => {
     if (selectedEvent && !selectedEventOccurrence) {
       setShowDetails(false);
     }
-  }, [selectedEvent]);
+  }, [selectedEvent, selectedEventOccurrence]);
 
   const handleOccurrenceCreate = (selectedDate: Date) => {
     if (!selectedEvent?.id) return;
@@ -45,13 +43,13 @@ const EventOccurrences = ({}: EventOccurrencesProps) => {
       },
     };
 
-    handleViewChange(dispatch(setSelectedEventOccurrence(newOccurrence)));
+    handleViewChange(() => dispatch(setSelectedEventOccurrence(newOccurrence)));
   };
 
-  const handleViewChange = (callback: any) => {
+  const handleViewChange = (callback: () => void) => {
     setAnimating(true);
     setTimeout(() => {
-      callback;
+      callback();
       setShowDetails(true);
       setAnimating(false);
     }, 200);

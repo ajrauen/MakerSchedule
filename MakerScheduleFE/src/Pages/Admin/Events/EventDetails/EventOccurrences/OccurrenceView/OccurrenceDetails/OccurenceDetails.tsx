@@ -15,7 +15,7 @@ import type {
 } from "@ms/types/occurrence.types";
 import type { PickerValidDate } from "@mui/x-date-pickers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import type { DomainUser } from "@ms/types/domain-user.types";
@@ -26,20 +26,12 @@ import {
 } from "@ms/redux/slices/adminSlice";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import type { AxiosResponse } from "axios";
+import type { EventOffering } from "@ms/types/event.types";
+import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 
 interface OccurrenceDetailsProps {
   onCancel: () => void;
 }
-
-const createOccurrenceValidationSchema = z.object({
-  scheduleStart: z.date(),
-  duration: z.number().optional(),
-  leaders: z.array(z.string()).optional(),
-});
-
-type CreateOccurrenceFormData = z.infer<
-  typeof createOccurrenceValidationSchema
->;
 
 const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
   const [removedLeaders, setRemovedLeaders] = useState<DomainUser[]>([]);
@@ -49,6 +41,30 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
 
   const { selectedEvent, selectedEventOccurrence } =
     useAppSelector(selectAdminState);
+  const { events } = useAdminEventsData();
+
+  // Create dynamic validation schema based on occurrence state
+  const createOccurrenceValidationSchema = useMemo(() => {
+    const isNewFromCalendar =
+      selectedEventOccurrence?.meta?.isNew &&
+      selectedEventOccurrence?.meta?.componentOrigin === "occurrenceCalendar";
+
+    return z.object({
+      scheduleStart: z.date(),
+      duration: z.number().optional(),
+      leaders: z.array(z.string()).optional(),
+      eventId: isNewFromCalendar
+        ? z.string().min(1, { message: "Event is required" })
+        : z.string().optional(),
+    });
+  }, [
+    selectedEventOccurrence?.meta?.isNew,
+    selectedEventOccurrence?.meta?.componentOrigin,
+  ]);
+
+  type CreateOccurrenceFormData = z.infer<
+    typeof createOccurrenceValidationSchema
+  >;
 
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
@@ -69,17 +85,41 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
   const duration = watch("duration");
 
   const handleSaveSuccess = (data: AxiosResponse<Occurrence>) => {
-    queryClient.setQueryData(["event", data.data.eventId], (oldData: any) => {
-      if (!oldData) return undefined;
-      return {
-        ...oldData,
-        data: {
-          ...oldData.data,
-          occurrences: [...oldData.data.occurrences, data.data],
+    if (data.data.meta?.componentOrigin === "occurrenceCalendar") {
+      queryClient.setQueriesData(
+        {
+          queryKey: ["occurrences"],
+          predicate: (query) => {
+            const [key] = query.queryKey;
+            return key === "occurrences";
+          },
         },
-      };
-    });
-    // Preserve meta (such as componentOrigin) so UI stays in correct view
+        (oldData: AxiosResponse<Occurrence[]>) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            data: oldData.data.map((occurrence: Occurrence) =>
+              occurrence.id === data.data.id ? data.data : occurrence
+            ),
+          };
+        }
+      );
+    } else {
+      queryClient.setQueryData(
+        ["event", data.data.eventId],
+        (oldData: AxiosResponse<Occurrence[]>) => {
+          if (!oldData) return undefined;
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              occurrences: [...oldData.data, data.data],
+            },
+          };
+        }
+      );
+    }
+
     dispatch(
       setSelectedEventOccurrence({
         ...data.data,
@@ -89,18 +129,52 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
   };
 
   const handleUpdateSuccess = (data: AxiosResponse<Occurrence>) => {
-    queryClient.setQueryData(["event", data.data.eventId], (oldData: any) => {
-      if (!oldData) return undefined;
-      return {
-        ...oldData,
-        data: {
-          ...oldData.data,
-          occurrences: oldData.data.occurrences.map((occurrence: any) =>
-            occurrence.id === data.data.id ? data.data : occurrence
-          ),
-        },
-      };
-    });
+    if (
+      selectedEventOccurrence?.meta?.componentOrigin === "occurrenceCalendar"
+    ) {
+      queryClient.setQueryData(
+        ["event", data.data.eventId],
+        (oldData: AxiosResponse<Occurrence[]>) => {
+          if (!oldData) return undefined;
+          return {
+            ...oldData,
+            data: {
+              ...oldData.data,
+              occurrences: oldData.data.map((occurrence: Occurrence) =>
+                occurrence.id === data.data.id ? data.data : occurrence
+              ),
+            },
+          };
+        }
+      );
+    } else {
+      queryClient.setQueryData(
+        ["event", data.data.eventId],
+        (oldData: AxiosResponse<EventOffering>) => {
+          if (!oldData || !oldData.data || !oldData.data.occurrences)
+            return undefined;
+
+          const occurrenceIndex = oldData.data.occurrences.findIndex(
+            (occurrence: Occurrence) => occurrence.id === data.data.id
+          );
+
+          if (occurrenceIndex >= 0) {
+            return {
+              ...oldData,
+              data: {
+                ...oldData.data,
+                occurrences: oldData.data.occurrences.map(
+                  (occurrence: Occurrence, idx) =>
+                    idx === occurrenceIndex ? data.data : occurrence
+                ),
+              },
+            };
+          }
+
+          return oldData;
+        }
+      );
+    }
     // Preserve meta (such as componentOrigin) so UI stays in correct view
     dispatch(
       setSelectedEventOccurrence({
@@ -233,7 +307,7 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
     });
 
     // From the unavailable leaders array, get the domain user object and make a new array
-    let unavailableLeaderObjectArray: DomainUser[] = [];
+    const unavailableLeaderObjectArray: DomainUser[] = [];
     if (unavailbeLeader.length > 0) {
       for (const leaderIdx in unavailbeLeader) {
         const domainLeader = domainLeaderResponse?.data.find(
@@ -256,7 +330,7 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
     if (time && duration) {
       getAvailableLeaders();
     }
-  }, [duration, time]);
+  }, [duration, time, getAvailableLeaders, selectedEventOccurrence?.status]);
 
   const shouldDisableDate = (date: PickerValidDate) => {
     const today = new Date();
@@ -265,7 +339,11 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
   };
 
   const onSave = () => {
-    if (!selectedEventOccurrence || !selectedEventOccurrence.id) return;
+    if (
+      !selectedEventOccurrence ||
+      (!selectedEventOccurrence.id && !selectedEventOccurrence.meta?.isNew)
+    )
+      return;
 
     const { scheduleStart, duration, leaders } = getValues();
 
@@ -290,12 +368,24 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
     }
   };
 
+  const eventOptions = events.map((event) => ({
+    label: event.eventName,
+    value: event.id,
+  }));
+
   return (
     <>
       {selectedEventOccurrence?.meta?.componentOrigin ===
         "occurrenceCalendar" && <h2>{selectedEventOccurrence.eventName}</h2>}
       <form onSubmit={handleSubmit(onSave)}>
         <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
+          <FormSelect
+            name="eventId"
+            control={control}
+            options={eventOptions}
+            label={"Event"}
+          />
+
           <FormDateTime
             control={control}
             name="scheduleStart"
@@ -313,9 +403,11 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
             name="leaders"
             control={control}
             options={availableLeaderOptions}
+            noOptionsText="No Leaders available"
+            displayEmpty={true}
             label={
               selectedEventOccurrence?.status.toLowerCase() === "complete"
-                ? "Assigned Leanders"
+                ? "Assigned Leaders"
                 : "Assign Leaders"
             }
             multiSelect

@@ -41,7 +41,7 @@ const OccurrencesList = ({ onOccurrenceCreate }: OccurrencesListProps) => {
           new Date(a.scheduleStart).getTime() -
           new Date(b.scheduleStart).getTime()
       );
-  }, [selectedDate, selectedEvent]);
+  }, [dispatch, selectedDate, selectedEvent?.occurrences]);
 
   const handleAddOccurrenceClick = () => {
     let date = selectedDate;

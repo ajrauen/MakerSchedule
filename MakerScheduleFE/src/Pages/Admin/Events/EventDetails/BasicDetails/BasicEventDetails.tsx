@@ -101,7 +101,7 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
       };
       reset(structuredClone(editEvent));
     }
-  }, [selectedEvent]);
+  }, [selectedEvent, reset]);
 
   const handleOnClose = (refreshData = false) => {
     onClose(refreshData);
@@ -112,26 +112,33 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
   };
 
   const handleSaveSuccess = (data: AxiosResponse<EventOffering>) => {
-    queryClient.setQueryData(["events"], (oldData: any) => {
-      if (!oldData) return undefined;
-      return {
-        ...oldData,
-        data: [...oldData.data, data.data],
-      };
-    });
+    queryClient.setQueryData(
+      ["events"],
+      (oldData: AxiosResponse<EventOffering[]>) => {
+        if (!oldData) return undefined;
+        return {
+          ...oldData,
+          data: [...oldData.data, data.data],
+        };
+      }
+    );
     dispatch(setSelectedEvent(data.data));
   };
 
   const handleUpdateSuccess = (data: AxiosResponse<EventOffering>) => {
-    queryClient.setQueryData(["events"], (oldData: any) => {
-      if (!oldData) return undefined;
-      return {
-        ...oldData,
-        data: oldData.data.map((event: any) =>
-          event.id === data.data.id ? data.data : event
-        ),
-      };
-    });
+    queryClient.setQueryData(
+      ["events"],
+      (oldData: AxiosResponse<EventOffering[]>) => {
+        if (!oldData) return undefined;
+        return {
+          ...oldData,
+          data: oldData.data.map((event: EventOffering) =>
+            event.id === data.data.id ? data.data : event
+          ),
+        };
+      }
+    );
+    reset(data.data);
     dispatch(setSelectedEvent(data.data));
   };
 

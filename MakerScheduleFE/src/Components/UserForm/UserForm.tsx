@@ -2,9 +2,10 @@ import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextF
 import { FormHelperText } from "@mui/material";
 
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
+import type { Control } from "react-hook-form";
 
 interface UserFormProps {
-  control: any;
+  control: Control;
   errorCode?: string;
 }
 

@@ -1,12 +1,12 @@
 import React from "react";
 import { useDropzone, type Accept, type DropzoneOptions } from "react-dropzone";
-import { Controller, type Control } from "react-hook-form";
+import { Controller, type Control, type FieldValues } from "react-hook-form";
 
-interface FormDropZoneProps {
+interface FormDropZoneProps<T extends FieldValues = FieldValues> {
   onDrop?: (files: File[]) => void;
   accept?: Accept;
   multiple?: boolean;
-  control?: Control<any>;
+  control?: Control<T>;
   name?: string;
   error?: string;
   showFileNames?: boolean;
@@ -15,7 +15,7 @@ interface FormDropZoneProps {
   dropText?: string;
 }
 
-const DropZoneInner = ({
+const DropZoneInner = <T extends FieldValues = FieldValues>({
   onDrop,
   accept,
   multiple = false,
@@ -24,7 +24,7 @@ const DropZoneInner = ({
   error,
   dropText,
   showFileNames = false,
-}: FormDropZoneProps) => {
+}: FormDropZoneProps<T>) => {
   const [rejectedFiles, setRejectedFiles] = React.useState<File[]>([]);
 
   const handleDrop = React.useCallback(

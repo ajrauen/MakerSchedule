@@ -96,31 +96,7 @@ services.AddProblemDetails();
 
 var app = builder.Build();
 
-try
-{
-    using var scope = app.Services.CreateScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    await dbContext.Database.CanConnectAsync();
-    app.Logger.LogInformation("Successfully connected to the database.");
-
-    if (app.Environment.IsDevelopment())
-    {
-        app.Logger.LogInformation("Applying database migrations...");
-        await dbContext.Database.MigrateAsync();
-        app.Logger.LogInformation("Database migrations completed successfully.");
-    }
-    
-    app.Logger.LogInformation("Seeding database...");
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedAsync();
-    app.Logger.LogInformation("Database seeding completed successfully.");
-
-}
-catch (Exception ex)
-{
-    app.Logger.LogError(ex, "Failed to connect to the database. Application cannot start without database access.");
-    throw;
-}
+await app.EnsureDatabaseReadyAsync(); 
 
 
 app.UseSwagger();

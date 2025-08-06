@@ -1,9 +1,9 @@
 import type { EventOffering } from "@ms/types/event.types";
 import { Button, Paper } from "@mui/material";
-import { Construction, Circle, ContentCut } from "@mui/icons-material";
+import { Construction } from "@mui/icons-material";
 import { ClassCalendarDialog } from "@ms/Pages/Classes/ClassCard/ClassCalendarDialog/ClassCalendarDialog";
 import { useState } from "react";
-import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
+// import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 
 interface ClassCardProps {
   event: EventOffering;
@@ -11,7 +11,7 @@ interface ClassCardProps {
 
 const ClassCard = ({ event }: ClassCardProps) => {
   const [isScheduleCardOpen, setIsScheduleCardOpen] = useState(false);
-  const { appMetaData } = useAdminEventsData();
+  // const { appMetaData } = useAdminEventsData();
 
   const getEventIcon = (eventType: number) => {
     switch (eventType) {

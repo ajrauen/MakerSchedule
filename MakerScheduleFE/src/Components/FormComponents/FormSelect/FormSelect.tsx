@@ -23,6 +23,7 @@ type FormSelectProps<T extends FieldValues, C> = Omit<
   label?: string;
   helperText?: string;
   isLoading?: boolean;
+  noOptionsText?: string;
 };
 
 const FormSelect = <T extends FieldValues, C>({
@@ -33,6 +34,7 @@ const FormSelect = <T extends FieldValues, C>({
   label,
   helperText,
   isLoading,
+  noOptionsText,
   ...props
 }: FormSelectProps<T, C>) => {
   return (
@@ -52,7 +54,9 @@ const FormSelect = <T extends FieldValues, C>({
                 label={label}
                 isLoading={isLoading}
                 error={!!fieldState.error?.message}
+                noOptionsText={noOptionsText}
                 {...field}
+                {...props}
                 value={
                   multiSelect
                     ? field.value || []
@@ -89,6 +93,7 @@ const FormSelect = <T extends FieldValues, C>({
           label={label}
           helperText={helperText}
           isLoading={isLoading}
+          noOptionsText={noOptionsText}
           {...props}
           error={!!helperText}
         />
