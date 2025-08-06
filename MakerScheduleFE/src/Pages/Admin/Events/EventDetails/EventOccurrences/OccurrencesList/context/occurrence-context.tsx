@@ -2,8 +2,8 @@ import type { Occurrence } from "@ms/types/occurrence.types";
 import { createContext } from "react";
 
 const OccurrenceCalendarContext = createContext<{
-  today: Date;
+  selectedDate: Date;
   occurrences: Occurrence[];
-}>({ today: new Date(), occurrences: [] });
+}>({ selectedDate: new Date(), occurrences: [] });
 
 export { OccurrenceCalendarContext };

@@ -8,22 +8,21 @@ import type { EventOffering, EventType } from "@ms/types/event.types";
 import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
 import { useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import { useAppDispatch } from "@ms/redux/hooks";
 import {
-  selectAdminState,
   setAdminDrawerOpen,
   setSelectedEvent,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
 import type { Occurrence } from "@ms/types/occurrence.types";
-import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
+import type { ViewState } from "@ms/types/admin.types";
 
 interface EventsHeaderProps {
   onSearch: (value: string | undefined) => void;
   onFilterChange: (value: string) => void;
   eventTypes: EventType[];
-  onSetViewState: (value: string) => void;
-  viewState: string;
+  onSetViewState: (value: ViewState) => void;
+  viewState: ViewState;
 }
 
 const EventsHeader = ({
@@ -34,7 +33,6 @@ const EventsHeader = ({
   viewState,
 }: EventsHeaderProps) => {
   const dispatch = useAppDispatch();
-  const { selectedEvent } = useAppSelector(selectAdminState);
 
   const eventTypeOptions = useMemo(() => {
     if (!eventTypes) return [];
@@ -62,11 +60,15 @@ const EventsHeader = ({
   };
 
   const handleCreateOccurrence = () => {
-    if (!selectedEvent?.id) return;
+    const today = new Date();
+    if (today.getHours() >= 17) {
+      today.setDate(today.getDate() + 1);
+    }
+    today.setHours(0, 0, 0, 0);
 
     const newOccurrence: Occurrence = {
-      eventId: selectedEvent.id,
-      scheduleStart: new Date().toISOString(),
+      eventId: "",
+      scheduleStart: today.toISOString(),
       attendees: [],
       leaders: [],
       status: "pending",
@@ -81,7 +83,6 @@ const EventsHeader = ({
   };
 
   const handleCreateClick = () => {
-    debugger;
     if (viewState === "calendar") {
       handleCreateOccurrence();
     } else {

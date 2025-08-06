@@ -2,7 +2,7 @@ import type { EventOffering, EventType } from "@ms/types/event.types";
 
 import { BasicEventDetails } from "@ms/Pages/Admin/Events/EventDetails/BasicDetails/BasicEventDetails";
 import { IconButton, Tab, Tabs } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import CloseIcon from "@mui/icons-material/Close";
 import { useQuery } from "@tanstack/react-query";
@@ -21,6 +21,8 @@ interface CreateEventProps {
 
 const EventDetails = ({ eventTypes }: CreateEventProps) => {
   const [value, setValue] = useState(0);
+  // store a ref so that if an event is updated via API, we dont automatically switch tabs
+  const selectedEventIdRef = useRef<string | undefined>(undefined);
 
   const handleChange = (_event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -31,6 +33,11 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
+    if (selectedEventIdRef.current === selectedEvent?.id) {
+      return;
+    }
+
+    selectedEventIdRef.current = selectedEvent?.id;
     setValue(0);
   }, [selectedEvent]);
 

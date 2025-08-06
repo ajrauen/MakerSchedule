@@ -17,12 +17,15 @@ import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 
 interface OccurrencesListProps {
   onOccurrenceCreate: (selectedDate: Date) => void;
+  selectedDate: Date;
+  onDateChange: (date: Date) => void;
 }
 
-const OccurrencesList = ({ onOccurrenceCreate }: OccurrencesListProps) => {
-  const today = startOfDay(new Date());
-
-  const [selectedDate, setSelectedDate] = useState<Date | null>(today);
+const OccurrencesList = ({
+  onOccurrenceCreate,
+  selectedDate,
+  onDateChange,
+}: OccurrencesListProps) => {
   const { selectedEvent } = useAppSelector(selectAdminState);
   const dispatch = useAppDispatch();
 
@@ -47,20 +50,26 @@ const OccurrencesList = ({ onOccurrenceCreate }: OccurrencesListProps) => {
     let date = selectedDate;
     if (!date) {
       date = new Date();
+      if (date.getHours() >= 17) {
+        date.setDate(date.getDate() + 1);
+      }
+      date.setHours(12, 0, 0, 0);
     }
     onOccurrenceCreate(date);
   };
 
   return (
     <OccurrenceCalendarContext.Provider
-      value={{ today, occurrences: selectedEvent?.occurrences ?? [] }}
+      value={{ selectedDate, occurrences: selectedEvent?.occurrences ?? [] }}
     >
       <div className="flex flex-col items-center gap-4 overflow-y-auto h-full pb-8">
         <div className=" min-h-[255px]">
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DateCalendar
               value={selectedDate}
-              onChange={setSelectedDate}
+              onChange={(value) => {
+                onDateChange(value as Date);
+              }}
               slots={{ day: OccurenceCalendarDate }}
             />
           </LocalizationProvider>

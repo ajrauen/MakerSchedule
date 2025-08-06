@@ -7,6 +7,7 @@ import {
 } from "@ms/redux/slices/adminSlice";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import { OccurrenceView } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceView/OccurrenceView";
+import { startOfDay } from "date-fns";
 
 const EventOccurrences = () => {
   const [animating, setAnimating] = useState(false);
@@ -14,6 +15,9 @@ const EventOccurrences = () => {
   const { selectedEvent, selectedEventOccurrence } =
     useAppSelector(selectAdminState);
   const dispatch = useAppDispatch();
+
+  const today = startOfDay(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date>(today);
 
   useEffect(() => {
     if (selectedEventOccurrence) {
@@ -71,14 +75,20 @@ const EventOccurrences = () => {
           ${showDetails ? "opacity-0 translate-x-10 pointer-events-none" : "opacity-100 translate-x-0 z-10"}
         `}
       >
-        <OccurrencesList onOccurrenceCreate={handleOccurrenceCreate} />
+        {!showDetails && (
+          <OccurrencesList
+            selectedDate={selectedDate}
+            onOccurrenceCreate={handleOccurrenceCreate}
+            onDateChange={setSelectedDate}
+          />
+        )}
       </div>
       <div
         className={`absolute w-full h-full transition-all duration-300 ease-in-out
           ${showDetails ? "opacity-100 translate-x-0 z-20" : "opacity-0 translate-x-10 pointer-events-none"}
         `}
       >
-        <OccurrenceView onBack={handleBack} />
+        {showDetails && <OccurrenceView onBack={handleBack} />}
       </div>
     </div>
   );

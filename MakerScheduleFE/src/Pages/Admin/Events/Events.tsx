@@ -13,12 +13,11 @@ import {
   setSelectedEvent,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
+import type { ViewState } from "@ms/types/admin.types";
 import type { EventOffering } from "@ms/types/event.types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
-
-type ViewState = "table" | "calendar";
 
 const AdminEvents = () => {
   const [eventToDelete, setEventToDelete] = useState<
@@ -29,7 +28,7 @@ const AdminEvents = () => {
   const [filteredEvents, setFilteredEvents] = useState<EventOffering[]>([]);
   const [searchString, setSearchString] = useState("");
   const [filterValue, setFilterValue] = useState("");
-  const [viewState, setViewState] = useState("table");
+  const [viewState, setViewState] = useState<ViewState>("table");
 
   const queryClient = useQueryClient();
   const { selectedEvent, adminDrawerOpen, selectedEventOccurrence } =
@@ -107,7 +106,7 @@ const AdminEvents = () => {
     dispatch(setAdminDrawerOpen(false));
   };
 
-  const handleViewStateChange = (value: string) => {
+  const handleViewStateChange = (value: ViewState) => {
     dispatch(setSelectedEventOccurrence(undefined));
     dispatch(setSelectedEvent(undefined));
     dispatch(setAdminDrawerOpen(false));

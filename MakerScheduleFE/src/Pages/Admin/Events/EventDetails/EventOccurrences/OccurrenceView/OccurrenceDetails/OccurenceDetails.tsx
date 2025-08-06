@@ -27,7 +27,6 @@ import {
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import type { AxiosResponse } from "axios";
 import type { EventOffering } from "@ms/types/event.types";
-import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 
 interface OccurrenceDetailsProps {
   onCancel: () => void;
@@ -41,9 +40,8 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
 
   const { selectedEvent, selectedEventOccurrence } =
     useAppSelector(selectAdminState);
-  const { events } = useAdminEventsData();
+  const dispatch = useAppDispatch();
 
-  // Create dynamic validation schema based on occurrence state
   const createOccurrenceValidationSchema = useMemo(() => {
     const isNewFromCalendar =
       selectedEventOccurrence?.meta?.isNew &&
@@ -67,7 +65,6 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
   >;
 
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
 
   const { control, handleSubmit, reset, watch, getValues, setValue } =
     useForm<CreateOccurrenceFormData>({
@@ -84,103 +81,48 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
   const time = watch("scheduleStart");
   const duration = watch("duration");
 
-  const handleSaveSuccess = (data: AxiosResponse<Occurrence>) => {
-    if (data.data.meta?.componentOrigin === "occurrenceCalendar") {
-      queryClient.setQueriesData(
-        {
-          queryKey: ["occurrences"],
-          predicate: (query) => {
-            const [key] = query.queryKey;
-            return key === "occurrences";
-          },
-        },
-        (oldData: AxiosResponse<Occurrence[]>) => {
-          if (!oldData) return oldData;
-          return {
-            ...oldData,
-            data: oldData.data.map((occurrence: Occurrence) =>
-              occurrence.id === data.data.id ? data.data : occurrence
-            ),
-          };
-        }
-      );
-    } else {
-      queryClient.setQueryData(
-        ["event", data.data.eventId],
-        (oldData: AxiosResponse<Occurrence[]>) => {
-          if (!oldData) return undefined;
-          return {
-            ...oldData,
-            data: {
-              ...oldData.data,
-              occurrences: [...oldData.data, data.data],
-            },
-          };
-        }
-      );
-    }
+  const handleSaveSuccess = (response: AxiosResponse<Occurrence>) => {
+    queryClient.setQueryData(
+      ["event", response.data.eventId],
+      (oldData: AxiosResponse<EventOffering>) => {
+        if (!oldData) return undefined;
 
-    dispatch(
-      setSelectedEventOccurrence({
-        ...data.data,
-        meta: { ...selectedEventOccurrence?.meta },
-      })
+        return {
+          ...oldData,
+          data: {
+            ...oldData.data,
+            occurrences: [...(oldData.data.occurrences || []), response.data],
+          },
+        };
+      }
     );
+    dispatch(setSelectedEventOccurrence(response.data));
   };
 
-  const handleUpdateSuccess = (data: AxiosResponse<Occurrence>) => {
-    if (
-      selectedEventOccurrence?.meta?.componentOrigin === "occurrenceCalendar"
-    ) {
-      queryClient.setQueryData(
-        ["event", data.data.eventId],
-        (oldData: AxiosResponse<Occurrence[]>) => {
-          if (!oldData) return undefined;
+  const handleUpdateSuccess = (response: AxiosResponse<Occurrence>) => {
+    queryClient.setQueryData(
+      ["event", response.data.eventId],
+      (oldData: AxiosResponse<EventOffering>) => {
+        if (!oldData || !oldData.data || !oldData.data.occurrences)
+          return undefined;
+        const occurrenceIndex = oldData.data.occurrences.findIndex(
+          (occurrence: Occurrence) => occurrence.id === response.data.id
+        );
+
+        if (occurrenceIndex >= 0) {
           return {
             ...oldData,
             data: {
               ...oldData.data,
-              occurrences: oldData.data.map((occurrence: Occurrence) =>
-                occurrence.id === data.data.id ? data.data : occurrence
+              occurrences: oldData.data.occurrences.map(
+                (occurrence: Occurrence, idx) =>
+                  idx === occurrenceIndex ? response.data : occurrence
               ),
             },
           };
         }
-      );
-    } else {
-      queryClient.setQueryData(
-        ["event", data.data.eventId],
-        (oldData: AxiosResponse<EventOffering>) => {
-          if (!oldData || !oldData.data || !oldData.data.occurrences)
-            return undefined;
-
-          const occurrenceIndex = oldData.data.occurrences.findIndex(
-            (occurrence: Occurrence) => occurrence.id === data.data.id
-          );
-
-          if (occurrenceIndex >= 0) {
-            return {
-              ...oldData,
-              data: {
-                ...oldData.data,
-                occurrences: oldData.data.occurrences.map(
-                  (occurrence: Occurrence, idx) =>
-                    idx === occurrenceIndex ? data.data : occurrence
-                ),
-              },
-            };
-          }
-
-          return oldData;
-        }
-      );
-    }
-    // Preserve meta (such as componentOrigin) so UI stays in correct view
-    dispatch(
-      setSelectedEventOccurrence({
-        ...data.data,
-        meta: { ...selectedEventOccurrence?.meta },
-      })
+        return oldData;
+      }
     );
   };
 
@@ -368,10 +310,10 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
     }
   };
 
-  const eventOptions = events.map((event) => ({
-    label: event.eventName,
-    value: event.id,
-  }));
+  // const eventOptions = events.map((event) => ({
+  //   label: event.eventName,
+  //   value: event.id!,
+  // }));
 
   return (
     <>
@@ -379,12 +321,12 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
         "occurrenceCalendar" && <h2>{selectedEventOccurrence.eventName}</h2>}
       <form onSubmit={handleSubmit(onSave)}>
         <div className="p-4 space-y-2 bg-white rounded shadow flex flex-col gap-6">
-          <FormSelect
+          {/* <FormSelect
             name="eventId"
             control={control}
             options={eventOptions}
             label={"Event"}
-          />
+          /> */}
 
           <FormDateTime
             control={control}
@@ -431,7 +373,7 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
                 ? "Cancel"
                 : "Back"
             }
-            saveButtonText={selectedEventOccurrence?.id ? "Update" : "Save"}
+            saveButtonText={selectedEventOccurrence?.id ? "Update" : "Create"}
           />
         </div>
       </form>
