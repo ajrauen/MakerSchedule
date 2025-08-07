@@ -4,7 +4,7 @@ import { createOccurrence } from "@ms/api/occurrence.api";
 import { FormDateTime } from "@ms/Components/FormComponents/FormDateTime/FormDateTime";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
-import { durationOptions } from "@ms/Pages/Admin/Events/utils/event.utils";
+import { durationOptions } from "@ms/Pages/Admin/Events/AdminEventView/utils/event.utils";
 import type { SelectOption } from "@ms/types/form.types";
 import type { CreateOccurrence, Occurrence } from "@ms/types/occurrence.types";
 import type { PickerValidDate } from "@mui/x-date-pickers";

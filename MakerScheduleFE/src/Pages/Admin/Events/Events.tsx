@@ -1,15 +1,13 @@
 import { deleteEvent } from "@ms/api/event.api";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
-import { EventCalendar } from "@ms/Pages/Admin/Events/Calendar/EventsCalendar";
-import { EventDetails } from "@ms/Pages/Admin/Events/EventDetails/EventDetails";
-import { OccurrenceView } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceView/OccurrenceView";
+import { OccurrenceCalendarDetails } from "@ms/Pages/Admin/Events/AdminCalendarView/CalanderOccurrenceDetails/OccurrenceCalendarDetails";
 import { EventsHeader } from "@ms/Pages/Admin/Events/Header/Header";
-import { AdminEventsTable } from "@ms/Pages/Admin/Events/Table/Table";
+import { AdminCalendarView } from "@ms/Pages/Admin/Events/AdminCalendarView/AdminCalendarView";
+import { AdminEventView } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventView";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
   selectAdminState,
-  setAdminDrawerOpen,
   setSelectedEvent,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
@@ -31,8 +29,7 @@ const AdminEvents = () => {
   const [viewState, setViewState] = useState<ViewState>("table");
 
   const queryClient = useQueryClient();
-  const { selectedEvent, adminDrawerOpen, selectedEventOccurrence } =
-    useAppSelector(selectAdminState);
+  const { selectedEventOccurrence } = useAppSelector(selectAdminState);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -57,10 +54,7 @@ const AdminEvents = () => {
         }
       );
 
-      if (selectedEvent?.id === eventToDelete.id) {
-        dispatch(setSelectedEvent(undefined));
-      }
-
+      // Clear any selected event if it was the one deleted
       setEventToDelete(undefined);
     },
   });
@@ -101,26 +95,16 @@ const AdminEvents = () => {
   const handleFilterChange = (value: string) => {
     setFilterValue(value);
   };
-  const handleCaledarDrawerClose = () => {
-    dispatch(setSelectedEventOccurrence(undefined));
-    dispatch(setAdminDrawerOpen(false));
-  };
 
   const handleViewStateChange = (value: ViewState) => {
     dispatch(setSelectedEventOccurrence(undefined));
     dispatch(setSelectedEvent(undefined));
-    dispatch(setAdminDrawerOpen(false));
     setViewState(value);
   };
 
   return (
     <div className="flex w-full h-full overflow-hidden pb-12">
-      <div
-        className={`flex-grow basis-0 transition-all duration-300  flex-col ${adminDrawerOpen ? "hidden md:flex" : ""}`}
-        style={{
-          marginRight: adminDrawerOpen ? "var(--create-drawer-width)" : "",
-        }}
-      >
+      <div className="flex-grow flex-col w-full">
         <EventsHeader
           onSearch={handleSearch}
           eventTypes={appMetaData.eventTypes || []}
@@ -129,33 +113,16 @@ const AdminEvents = () => {
           viewState={viewState}
         />
         {viewState === "calendar" ? (
-          <EventCalendar selectedEventType={filterValue} />
+          <AdminCalendarView selectedEventType={filterValue} />
         ) : (
-          <AdminEventsTable
+          <AdminEventView
             events={filteredEvents}
             onEventDelete={handleDeletClick}
+            eventTypes={appMetaData.eventTypes || []}
           />
         )}
       </div>
-      <div
-        className="fixed top-0 right-0 h-full bg-white shadow-lg z-50 transition-transform duration-300 w-full md:w-[var(--create-drawer-width)]"
-        style={{
-          willChange: "transform",
-          transform: adminDrawerOpen ? "translateX(0)" : "translateX(100%)",
-        }}
-      >
-        <div className="p-6 h-full">
-          {selectedEventOccurrence &&
-          selectedEventOccurrence.meta?.componentOrigin ===
-            "occurrenceCalendar" ? (
-            <OccurrenceView onBack={handleCaledarDrawerClose} />
-          ) : (
-            selectedEvent && (
-              <EventDetails eventTypes={appMetaData.eventTypes} />
-            )
-          )}
-        </div>
-      </div>
+
       <ConfirmationDialog
         open={!!eventToDelete}
         onCancel={handleCancelDeleteEvent}

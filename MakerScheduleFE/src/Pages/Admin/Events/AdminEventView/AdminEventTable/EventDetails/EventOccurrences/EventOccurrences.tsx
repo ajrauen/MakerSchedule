@@ -1,12 +1,12 @@
 import type { Occurrence } from "@ms/types/occurrence.types";
 import { useEffect, useState } from "react";
-import { OccurrencesList } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrencesList";
+import { OccurrencesList } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrencesList/OccurrencesList";
 import {
   selectAdminState,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
-import { OccurrenceView } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrenceView/OccurrenceView";
+import { OccurrenceView } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrenceView/OccurrenceView";
 import { startOfDay } from "date-fns";
 
 const EventOccurrences = () => {

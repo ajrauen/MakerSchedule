@@ -6,34 +6,24 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
 import type { EventOffering } from "@ms/types/event.types";
-import { durationMap } from "@ms/Pages/Admin/Events/utils/event.utils";
-import {
-  selectAdminState,
-  setAdminDrawerOpen,
-  setSelectedEvent,
-} from "@ms/redux/slices/adminSlice";
-import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import { durationMap } from "@ms/Pages/Admin/Events/AdminEventView/utils/event.utils";
 
 interface AdminEventTableProps {
   events: EventOffering[];
   onEventDelete: (event: EventOffering) => void;
+  onEventSelect: (event: EventOffering) => void;
+  selectedEvent?: EventOffering;
 }
 
-const AdminEventsTable = ({
+const AdminEventTable = ({
   onEventDelete,
   events = [],
+  onEventSelect,
+  selectedEvent,
 }: AdminEventTableProps) => {
   const handleDeletClick = (evt: React.MouseEvent, row: EventOffering) => {
     evt.stopPropagation();
     onEventDelete(row);
-  };
-
-  const { selectedEvent } = useAppSelector(selectAdminState);
-  const dispatch = useAppDispatch();
-
-  const handleEventSelect = (event: EventOffering) => {
-    dispatch(setSelectedEvent(event));
-    dispatch(setAdminDrawerOpen(true));
   };
 
   return (
@@ -54,10 +44,8 @@ const AdminEventsTable = ({
             <TableRow
               key={idx}
               hover
-              selected={selectedEvent?.id == row.id}
-              onClick={() => {
-                handleEventSelect(row);
-              }}
+              selected={selectedEvent?.id === row.id}
+              onClick={() => onEventSelect(row)}
             >
               <TableCell>{row.eventName}</TableCell>
               <TableCell className="w-2/5">
@@ -101,4 +89,4 @@ const AdminEventsTable = ({
   );
 };
 
-export { AdminEventsTable };
+export { AdminEventTable };

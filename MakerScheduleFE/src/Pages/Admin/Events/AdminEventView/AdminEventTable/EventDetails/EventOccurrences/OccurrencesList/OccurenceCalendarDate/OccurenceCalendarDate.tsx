@@ -1,4 +1,4 @@
-import { OccurrenceCalendarContext } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/context/occurrence-context";
+import { OccurrenceCalendarContext } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrencesList/context/occurrence-context";
 import { PickersDay, type PickersDayProps } from "@mui/x-date-pickers";
 import { startOfDay } from "date-fns";
 import { useContext, useState } from "react";

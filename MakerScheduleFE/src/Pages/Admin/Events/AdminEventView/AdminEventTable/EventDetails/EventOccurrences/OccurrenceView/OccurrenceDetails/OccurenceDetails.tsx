@@ -6,7 +6,7 @@ import {
 import { createOccurrence, updateOccurrence } from "@ms/api/occurrence.api";
 import { FormDateTime } from "@ms/Components/FormComponents/FormDateTime/FormDateTime";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import { durationOptions } from "@ms/Pages/Admin/Events/utils/event.utils";
+import { durationOptions } from "@ms/Pages/Admin/Events/AdminEventView/utils/event.utils";
 import type { SelectOption } from "@ms/types/form.types";
 import type {
   CreateOccurrence,

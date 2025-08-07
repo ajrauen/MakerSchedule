@@ -4,9 +4,9 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { startOfDay } from "date-fns";
 
 import { useMemo, useState } from "react";
-import { OccurrenceCalendarContext } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/context/occurrence-context";
-import { OccurenceCalendarDate } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurenceCalendarDate/OccurenceCalendarDate";
-import { OccurenceRow } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrenceRow/OccurrenceRow";
+import { OccurrenceCalendarContext } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrencesList/context/occurrence-context";
+import { OccurenceCalendarDate } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrencesList/OccurenceCalendarDate/OccurenceCalendarDate";
+import { OccurenceRow } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrencesList/OccurrenceRow/OccurrenceRow";
 import { IconButton } from "@mui/material";
 import { AddCircle } from "@mui/icons-material";
 import {

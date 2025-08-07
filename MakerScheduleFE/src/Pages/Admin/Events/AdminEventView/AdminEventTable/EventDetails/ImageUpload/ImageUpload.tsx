@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { Controller, type Control, type FieldValues } from "react-hook-form";
 
 import { FormDropZone } from "@ms/Components/FormComponents/FormDropZone";
-import { ImageCropper } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/ImageCropper/ImageCropper";
+import { ImageCropper } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/ImageUpload/ImageCropper/ImageCropper";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
-import { getCroppedImg } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/getCroppedImg.utils";
+import { getCroppedImg } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/ImageUpload/getCroppedImg.utils";
 import type { Area } from "react-easy-crop";
 
 interface ImageUploadProps<T extends FieldValues = FieldValues> {

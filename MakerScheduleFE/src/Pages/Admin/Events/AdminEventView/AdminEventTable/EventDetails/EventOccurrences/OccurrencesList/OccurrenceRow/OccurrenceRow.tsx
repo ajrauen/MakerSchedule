@@ -1,8 +1,8 @@
 import { getAvailableDomainUserLeaders } from "@ms/api/domain-user.api";
 import { deleteOccurrence } from "@ms/api/occurrence.api";
 import { queryClient } from "@ms/common/query-client";
-import { isOccurrenceInPast } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/Occurrence.utils";
-import { OccurrenceTime } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/OccurrencesList/OccurrenceTime/OccurrenceTime";
+import { isOccurrenceInPast } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/Occurrence.utils";
+import { OccurrenceTime } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrencesList/OccurrenceTime/OccurrenceTime";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
   selectAdminState,

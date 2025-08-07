@@ -1,6 +1,6 @@
 import type { EventOffering, EventType } from "@ms/types/event.types";
 
-import { BasicEventDetails } from "@ms/Pages/Admin/Events/EventDetails/BasicDetails/BasicEventDetails";
+import { BasicEventDetails } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/BasicDetails/BasicEventDetails";
 import { IconButton, Tab, Tabs } from "@mui/material";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
@@ -13,7 +13,7 @@ import {
   setSelectedEvent,
 } from "@ms/redux/slices/adminSlice";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
-import { EventOccurrences } from "@ms/Pages/Admin/Events/EventDetails/EventOccurrences/EventOccurrences";
+import { EventOccurrences } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/EventOccurrences";
 
 interface CreateEventProps {
   eventTypes: EventType[];
@@ -28,7 +28,7 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
     setValue(newValue);
   };
 
-  const { selectedEvent, selectedEventOccurrence } =
+  const { selectedEvent, selectedEventOccurrence, adminDrawerOpen } =
     useAppSelector(selectAdminState);
   const dispatch = useAppDispatch();
 
@@ -86,28 +86,38 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full">
-      <div className="ml-auto absolute right-2 z-1001">
-        <IconButton onClick={handleClose}>
-          <CloseIcon />
-        </IconButton>
+    <div
+      className="fixed top-0 right-0 h-full bg-white shadow-lg z-50 transition-transform duration-300 w-full md:w-[var(--create-drawer-width)]"
+      style={{
+        willChange: "transform",
+        transform: adminDrawerOpen ? "translateX(0)" : "translateX(100%)",
+      }}
+    >
+      <div className="p-6 h-full">
+        <div className="flex flex-col h-full w-full">
+          <div className="ml-auto absolute right-2 z-1001">
+            <IconButton onClick={handleClose}>
+              <CloseIcon />
+            </IconButton>
+          </div>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="Vertical tabs example"
+          >
+            <Tab label="Details" {...a11yProps(0)} />
+            {event?.meta?.isNew ? null : (
+              <Tab label="Occurrences" {...a11yProps(1)} />
+            )}
+          </Tabs>
+          <TabPanel index={0} value={value}>
+            <BasicEventDetails onClose={handleClose} eventTypes={eventTypes} />
+          </TabPanel>
+          <TabPanel index={1} value={value}>
+            <EventOccurrences />
+          </TabPanel>
+        </div>
       </div>
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        aria-label="Vertical tabs example"
-      >
-        <Tab label="Details" {...a11yProps(0)} />
-        {event?.meta?.isNew ? null : (
-          <Tab label="Occurrences" {...a11yProps(1)} />
-        )}
-      </Tabs>
-      <TabPanel index={0} value={value}>
-        <BasicEventDetails onClose={handleClose} eventTypes={eventTypes} />
-      </TabPanel>
-      <TabPanel index={1} value={value}>
-        <EventOccurrences />
-      </TabPanel>
     </div>
   );
 };

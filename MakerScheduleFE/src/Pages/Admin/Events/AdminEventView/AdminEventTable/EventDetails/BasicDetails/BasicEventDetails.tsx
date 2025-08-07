@@ -13,8 +13,8 @@ import {
   createSaveForm,
   createUpdateForm,
   durationOptions,
-} from "@ms/Pages/Admin/Events/utils/event.utils";
-import { ImageUpload } from "@ms/Pages/Admin/Events/EventDetails/ImageUpload/ImageUpload";
+} from "@ms/Pages/Admin/Events/AdminEventView/utils/event.utils";
+import { ImageUpload } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/ImageUpload/ImageUpload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createEvent, patchEvent } from "@ms/api/event.api";
 import { z } from "zod";

@@ -4,7 +4,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import { getOccurrences } from "@ms/api/occurrence.api";
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { useAppDispatch } from "@ms/redux/hooks";
@@ -15,7 +15,7 @@ import {
 } from "@ms/redux/slices/adminSlice";
 import type { DatesSetArg, EventClickArg } from "@fullcalendar/core/index.js";
 
-interface EventCalendarProps {
+interface OccurrenceCalendarProps {
   selectedEventType?: string;
 }
 
@@ -28,23 +28,9 @@ function calculateEndTime(
   return start.toISOString();
 }
 
-const EventCalendar = ({ selectedEventType }: EventCalendarProps) => {
+const OccurrenceCalendar = ({ selectedEventType }: OccurrenceCalendarProps) => {
   const { events } = useAdminEventsData();
-
   const calendarRef = useRef<FullCalendar>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!containerRef.current || !calendarRef.current) return;
-    const calendarApi = calendarRef.current.getApi();
-    const observer = new window.ResizeObserver(() => {
-      calendarApi.updateSize();
-    });
-    observer.observe(containerRef.current);
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 
   const handleDatesSet = (arg: DatesSetArg) => {
     setCalendarStartDate(arg.start);
@@ -52,7 +38,7 @@ const EventCalendar = ({ selectedEventType }: EventCalendarProps) => {
   };
   const [calendarStartDate, setCalendarStartDate] = useState<Date | null>(null);
   const [calendarEndDate, setCalendarEndDate] = useState<Date | null>(null);
-  const dispath = useAppDispatch();
+  const dispatch = useAppDispatch();
 
   const { data: occurrences } = useQuery({
     queryKey: [
@@ -100,15 +86,14 @@ const EventCalendar = ({ selectedEventType }: EventCalendarProps) => {
     const event = events.find((evt) => evt.id === updateOccurrence.eventId);
     setSelectedEvent(event);
 
-    dispath(setSelectedEventOccurrence(updateOccurrence));
-    dispath(setAdminDrawerOpen(true));
+    dispatch(setSelectedEventOccurrence(updateOccurrence));
+    dispatch(setAdminDrawerOpen(true));
   };
 
   return (
-    <div ref={containerRef} style={{ height: "100%" }}>
+    <div style={{ width: "100%", position: "relative" }}>
       <FullCalendar
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        ref={calendarRef}
         initialView="dayGridMonth"
         headerToolbar={{
           left: "prev,next today",
@@ -130,4 +115,4 @@ const EventCalendar = ({ selectedEventType }: EventCalendarProps) => {
   );
 };
 
-export { EventCalendar };
+export { OccurrenceCalendar };
