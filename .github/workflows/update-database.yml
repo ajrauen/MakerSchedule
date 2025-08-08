@@ -1,0 +1,62 @@
+name: Update Azure Database
+
+on:
+  workflow_dispatch: # Manual trigger
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - staging
+  push:
+    branches: [main]
+    paths:
+      - "MakeScheduleBE/MakerSchedule.Infrastructure/Migrations/**"
+
+jobs:
+  update-database:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Azure CLI Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Get secrets from Azure Key Vault
+        uses: azure/CLI@v1
+        with:
+          inlineScript: |
+            # Get database connection string from Key Vault
+            DB_CONN=$(az keyvault secret show --name "DatabaseConnectionString" --vault-name "makerschedule-keyvault" --query value -o tsv)
+            echo "::add-mask::$DB_CONN"
+            echo "DATABASE_CONNECTION_STRING=$DB_CONN" >> $GITHUB_ENV
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ./MakeScheduleBE
+
+      - name: Update database
+        run: |
+          dotnet ef database update --project MakerSchedule.Infrastructure --startup-project MakerSchedule.API --connection "${{ env.DATABASE_CONNECTION_STRING }}"
+        working-directory: ./MakeScheduleBE
+        env:
+          ASPNETCORE_ENVIRONMENT: Production
+
+      - name: Notify success
+        if: success()
+        run: echo "✅ Database updated successfully!"
+
+      - name: Notify failure
+        if: failure()
+        run: echo "❌ Database update failed!"
