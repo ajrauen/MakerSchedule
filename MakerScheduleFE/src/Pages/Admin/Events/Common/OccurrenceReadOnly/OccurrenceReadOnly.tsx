@@ -51,14 +51,7 @@ const OccurrenceReadOnly = ({ onBack }: OccurrencReadOnlyProps) => {
                 .join(", ")}
             </div>
           )}
-          {occurrence.meta && (
-            <div className="text-xs text-gray-400">
-              <span className="font-semibold">Meta:</span>{" "}
-              {Object.entries(occurrence.meta)
-                .map(([k, v]) => `${k}: ${v}`)
-                .join(", ")}
-            </div>
-          )}
+
           <Button
             variant="outlined"
             color="primary"

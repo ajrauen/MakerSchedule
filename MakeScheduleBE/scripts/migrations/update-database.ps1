@@ -19,8 +19,8 @@ if ($Env -eq 0) {
     $env:ASPNETCORE_ENVIRONMENT = "Development"
     Write-Host "Updating Local/Docker database (Development)..." -ForegroundColor Green
 } else {
-    $env:ASPNETCORE_ENVIRONMENT = "Production"
-    Write-Host "Updating Cloud database (Production)..." -ForegroundColor Green
+    $env:ASPNETCORE_ENVIRONMENT = "Development"  # Use Development to avoid Azure auth issues
+    Write-Host "Updating Cloud database (Production connection via user secrets)..." -ForegroundColor Green
 }
 
 # Run the database update

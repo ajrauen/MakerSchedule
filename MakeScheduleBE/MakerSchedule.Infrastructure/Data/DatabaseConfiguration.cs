@@ -8,7 +8,7 @@ public static class DatabaseConfiguration
 {
     public static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = configuration["DatabaseConnectionString"] ?? configuration.GetConnectionString("DefaultConnection");
         var environment = configuration["ASPNETCORE_ENVIRONMENT"] ?? "Development";
 
         // Log the environment and connection string for debugging

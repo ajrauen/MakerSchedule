@@ -1,6 +1,6 @@
 import { isOccurrenceInPast } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/Occurrence.utils";
 import { OccurrenceDetails } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrenceView/OccurrenceDetails/OccurenceDetails";
-import { OccurrenceReadOnly } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/OccurrenceView/OccurrenceReadOnly/OccurrenceReadOnly";
+import { OccurrenceReadOnly } from "@ms/Pages/Admin/Events/Common/OccurrenceReadOnly/OccurrenceReadOnly";
 import { useAppSelector } from "@ms/redux/hooks";
 import { selectAdminState } from "@ms/redux/slices/adminSlice";
 
