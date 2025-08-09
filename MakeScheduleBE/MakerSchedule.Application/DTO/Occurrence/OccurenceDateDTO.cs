@@ -11,6 +11,7 @@ public class OccurenceDateDTO
     public string EventName { get; set; } = string.Empty;
     public int? Duration { get; set; }
     public DateTime ScheduleStart { get; set; }
+    public string EventType { get; set; } = string.Empty;
     public ICollection<OccurrenceUserDTO> Attendees { get; set; } = Array.Empty<OccurrenceUserDTO>();
     public ICollection<OccurrenceUserDTO> Leaders { get; set; } = Array.Empty<OccurrenceUserDTO>();
     public OccurrenceStatus Status { get; set; }

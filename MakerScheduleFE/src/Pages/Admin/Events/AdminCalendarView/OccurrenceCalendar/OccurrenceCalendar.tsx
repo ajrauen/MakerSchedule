@@ -3,9 +3,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { Occurrence } from "@ms/types/occurrence.types";
-import { getOccurrences } from "@ms/api/occurrence.api";
-import { useState, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { useAppDispatch } from "@ms/redux/hooks";
 import {
@@ -17,6 +15,9 @@ import type { DatesSetArg, EventClickArg } from "@fullcalendar/core/index.js";
 
 interface OccurrenceCalendarProps {
   selectedEventType?: string;
+  onDateSet: (dates: DatesSetArg) => void;
+
+  occurrences: Occurrence[];
 }
 
 function calculateEndTime(
@@ -28,29 +29,14 @@ function calculateEndTime(
   return start.toISOString();
 }
 
-const OccurrenceCalendar = ({ selectedEventType }: OccurrenceCalendarProps) => {
+const OccurrenceCalendar = ({
+  onDateSet,
+
+  occurrences,
+}: OccurrenceCalendarProps) => {
   const { events } = useAdminEventsData();
-  const calendarRef = useRef<FullCalendar>(null);
 
-  const handleDatesSet = (arg: DatesSetArg) => {
-    setCalendarStartDate(arg.start);
-    setCalendarEndDate(arg.end);
-  };
-  const [calendarStartDate, setCalendarStartDate] = useState<Date | null>(null);
-  const [calendarEndDate, setCalendarEndDate] = useState<Date | null>(null);
   const dispatch = useAppDispatch();
-
-  const { data: occurrences } = useQuery({
-    queryKey: [
-      "occurrences",
-      calendarStartDate,
-      calendarEndDate,
-      selectedEventType,
-    ],
-    queryFn: () =>
-      getOccurrences(calendarStartDate!, calendarEndDate!, selectedEventType),
-    enabled: !!calendarStartDate && !!calendarEndDate,
-  });
 
   function getEventTypeColor(): string {
     return "red";
@@ -73,7 +59,7 @@ const OccurrenceCalendar = ({ selectedEventType }: OccurrenceCalendarProps) => {
   };
 
   const handleEventClick = (info: EventClickArg) => {
-    const occurrence = occurrences?.data.find(
+    const occurrence = occurrences.find(
       (occ) => occ.id === info.event.extendedProps.occurrenceId
     );
     if (!occurrence) return;
@@ -100,16 +86,14 @@ const OccurrenceCalendar = ({ selectedEventType }: OccurrenceCalendarProps) => {
           center: "title",
           right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
-        events={
-          occurrences?.data ? convertToCalendarEvents(occurrences.data) : []
-        }
+        events={occurrences ? convertToCalendarEvents(occurrences) : []}
         eventClick={handleEventClick}
         editable={true}
         selectable={true}
         selectMirror={true}
         dayMaxEvents={true}
         height="auto"
-        datesSet={handleDatesSet}
+        datesSet={onDateSet}
       />
     </div>
   );

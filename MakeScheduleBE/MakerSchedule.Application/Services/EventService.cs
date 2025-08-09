@@ -547,6 +547,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     Duration = o.Duration,
                     Status = o.Status,
                     EventName = o.Event.EventName.Value, 
+                    EventType = o.Event.EventType.Name.Value,
                     Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
                     {
                         Id = a.UserId.ToString().ToLower(),

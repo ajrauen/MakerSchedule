@@ -17,8 +17,6 @@ public static class DatabaseConfiguration
 
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            // Always use SQL Server
-            Console.WriteLine("Using SQL Server provider");
             options.UseSqlServer(connectionString, sqlServerOptionsAction: sqlOptions =>
             {
                 sqlOptions.EnableRetryOnFailure(

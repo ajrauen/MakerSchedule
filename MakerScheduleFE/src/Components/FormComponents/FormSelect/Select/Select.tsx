@@ -12,7 +12,6 @@ import React, { useEffect } from "react";
 // No-op icon for hiding dropdown arrow
 const NoDropdownIcon: React.FC = () => null;
 import { type FormSelectOption } from "../FormSelect";
-import { no } from "zod/v4/locales";
 
 export type SelectProps = MuiSelectProps & {
   options: FormSelectOption[];
@@ -97,13 +96,7 @@ const Select = ({
     <FormControl fullWidth disabled={disabled || isLoading}>
       <InputLabel
         id={props.name ? `${props.name}-label` : undefined}
-        shrink={
-          (props.displayEmpty && options.length === 0) ||
-          (props.value !== undefined &&
-            props.value !== "" &&
-            props.value !== null) ||
-          (multiSelect && Array.isArray(props.value) && props.value.length > 0)
-        }
+        hidden={props.displayEmpty && options.length === 0}
       >
         {label || "Select"}
       </InputLabel>
