@@ -7,5 +7,5 @@ public class UpdateOccurrenceDTO
     public ICollection<Guid> Leaders { get; set; } = Array.Empty<Guid>();
     public DateTime ScheduleStart { get; set; }
     public int Duration { get; set; }
-    public Guid EventId { get; set; } =  Guid.NewGuid();
+    public Guid EventId { get; set; } = Guid.NewGuid();
 } 

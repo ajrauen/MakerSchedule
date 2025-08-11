@@ -98,7 +98,9 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                         LastName = l.User?.LastName ?? ""
                     }).ToList(),
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
-                    Status = o.Status
+                    Status = o.Status,
+                    EventName = o.Event.EventName.Value,
+                    EventType = o.Event.EventType.Name.Value
                 })
         };
     }
@@ -295,7 +297,9 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                         LastName = l.User?.LastName ?? ""
                     }).ToList(),
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
-                    Status = o.Status
+                    Status = o.Status,
+                    EventName = o.Event.EventName.Value,
+                    EventType = o.Event.EventType.Name.Value
                 }).ToList()
         };
 
@@ -315,7 +319,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
     public async Task<OccurrenceDTO> CreateOccurrenceAsync(CreateOccurrenceDTO occurrenceDTO)
     {
 
-        var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
+        var eventEntity = await _context.Events.Include(e => e.EventType).Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
         if (eventEntity == null)
             throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
 
@@ -404,7 +408,9 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Duration = newOccurrence.Duration,
             Status = newOccurrence.Status,
             Attendees = attendeeDTOs,
-            Leaders = leaderDTOs
+            Leaders = leaderDTOs,
+            EventName = eventEntity.EventName.Value,
+            EventType = eventEntity.EventType.Name.Value,
         };
     }
 
@@ -412,7 +418,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
     {
 
 
-        var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
+        var eventEntity = await _context.Events.Include(e=> e.EventType).Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
         if (eventEntity == null)
             throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
 
@@ -495,8 +501,9 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             EventId = occurrence.EventId,
             ScheduleStart = DateTime.SpecifyKind(occurrence.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
             Duration = occurrence.Duration,
-            Status = occurrence.Status
-            
+            Status = occurrence.Status,
+            EventName = occurrence.Event.EventName.Value,
+            EventType = occurrence.Event.EventType.Name.Value
         };
     }
 
@@ -512,7 +519,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         return true;
     }
     
-    public async Task<IEnumerable<OccurenceDateDTO>> GetOccurancesByDateAsync(SearchOccurrenceDTO searchDTO)
+    public async Task<IEnumerable<OccurrenceDTO>> GetOccurancesByDateAsync(SearchOccurrenceDTO searchDTO)
     {
         if (searchDTO.EndDate < searchDTO.StartDate)
             throw new ArgumentException("End date must be greater than or equal to start date", nameof(searchDTO.EndDate));
@@ -539,7 +546,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 .Where(o => o.ScheduleStart >= searchDTO.StartDate && o.ScheduleStart <= searchDTO.EndDate)
                 .Where(o => !o.isDeleted)
                 .Where(o => string.IsNullOrEmpty(searchDTO.EventType) || o.Event.EventType.Name == searchDTO.EventType)
-                .Select(o => new OccurenceDateDTO
+                .Select(o => new OccurrenceDTO
                 {
                     Id = o.Id,
                     EventId = o.EventId,

@@ -2,6 +2,7 @@ import { AdminCalendarView } from "@ms/Pages/Admin/Events/AdminCalendarView/Admi
 import { AdminEventView } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventView";
 import { useAppDispatch } from "@ms/redux/hooks";
 import {
+  setAdminDrawerOpen,
   setSelectedEvent,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
@@ -16,6 +17,7 @@ const AdminEvents = () => {
   const handleViewStateChange = (value: ViewState) => {
     dispatch(setSelectedEventOccurrence(undefined));
     dispatch(setSelectedEvent(undefined));
+    dispatch(setAdminDrawerOpen(false));
     setViewState(value);
   };
 

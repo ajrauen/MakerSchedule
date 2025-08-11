@@ -61,10 +61,10 @@ const EventsHeader = ({
 
   const handleCreateOccurrence = () => {
     const today = new Date();
-    if (today.getHours() >= 17) {
+    if (today.getHours() >= 12) {
       today.setDate(today.getDate() + 1);
     }
-    today.setHours(0, 0, 0, 0);
+    today.setHours(12, 0, 0, 0);
 
     const newOccurrence: Occurrence = {
       eventId: "",
@@ -92,7 +92,7 @@ const EventsHeader = ({
 
   return (
     <div className="flex items-end mt-2">
-      <div className="grow flex items-end gap-6">
+      <div className="flex items-end gap-6">
         <TextSearch onSearch={onSearch} />
         <FormSelect
           autoWidth={true}
@@ -109,7 +109,7 @@ const EventsHeader = ({
           }}
         />
       </div>
-      <div>
+      <div className="mx-auto pr-[25rem] ">
         <ToggleButtonGroup
           value={viewState}
           exclusive

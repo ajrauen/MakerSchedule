@@ -43,10 +43,10 @@ const OccurrenceCalendarHeader = ({
 
   const handleCreateOccurrence = () => {
     const today = new Date();
-    if (today.getHours() >= 17) {
+    if (today.getHours() >= 12) {
       today.setDate(today.getDate() + 1);
     }
-    today.setHours(0, 0, 0, 0);
+    today.setHours(12, 0, 0, 0);
 
     const newOccurrence: Occurrence = {
       eventId: "",
@@ -66,7 +66,7 @@ const OccurrenceCalendarHeader = ({
 
   return (
     <div className="flex items-end mt-2">
-      <div className="grow flex items-end gap-6">
+      <div className=" flex items-end gap-6">
         <FormSelect
           autoWidth={true}
           label="Event Type"
@@ -82,7 +82,7 @@ const OccurrenceCalendarHeader = ({
           }}
         />
       </div>
-      <div>
+      <div className="mx-auto pr-24 ">
         <ToggleButtonGroup
           value={viewState}
           exclusive

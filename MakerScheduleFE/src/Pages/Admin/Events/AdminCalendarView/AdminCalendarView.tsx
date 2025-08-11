@@ -131,7 +131,11 @@ const AdminCalendarView = ({
             </IconButton>
           </div>
 
-          <OccurrenceCalendarDetails />
+          <OccurrenceCalendarDetails
+            calendarEndDate={calendarEndDate}
+            calendarStartDate={calendarStartDate}
+            selectedEventType={selectedEventType}
+          />
         </div>
       </Drawer>
     </>

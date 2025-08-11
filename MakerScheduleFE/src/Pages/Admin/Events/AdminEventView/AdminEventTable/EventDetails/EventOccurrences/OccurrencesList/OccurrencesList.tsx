@@ -50,7 +50,7 @@ const OccurrencesList = ({
     let date = selectedDate;
     if (!date) {
       date = new Date();
-      if (date.getHours() >= 17) {
+      if (date.getHours() >= 12) {
         date.setDate(date.getDate() + 1);
       }
       date.setHours(12, 0, 0, 0);
