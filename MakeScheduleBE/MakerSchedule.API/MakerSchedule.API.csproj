@@ -27,6 +27,13 @@
     <Watch Remove="**\*.db-journal" />
   </ItemGroup>
 
+<ItemGroup>
+  <Content Include="..\MakerSchedule.Application\EmailTemplates\register-welcome.html">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <Link>EmailTemplates\%(Filename)%(Extension)</Link>
+  </Content>
+</ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\MakerSchedule.Infrastructure\MakerSchedule.Infrastructure.csproj" />
     <ProjectReference Include="..\MakerSchedule.Application\MakerSchedule.Application.csproj" />

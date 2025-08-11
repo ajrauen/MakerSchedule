@@ -204,13 +204,14 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             e.Description = dto.Description;
         if (dto.Duration.HasValue)
             e.Duration = new Duration(dto.Duration.Value);
-        if (dto.EventType != null)
+        if (dto.EventTypeId != null)
         {
-            var eventType = await _context.EventTypes.FirstOrDefaultAsync(et => et.Name.Value == dto.EventType);
+            var eventType = await _context.EventTypes.FirstOrDefaultAsync(et => et.Id.ToString() == dto.EventTypeId);
             if (eventType == null)
             {
-                throw new NotFoundException($"EventType with name {dto.EventType} not found", dto.EventType);
+                throw new NotFoundException($"EventType with id {dto.EventTypeId} not found", dto.EventTypeId);
             }
+            e.EventTypeId = eventType.Id;
         }
         if (dto.FormFile != null && dto.FormFile.Length > 0)
         {
