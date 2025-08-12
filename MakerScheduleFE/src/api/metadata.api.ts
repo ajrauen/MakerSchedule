@@ -11,7 +11,9 @@ const getEventMetadata = async () => {
     url: url,
   };
 
-  return await sendAxiosRequest<AdminEventsMetaData>(req);
+  const metadata = await sendAxiosRequest<AdminEventsMetaData>(req);
+
+  return metadata.data;
 };
 
 const getUserMetadata = async () => {
@@ -21,7 +23,9 @@ const getUserMetadata = async () => {
     url: url,
   };
 
-  return await sendAxiosRequest<UserMetaData>(req);
+  const metadata = await sendAxiosRequest<UserMetaData>(req);
+
+  return metadata.data;
 };
 
 export { getEventMetadata, getUserMetadata };

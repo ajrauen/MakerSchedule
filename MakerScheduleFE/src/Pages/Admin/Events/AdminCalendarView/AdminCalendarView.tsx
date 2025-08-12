@@ -62,8 +62,8 @@ const AdminCalendarView = ({
   });
 
   useEffect(() => {
-    if (occurrences && occurrences.data) {
-      setFilteredOccurrences(occurrences.data);
+    if (occurrences) {
+      setFilteredOccurrences(occurrences);
     }
   }, [occurrences]);
 
@@ -83,10 +83,10 @@ const AdminCalendarView = ({
     if (!occurrences) return;
 
     if (!value) {
-      setFilteredOccurrences(occurrences.data ?? []);
+      setFilteredOccurrences(occurrences ?? []);
     } else {
       setFilteredOccurrences(
-        occurrences.data.filter((occurrence) => occurrence.eventType === value)
+        occurrences.filter((occurrence) => occurrence.eventType === value)
       );
     }
   };

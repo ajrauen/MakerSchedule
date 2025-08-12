@@ -15,7 +15,7 @@ const getDomainUserList = async () => {
   };
   const response = await sendRequest<DomainUser[]>(req);
 
-  return response;
+  return response.data;
 };
 
 const registerNewDomainUser = async (user: RegisterDomainUserRequest) => {
@@ -27,7 +27,7 @@ const registerNewDomainUser = async (user: RegisterDomainUserRequest) => {
   };
   const response = await sendRequest<number>(req);
 
-  return response;
+  return response.data;
 };
 
 const getDomainUsers = async (role?: string) => {
@@ -43,7 +43,7 @@ const getDomainUsers = async (role?: string) => {
   };
   const response = await sendRequest<DomainUser[]>(req);
 
-  return response;
+  return response.data;
 };
 
 const getAvailableDomainUserLeaders = async (
@@ -67,7 +67,7 @@ const getAvailableDomainUserLeaders = async (
   };
   const response = await sendRequest<DomainUser[]>(req);
 
-  return response;
+  return response.data;
 };
 
 export {

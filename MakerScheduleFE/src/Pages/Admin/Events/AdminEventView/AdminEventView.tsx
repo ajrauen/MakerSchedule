@@ -14,7 +14,6 @@ import { EventsHeader } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTa
 import type { ViewState } from "@ms/types/admin.types";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
-import type { AxiosResponse } from "axios";
 import { AdminEventDrawer } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/AdminEventDrawer/AdminEventDrawer";
 
 interface AdminEventViewProps {
@@ -51,16 +50,10 @@ const AdminEventView = ({
     onSuccess: () => {
       if (!eventToDelete) return;
 
-      queryClient.setQueryData(
-        ["events"],
-        (oldEvents: AxiosResponse<EventOffering[]>) => {
-          if (!oldEvents) return oldEvents;
-          return {
-            ...oldEvents,
-            data: oldEvents.data.filter((evt) => evt.id !== eventToDelete.id),
-          };
-        }
-      );
+      queryClient.setQueryData(["events"], (oldEvents: EventOffering[]) => {
+        if (!oldEvents) return oldEvents;
+        return oldEvents.filter((evt) => evt.id !== eventToDelete.id);
+      });
 
       setEventToDelete(undefined);
     },

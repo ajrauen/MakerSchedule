@@ -4,7 +4,7 @@ import type { AxiosRequestConfig } from "axios";
 
 const BASE_EVENT_ENDPOINT = "api/Events";
 
-const createEvent = async (event: FormData) => {
+const createEvent = async (event: FormData): Promise<EventOffering> => {
   const req: AxiosRequestConfig = {
     method: "POST",
     url: `${BASE_EVENT_ENDPOINT}`,
@@ -12,21 +12,14 @@ const createEvent = async (event: FormData) => {
     data: event,
   };
 
-  return await sendRequest<EventOffering>(req);
+  const response = await sendRequest<EventOffering>(req);
+  return response.data;
 };
 
-const updateEvent = async (id: string, event: FormData) => {
-  const req: AxiosRequestConfig = {
-    method: "PUT",
-    url: `${BASE_EVENT_ENDPOINT}/${id}`,
-    withCredentials: true,
-    data: event,
-  };
-
-  return await sendRequest<number>(req);
-};
-
-const patchEvent = async (id: string, event: FormData) => {
+const patchEvent = async (
+  id: string,
+  event: FormData
+): Promise<EventOffering> => {
   const req: AxiosRequestConfig = {
     method: "PATCH",
     url: `${BASE_EVENT_ENDPOINT}/${id}`,
@@ -34,44 +27,41 @@ const patchEvent = async (id: string, event: FormData) => {
     data: event,
   };
 
-  return await sendRequest<EventOffering>(req);
+  const response = await sendRequest<EventOffering>(req);
+  return response.data;
 };
 
-const getEvents = async () => {
+const getEvents = async (): Promise<EventOffering[]> => {
   const req: AxiosRequestConfig = {
     method: "GET",
     url: `${BASE_EVENT_ENDPOINT}`,
     withCredentials: true,
   };
 
-  return await sendRequest<EventOffering[]>(req);
+  const response = await sendRequest<EventOffering[]>(req);
+  return response.data;
 };
 
-const getEvent = async (eventId: string) => {
+const getEvent = async (eventId: string): Promise<EventOffering> => {
   const req: AxiosRequestConfig = {
     method: "GET",
     url: `${BASE_EVENT_ENDPOINT}/${eventId}`,
     withCredentials: true,
   };
 
-  return await sendRequest<EventOffering>(req);
+  const response = await sendRequest<EventOffering>(req);
+  return response.data;
 };
 
-const deleteEvent = async (eventId: string) => {
+const deleteEvent = async (eventId: string): Promise<boolean> => {
   const req: AxiosRequestConfig = {
     method: "DELETE",
     url: `${BASE_EVENT_ENDPOINT}/${eventId}`,
     withCredentials: true,
   };
 
-  return await sendRequest<boolean>(req);
+  const response = await sendRequest<boolean>(req);
+  return response.data;
 };
 
-export {
-  createEvent,
-  getEvents,
-  getEvent,
-  deleteEvent,
-  updateEvent,
-  patchEvent,
-};
+export { createEvent, getEvents, getEvent, deleteEvent, patchEvent };

@@ -9,7 +9,6 @@ import {
 } from "@ms/redux/slices/adminSlice";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import { useQueryClient } from "@tanstack/react-query";
-import type { AxiosResponse } from "axios";
 import { useMemo } from "react";
 
 interface OccurrenceCalendarDetailsProps {
@@ -36,13 +35,10 @@ const OccurrenceCalendarDetails = ({
   const handleSaveSuccess = (createOccurrence: Occurrence) => {
     queryClient.setQueryData(
       ["occurrences", calendarStartDate, calendarEndDate, selectedEventType],
-      (oldData: AxiosResponse<Occurrence[]>) => {
+      (oldData: Occurrence[]) => {
         if (!oldData) return undefined;
 
-        return {
-          ...oldData,
-          data: [...(oldData.data || []), createOccurrence],
-        };
+        return [...oldData, createOccurrence];
       }
     );
     dispatch(setSelectedEventOccurrence(createOccurrence));
@@ -51,19 +47,18 @@ const OccurrenceCalendarDetails = ({
   const handleUpdateSuccess = (updateOccurrence: Occurrence) => {
     queryClient.setQueryData(
       ["occurrences", calendarStartDate, calendarEndDate, selectedEventType],
-      (oldData: AxiosResponse<Occurrence[]>) => {
-        if (!oldData || !oldData.data) return undefined;
-        const occurrenceIndex = oldData.data.findIndex(
+      (oldData: Occurrence[]) => {
+        if (!oldData) return undefined;
+        const occurrenceIndex = oldData.findIndex(
           (occurrence: Occurrence) => occurrence.id === updateOccurrence.id
         );
 
         if (occurrenceIndex >= 0) {
-          return {
-            ...oldData,
-            data: oldData.data.map((occurrence: Occurrence, idx) =>
-              idx === occurrenceIndex ? updateOccurrence : occurrence
-            ),
-          };
+          return [
+            ...oldData.slice(0, occurrenceIndex),
+            updateOccurrence,
+            ...oldData.slice(occurrenceIndex + 1),
+          ];
         }
         return oldData;
       }
@@ -73,15 +68,12 @@ const OccurrenceCalendarDetails = ({
   const handleDeleteSuccess = (deleteOccurrence: Occurrence) => {
     queryClient.setQueryData(
       ["occurrences", calendarStartDate, calendarEndDate, selectedEventType],
-      (oldData: AxiosResponse<Occurrence[]>) => {
-        if (!oldData || !oldData.data) return undefined;
+      (oldData: Occurrence[]) => {
+        if (!oldData) return undefined;
 
-        return {
-          ...oldData,
-          data: oldData.data.filter(
-            (occurrence: Occurrence) => occurrence.id !== deleteOccurrence.id
-          ),
-        };
+        return oldData.filter(
+          (occurrence: Occurrence) => occurrence.id !== deleteOccurrence.id
+        );
       }
     );
     dispatch(setSelectedEventOccurrence(undefined));

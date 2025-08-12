@@ -47,7 +47,7 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
     }
   }, [selectedEventOccurrence]);
 
-  const { data: eventResponse } = useQuery({
+  const { data: eventData } = useQuery({
     queryKey: ["event", selectedEvent?.id],
     queryFn: async () => {
       return getEvent(selectedEvent!.id!);
@@ -63,20 +63,20 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
   }
 
   const event = useMemo(() => {
-    if (!eventResponse?.data) return selectedEvent;
+    if (!eventData) return selectedEvent;
 
-    if (JSON.stringify(eventResponse.data) === JSON.stringify(selectedEvent)) {
+    if (JSON.stringify(eventData) === JSON.stringify(selectedEvent)) {
       return selectedEvent;
     }
 
     const updatedEvent: EventOffering = {
       ...selectedEvent,
-      ...eventResponse.data,
+      ...eventData,
     };
 
     dispatch(setSelectedEvent(updatedEvent));
     return updatedEvent;
-  }, [eventResponse?.data, selectedEvent, dispatch]);
+  }, [eventData, selectedEvent, dispatch]);
 
   const handleClose = () => {
     if (selectedEvent?.meta?.isNew) {

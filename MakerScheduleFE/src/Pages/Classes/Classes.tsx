@@ -5,21 +5,21 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
 const Classes = () => {
-  const { data: eventResponse } = useQuery({
+  const { data: events } = useQuery({
     queryKey: ["events"],
     queryFn: getEvents,
     staleTime: 30000,
   });
 
   const eventData = useMemo(() => {
-    if (!eventResponse?.data) return [];
+    if (!events) return [];
 
-    return eventResponse.data.map((event: EventOffering) => ({
+    return events.map((event: EventOffering) => ({
       eventName: event.eventName || "",
       description: event.description || "",
       attendees: event.attendees || [],
       leaders: event.leaders || [],
-      scheduleStart: event.scheduleStart,
+      scheduleStart: event?.scheduleStart,
       duration: event.duration,
       price: event.price || 0,
       eventType: event.eventType,
@@ -27,7 +27,7 @@ const Classes = () => {
         ? event.thumbnailUrl
         : "https://www.akc.org/wp-content/uploads/2017/11/Pembroke-Welsh-Corgi-standing-outdoors-in-the-fall.jpg",
     })) as EventOffering[];
-  }, [eventResponse]);
+  }, [events]);
 
   return (
     <div className="flex flex-row gap-4 bg-[#F2F4EF] justify-center w-full min-h-screen">

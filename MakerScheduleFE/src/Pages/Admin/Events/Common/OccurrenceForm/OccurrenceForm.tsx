@@ -28,7 +28,6 @@ import { selectAdminState } from "@ms/redux/slices/adminSlice";
 import { useAppSelector } from "@ms/redux/hooks";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
-import type { AxiosResponse } from "axios";
 
 interface OccurrenceFormProps {
   onCancel: () => void;
@@ -119,8 +118,8 @@ const OccurrenceForm = ({
       mutationKey: ["createMutation"],
       mutationFn: ({ occurrence }: { occurrence: CreateOccurrence }) =>
         createOccurrence(occurrence),
-      onSuccess: (response: AxiosResponse<Occurrence>) => {
-        handleSaveSuccess(response.data);
+      onSuccess: (response: Occurrence) => {
+        handleSaveSuccess(response);
       },
       meta: {
         successMessage: "Occurrence Created",
@@ -133,8 +132,8 @@ const OccurrenceForm = ({
       mutationKey: ["updateMutation"],
       mutationFn: ({ occurrence }: { occurrence: UpdateOccurrence }) =>
         updateOccurrence(occurrence),
-      onSuccess: (response: AxiosResponse<Occurrence>) => {
-        handleUpdateSuccess(response.data);
+      onSuccess: (response: Occurrence) => {
+        handleUpdateSuccess(response);
       },
       meta: {
         successMessage: "Occurrence Updated",
@@ -147,7 +146,7 @@ const OccurrenceForm = ({
       mutationKey: ["deleteMutation"],
       mutationFn: () => deleteOccurrence(selectedEventOccurrence!.id!),
       onSuccess: () =>
-        handleDeleteSuccess && handleDeleteSuccess(selectedEventOccurrence),
+        handleDeleteSuccess && handleDeleteSuccess(selectedEventOccurrence!),
       meta: {
         successMessage: "Occurrence Deleted",
         errorMessage: "Failed to delete occurrence",
@@ -195,9 +194,9 @@ const OccurrenceForm = ({
   }, [selectedEventOccurrence]);
 
   useEffect(() => {
-    if (!availableLeaderResponse?.data) return;
+    if (!availableLeaderResponse) return;
     setAvailableLeader();
-  }, [availableLeaderResponse?.data]);
+  }, [availableLeaderResponse]);
 
   const setAvailableLeader = () => {
     let availableLeaderOptions: SelectOption[] = [];
@@ -209,13 +208,11 @@ const OccurrenceForm = ({
           value: leader.id,
         })) ?? [];
       availableLeaderOptions = leaders;
-    } else if (availableLeaderResponse?.data) {
-      const leaders: SelectOption[] = availableLeaderResponse.data.map(
-        (user) => ({
-          label: `${user.firstName} ${user.lastName}`,
-          value: user.id,
-        })
-      );
+    } else if (availableLeaderResponse) {
+      const leaders: SelectOption[] = availableLeaderResponse.map((user) => ({
+        label: `${user.firstName} ${user.lastName}`,
+        value: user.id,
+      }));
       availableLeaderOptions = leaders;
     } else {
       return;
@@ -240,7 +237,7 @@ const OccurrenceForm = ({
     const unavailableLeaderObjectArray: DomainUser[] = [];
     if (unavailbeLeader.length > 0) {
       for (const leaderIdx in unavailbeLeader) {
-        const domainLeader = domainLeaderResponse?.data.find(
+        const domainLeader = domainLeaderResponse?.find(
           (dlr) => dlr.id === unavailbeLeader[leaderIdx]
         );
         if (domainLeader) {

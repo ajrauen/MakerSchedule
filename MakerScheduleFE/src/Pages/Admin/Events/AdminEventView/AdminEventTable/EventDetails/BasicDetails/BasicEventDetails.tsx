@@ -25,7 +25,6 @@ import {
   setSelectedEvent,
 } from "@ms/redux/slices/adminSlice";
 import RestoreIcon from "@mui/icons-material/Restore";
-import type { AxiosResponse } from "axios";
 const createEventvalidationSchema = z
   .object({
     eventName: z
@@ -111,35 +110,26 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
     });
   };
 
-  const handleSaveSuccess = (data: AxiosResponse<EventOffering>) => {
-    queryClient.setQueryData(
-      ["events"],
-      (oldData: AxiosResponse<EventOffering[]>) => {
-        if (!oldData) return undefined;
-        return {
-          ...oldData,
-          data: [...oldData.data, data.data],
-        };
-      }
-    );
-    dispatch(setSelectedEvent(data.data));
+  const handleSaveSuccess = (eventOffering: EventOffering) => {
+    queryClient.setQueryData(["events"], (oldData: EventOffering[]) => {
+      if (!oldData) return undefined;
+      return {
+        ...oldData,
+        data: [...oldData, eventOffering],
+      };
+    });
+    dispatch(setSelectedEvent(eventOffering));
   };
 
-  const handleUpdateSuccess = (data: AxiosResponse<EventOffering>) => {
-    queryClient.setQueryData(
-      ["events"],
-      (oldData: AxiosResponse<EventOffering[]>) => {
-        if (!oldData) return undefined;
-        return {
-          ...oldData,
-          data: oldData.data.map((event: EventOffering) =>
-            event.id === data.data.id ? data.data : event
-          ),
-        };
-      }
-    );
-    reset(data.data);
-    dispatch(setSelectedEvent(data.data));
+  const handleUpdateSuccess = (data: EventOffering) => {
+    queryClient.setQueryData(["events"], (oldData: EventOffering[]) => {
+      if (!oldData) return undefined;
+      return oldData.map((event: EventOffering) =>
+        event.id === data.id ? data : event
+      );
+    });
+    reset(data);
+    dispatch(setSelectedEvent(data));
   };
 
   const { mutate: saveEventQuery, isPending: isSavePending } = useMutation({
@@ -156,7 +146,7 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
     mutationKey: ["patchEvent"],
     mutationFn: ({ id, event }: { id: string; event: FormData }) =>
       patchEvent(id, event),
-    onSuccess: handleUpdateSuccess,
+    onSuccess: () => handleUpdateSuccess,
     meta: {
       successMessage: "Event Update",
       errorMessage: "Error Updating Event",

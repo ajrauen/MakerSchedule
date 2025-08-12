@@ -11,7 +11,7 @@ const useAdminEventsData = () => {
   };
 
   const {
-    data: eventsResponse,
+    data: events,
     isError: eventError,
     isFetching: eventsLoading,
   } = useQuery({
@@ -43,8 +43,8 @@ const useAdminEventsData = () => {
 
   return {
     isLoading: eventsLoading || metadataLoading || domainLeaderLoading,
-    events: eventsResponse?.data ?? [],
-    appMetaData: eventMetadataResponse?.data ?? defaultAppMetaData,
+    events: events ?? [],
+    appMetaData: eventMetadataResponse ?? defaultAppMetaData,
   };
 };
 

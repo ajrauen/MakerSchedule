@@ -15,7 +15,6 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { deleteEventType } from "@ms/api/eventTypes.api";
-import type { AxiosResponse } from "axios";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 
 interface AdminEventTableProps {
@@ -37,16 +36,10 @@ const AdminEventTypesTable = ({ eventTypes }: AdminEventTableProps) => {
     onSuccess: (res, deleteEventId) => {
       if (!eventTypeToDelete) return;
 
-      queryClient.setQueryData(
-        ["eventTypes"],
-        (oldEvents: AxiosResponse<EventType[]>) => {
-          if (!oldEvents) return oldEvents;
-          return {
-            ...oldEvents,
-            data: oldEvents.data.filter((evt) => evt.id !== deleteEventId),
-          };
-        }
-      );
+      queryClient.setQueryData(["eventTypes"], (oldEvents: EventType[]) => {
+        if (!oldEvents) return oldEvents;
+        return oldEvents.filter((evt) => evt.id !== deleteEventId);
+      });
 
       if (selectedEventType?.id === deleteEventId) {
         setSelectedEventType(undefined);

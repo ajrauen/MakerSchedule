@@ -15,8 +15,9 @@ const createOccurrence = async (occurrence: CreateOccurrence) => {
     withCredentials: true,
     data: occurrence,
   };
+  const newOccurrence = await sendRequest<Occurrence>(req);
 
-  return await sendRequest<Occurrence>(req);
+  return newOccurrence.data;
 };
 
 const updateOccurrence = async (occurrence: UpdateOccurrence) => {
@@ -27,7 +28,9 @@ const updateOccurrence = async (occurrence: UpdateOccurrence) => {
     data: occurrence,
   };
 
-  return await sendRequest<Occurrence>(req);
+  const updateOcc = await sendRequest<Occurrence>(req);
+
+  return updateOcc.data;
 };
 
 const deleteOccurrence = async (occurrenceId: string) => {
@@ -37,7 +40,9 @@ const deleteOccurrence = async (occurrenceId: string) => {
     withCredentials: true,
   };
 
-  return await sendRequest<number>(req);
+  await sendRequest<number>(req);
+
+  return occurrenceId;
 };
 
 const getOccurrences = async (
@@ -60,7 +65,9 @@ const getOccurrences = async (
     withCredentials: true,
   };
 
-  return await sendRequest<Occurrence[]>(req);
+  const occurrences = await sendRequest<Occurrence[]>(req);
+
+  return occurrences.data;
 };
 
 export { createOccurrence, updateOccurrence, deleteOccurrence, getOccurrences };

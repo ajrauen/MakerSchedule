@@ -7,7 +7,6 @@ import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextF
 import { useEffect } from "react";
 import { createEventType, patchEventType } from "@ms/api/eventTypes.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { AxiosResponse } from "axios";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
   selectAdminState,
@@ -52,17 +51,14 @@ const EventTypeDetails = () => {
       });
       queryClient.setQueryData(
         ["eventTypes"],
-        (oldEventsTypes: AxiosResponse<EventType[]>) => {
+        (oldEventsTypes: EventType[]) => {
           if (!oldEventsTypes) return oldEventsTypes;
           const newEventType: EventType = {
             id: res.data,
             name: createdEventType.name,
           };
           dispatch(setSelectedEventType(newEventType));
-          return {
-            ...oldEventsTypes,
-            data: [...oldEventsTypes.data, newEventType],
-          };
+          return [...oldEventsTypes, newEventType];
         }
       );
     },
@@ -76,7 +72,6 @@ const EventTypeDetails = () => {
     mutationKey: ["patchEvent"],
     mutationFn: (event: EventType) => patchEventType(event),
     onSuccess: (res, savedEvent) => {
-      //
       queryClient.invalidateQueries({
         queryKey: ["events"],
         type: "all",
@@ -89,14 +84,11 @@ const EventTypeDetails = () => {
       });
       queryClient.setQueryData(
         ["eventTypes"],
-        (oldEventsTypes: AxiosResponse<EventType[]>) => {
+        (oldEventsTypes: EventType[]) => {
           if (!oldEventsTypes) return oldEventsTypes;
-          return {
-            ...oldEventsTypes,
-            data: oldEventsTypes.data.map((et) =>
-              et.id === selectedEventType?.id ? { ...et, ...savedEvent } : et
-            ),
-          };
+          return oldEventsTypes.map((et) =>
+            et.id === selectedEventType?.id ? { ...et, ...savedEvent } : et
+          );
         }
       );
     },
