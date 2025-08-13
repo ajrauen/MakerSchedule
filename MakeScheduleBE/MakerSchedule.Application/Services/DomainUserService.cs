@@ -185,7 +185,7 @@ public class DomainUserService(
             throw new BaseException(ex.Message, "@TODO_ERROR_CODE", 400);
         }
 
-        var occurrenceEnd = occurrenceStart.Value.AddMilliseconds(duration);
+        var occurrenceEnd = occurrenceStart.Value.AddMinutes(duration);
 
         var leaderUsers = await userManager.GetUsersInRoleAsync(Roles.Leader);
         var allLeaderIds = leaderUsers.Select(l => l.Id).ToList();
@@ -214,8 +214,7 @@ public class DomainUserService(
                     continue;
                 var occStart = occLeader.Occurrence.ScheduleStart!.Value;
                 
-                // ✅ Updated: Use Event.Duration instead of Occurrence.Duration
-                var occEnd = occStart.AddMinutes(occLeader.Occurrence.Event.Duration.Value);
+                var occEnd = occStart.AddMinutes(duration);
                 
                 if (occStart < occurrenceEnd && occEnd > occurrenceStart.Value)
                 {
@@ -233,8 +232,7 @@ public class DomainUserService(
                     return false;
                 var occStart = o.Occurrence.ScheduleStart!.Value;
                 
-                // ✅ Updated: Use Event.Duration instead of Occurrence.Duration
-                var occEnd = occStart.AddMinutes(o.Occurrence.Event.Duration.Value);
+                var occEnd = occStart.AddMinutes(duration);
                 
                 return occStart < occurrenceEnd && occEnd > occurrenceStart.Value;
             })

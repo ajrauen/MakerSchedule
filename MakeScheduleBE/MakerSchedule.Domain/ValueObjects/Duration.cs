@@ -7,7 +7,7 @@ public record Duration
 
     public Duration(int value)
     {
-        if (value < 0 || value > 1440 * 60 * 1000)
+        if (value < 0 || value > 1440 * 60 )
         {
             throw new ArgumentOutOfRangeException(nameof(value), "Duration must be between 0 and 24 hours in milliseconds");
         }

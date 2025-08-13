@@ -9,7 +9,6 @@ interface Occurrence {
   eventName?: string;
   id?: string;
   scheduleStart: string;
-  duration?: number;
   attendees?: OccurranceUsers[];
   leaders?: OccurranceUsers[];
   status: OccurrenceStaus;

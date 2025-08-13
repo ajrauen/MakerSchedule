@@ -60,7 +60,7 @@ public class SeedData
             Id = event1Id,
             EventName = new EventName("Advanced Pottery"),
             Description = "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.",
-            Duration = new Duration(120 * 60 * 1000), // 2 hours in milliseconds
+            Duration = new Duration(120 ),
             EventTypeId = potteryTypeId
         },
         new Event
@@ -68,7 +68,7 @@ public class SeedData
             Id = event2Id,
             EventName = new EventName("Woodworking Workshop"),
             Description = "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.",
-            Duration = new Duration(180 * 60 * 1000), // 3 hours in milliseconds
+            Duration = new Duration(180),
             EventTypeId = woodworkingTypeId
         },
         new Event
@@ -76,7 +76,7 @@ public class SeedData
             Id = event3Id,
             EventName = new EventName("Sewing Basics"),
             Description = "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.",
-            Duration = new Duration(90 * 60 * 1000), // 1.5 hours in milliseconds
+            Duration = new Duration(90 ), 
             EventTypeId = sewingTypeId
         }
     };
@@ -129,7 +129,7 @@ public class SeedData
                     // Convert CST to UTC
                     var start = TimeZoneInfo.ConvertTimeToUtc(localCstDate, cstZone);
                     
-                    var duration = durationOptions[random.Next(durationOptions.Length) ] * 60 * 1000;
+                    var duration = durationOptions[random.Next(durationOptions.Length) ] * 60 ;
                     
                     // Create occurrence directly with ScheduleStart.ForSeeding to bypass future date validation
                     var occurrence = new Occurrence
@@ -137,7 +137,7 @@ public class SeedData
                         Id = Guid.NewGuid(),
                         EventId = eventId,
                         ScheduleStart = ScheduleStart.ForSeeding(start),
-                        Status = (start.AddMilliseconds(duration) < DateTime.UtcNow)
+                        Status = (start.AddMinutes(duration) < DateTime.UtcNow)
                             ? OccurrenceStatus.Complete
                             : OccurrenceStatus.Pending
                     };

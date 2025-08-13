@@ -68,7 +68,7 @@ public class DomainUserServiceTests : IAsyncLifetime
             Id = "occ1",
             EventId = "event1",
             ScheduleStart = new MakerSchedule.Domain.ValueObjects.ScheduleStart(now),
-            Duration = 60
+            Duration = 60 // Duration in minutes
         };
         DbContext.Occurrences.Add(testOccurrence);
         await DbContext.SaveChangesAsync();
@@ -86,7 +86,7 @@ public class DomainUserServiceTests : IAsyncLifetime
             Id = "occ2",
             EventId = "event1",
             ScheduleStart = new MakerSchedule.Domain.ValueObjects.ScheduleStart(now), // same as occ1
-            Duration = 60
+            Duration = 60 // Duration in minutes
         };
         DbContext.Occurrences.Add(overlappingOccurrence);
         await DbContext.SaveChangesAsync();
@@ -120,8 +120,7 @@ public class DomainUserServiceTests : IAsyncLifetime
             mockUserManager.Object,
             mockMapper.Object);
 
-        long startTimeMs = new DateTimeOffset(now).ToUnixTimeMilliseconds();
-        long durationMs = 60 * 60 * 1000; // 1 hour in ms
+        // Act - Pass duration in minutes (60 minutes = 1 hour)
         var result = await service.GetAvailableOccurrenceLeadersAsync((long)now.Ticks, 60);
 
         // Assert
@@ -404,4 +403,4 @@ public class DomainUserServiceTests : IAsyncLifetime
     }
 
 
-} 
+}

@@ -43,7 +43,7 @@ const AdminEventDrawer = ({
   });
 
   const detailedEvent = useMemo(() => {
-    if (!eventData) return selectedEvent;
+    if (!eventData || selectedEvent?.meta?.isUpdated) return selectedEvent;
 
     if (JSON.stringify(eventData) === JSON.stringify(selectedEvent)) {
       return selectedEvent;

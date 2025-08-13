@@ -7,6 +7,7 @@ using MakerSchedule.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using System.Text.RegularExpressions;
 
 namespace MakerSchedule.Infrastructure.Services.Storage;
 
@@ -31,7 +32,8 @@ public class AzureImageStorageService : IImageStorageService
 
     public async Task<string> SaveImageAsync(IFormFile file, string fileName)
     {
-        var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
+        fileName = Regex.Replace(fileName, @"[^\w\d\.\-]", "_");
+         var containerClient = _blobServiceClient.GetBlobContainerClient(_blobContainerName);
 
         if (!containerClient.Exists())
         {

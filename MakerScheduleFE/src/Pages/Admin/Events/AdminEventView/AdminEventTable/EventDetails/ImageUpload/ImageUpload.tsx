@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { Controller, type Control, type FieldValues } from "react-hook-form";
+import {
+  Controller,
+  type Control,
+  type FieldValues,
+  type Path,
+} from "react-hook-form";
 
 import { FormDropZone } from "@ms/Components/FormComponents/FormDropZone";
 import { ImageCropper } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/ImageUpload/ImageCropper/ImageCropper";
@@ -9,7 +14,7 @@ import type { Area } from "react-easy-crop";
 
 interface ImageUploadProps<T extends FieldValues = FieldValues> {
   control: Control<T>;
-  name: string;
+  name: Path<T>;
   error?: string;
 }
 

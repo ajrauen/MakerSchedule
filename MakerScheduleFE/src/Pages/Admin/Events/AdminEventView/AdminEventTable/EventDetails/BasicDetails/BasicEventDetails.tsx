@@ -119,7 +119,9 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
         event.id === data.id ? data : event
       );
     });
-    reset(data);
+    data.meta = {
+      isUpdated: true,
+    };
     dispatch(setSelectedEvent(data));
   };
 
@@ -227,6 +229,8 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
 
     return options;
   }, [eventTypes]);
+
+  console.log(getValues("thumbnailUrl"));
 
   const thumbnailUrl = watch("thumbnailUrl");
   const thumbnailFile = watch("thumbnailFile");

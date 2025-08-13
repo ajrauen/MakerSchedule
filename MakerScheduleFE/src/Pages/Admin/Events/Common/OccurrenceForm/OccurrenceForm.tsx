@@ -10,7 +10,6 @@ import {
 } from "@ms/api/occurrence.api";
 import { FormDateTime } from "@ms/Components/FormComponents/FormDateTime/FormDateTime";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import { durationOptions } from "@ms/Pages/Admin/Events/AdminEventView/utils/event.utils";
 import type { SelectOption } from "@ms/types/form.types";
 import type {
   CreateOccurrence,
@@ -59,7 +58,6 @@ const OccurrenceForm = ({
 
     return z.object({
       scheduleStart: z.date(),
-      duration: z.number().optional(),
       leaders: z.array(z.string()).optional(),
       eventId: isNewFromCalendar
         ? z.string().min(1, { message: "Event is required" })
@@ -87,7 +85,6 @@ const OccurrenceForm = ({
   });
 
   const time = watch("scheduleStart");
-  const duration = watch("duration");
 
   const {
     refetch: getAvailableLeaders,
@@ -98,13 +95,11 @@ const OccurrenceForm = ({
     queryFn: () => {
       const isoString = time.toISOString();
 
-      const apiDuration = duration ?? selectedEvent?.duration;
-
-      if (!apiDuration) return;
+      if (!selectedEvent?.duration) return;
 
       return getAvailableDomainUserLeaders(
         isoString,
-        apiDuration,
+        selectedEvent.duration,
         selectedEventOccurrence?.id ?? "",
         selectedEventOccurrence?.leaders?.map((leader) => leader.id)
       );
@@ -184,7 +179,7 @@ const OccurrenceForm = ({
       }
       reset({
         scheduleStart: scheduleStartDate,
-        duration: selectedEventOccurrence?.duration,
+        duration: selectedEvent?.duration,
         eventId,
         leaders:
           selectedEventOccurrence?.leaders?.map((leader) => leader.id) ?? [],
@@ -254,10 +249,10 @@ const OccurrenceForm = ({
   useEffect(() => {
     if (selectedEventOccurrence?.status.toLowerCase() === "complete") return;
 
-    if (time && duration) {
+    if (time) {
       getAvailableLeaders();
     }
-  }, [duration, time, getAvailableLeaders, selectedEventOccurrence?.status]);
+  }, [time, getAvailableLeaders, selectedEventOccurrence?.status]);
 
   const shouldDisableDate = (date: PickerValidDate) => {
     const today = new Date();
@@ -272,12 +267,11 @@ const OccurrenceForm = ({
     )
       return;
 
-    const { scheduleStart, duration, leaders, eventId } = getValues();
+    const { scheduleStart, leaders, eventId } = getValues();
     if (selectedEventOccurrence?.meta?.isNew) {
       const createOccurrenceObj: CreateOccurrence = {
         eventId: eventId,
         scheduleStart: scheduleStart.toISOString(),
-        duration,
         leaders: leaders ?? [],
       };
       createOccurrenceMutation({ occurrence: createOccurrenceObj });
@@ -285,7 +279,6 @@ const OccurrenceForm = ({
       const updateOccurrenceObj: UpdateOccurrence = {
         eventId: eventId,
         scheduleStart: scheduleStart.toISOString(),
-        duration,
         leaders: leaders ?? [],
         id: selectedEventOccurrence.id,
       };
@@ -339,12 +332,6 @@ const OccurrenceForm = ({
             name="scheduleStart"
             label="Start Time"
             shouldDisableDate={shouldDisableDate}
-          />
-          <FormSelect
-            name="duration"
-            control={control}
-            options={durationOptions}
-            label={"Duration"}
           />
 
           <FormSelect

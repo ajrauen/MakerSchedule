@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using MakerSchedule.Application.Interfaces;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace MakerSchedule.Infrastructure.Services.Storage;
 
@@ -9,6 +10,7 @@ public class LocalImageStorageService(IHostEnvironment _env, IHttpContextAccesso
 {
     public async Task<string> SaveImageAsync(IFormFile file, string fileName)
     {
+        fileName = Regex.Replace(fileName, @"[^\w\d\.\-]", "_");
         var wwwrootPath = Path.Combine(_env.ContentRootPath, "wwwroot");
         var uploads = Path.Combine(wwwrootPath, "images", "events");
         Directory.CreateDirectory(uploads);

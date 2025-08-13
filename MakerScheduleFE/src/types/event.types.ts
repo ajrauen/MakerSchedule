@@ -16,7 +16,7 @@ interface EventOffering {
 
 type CreateEventOffering = Omit<
   EventOffering,
-  "id" | "thumbnailUrl" | "occurrences" | "eventType"
+  "id" | "thumbnailUrl" | "occurrences"
 > & {
   thumbnailFile: File;
   eventTypeId: string;
