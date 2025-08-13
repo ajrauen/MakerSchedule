@@ -89,7 +89,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                         FirstName = a.User?.FirstName ?? "",
                         LastName = a.User?.LastName ?? ""
                     }).ToList(),
-                    Duration = o.Duration,
                     EventId = o.EventId,
                     Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
                     {
@@ -289,7 +288,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                         FirstName = a.User?.FirstName ?? "",
                         LastName = a.User?.LastName ?? ""
                     }).ToList(),
-                    Duration = o.Duration,
                     EventId = o.EventId,
                     Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
                     {
@@ -334,7 +332,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             else if (start.Kind == DateTimeKind.Unspecified)
                 start = DateTime.SpecifyKind(start, DateTimeKind.Local).ToUniversalTime();
             // Now start is always UTC
-            info = new OccurrenceInfo(start, occurrenceDTO.Duration);
+            info = new OccurrenceInfo(start);
             newOccurrence = eventEntity.AddOccurrence(info);
             _context.Occurrences.Add(newOccurrence);
         }
@@ -406,7 +404,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Id = newOccurrence.Id,
             EventId = newOccurrence.EventId,
             ScheduleStart = DateTime.SpecifyKind(newOccurrence.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
-            Duration = newOccurrence.Duration,
             Status = newOccurrence.Status,
             Attendees = attendeeDTOs,
             Leaders = leaderDTOs,
@@ -433,7 +430,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         else if (start.Kind == DateTimeKind.Unspecified)
             start = DateTime.SpecifyKind(start, DateTimeKind.Local).ToUniversalTime();
         occurrence.ScheduleStart = ScheduleStart.Create(start);
-        occurrence.Duration = occurrenceDTO.Duration;
 
         var existingLeaders = _context.OccurrenceLeaders.Where(l => l.OccurrenceId == occurrence.Id);
         _context.OccurrenceLeaders.RemoveRange(existingLeaders);
@@ -501,7 +497,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Id = occurrence.Id,
             EventId = occurrence.EventId,
             ScheduleStart = DateTime.SpecifyKind(occurrence.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
-            Duration = occurrence.Duration,
             Status = occurrence.Status,
             EventName = occurrence.Event.EventName.Value,
             EventType = occurrence.Event.EventType.Name.Value
@@ -552,7 +547,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     Id = o.Id,
                     EventId = o.EventId,
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
-                    Duration = o.Duration,
                     Status = o.Status,
                     EventName = o.Event.EventName.Value, 
                     EventType = o.Event.EventType.Name.Value,

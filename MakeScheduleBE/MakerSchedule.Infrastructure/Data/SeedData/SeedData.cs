@@ -137,7 +137,6 @@ public class SeedData
                         Id = Guid.NewGuid(),
                         EventId = eventId,
                         ScheduleStart = ScheduleStart.ForSeeding(start),
-                        Duration = duration,
                         Status = (start.AddMilliseconds(duration) < DateTime.UtcNow)
                             ? OccurrenceStatus.Complete
                             : OccurrenceStatus.Pending

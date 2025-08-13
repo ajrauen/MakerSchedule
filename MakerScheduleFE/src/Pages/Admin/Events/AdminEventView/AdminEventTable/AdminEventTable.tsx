@@ -4,28 +4,20 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import Button from "@mui/material/Button";
 import type { EventOffering } from "@ms/types/event.types";
 import { durationMap } from "@ms/Pages/Admin/Events/AdminEventView/utils/event.utils";
 
 interface AdminEventTableProps {
   events: EventOffering[];
-  onEventDelete: (event: EventOffering) => void;
   onEventSelect: (event: EventOffering) => void;
   selectedEvent?: EventOffering;
 }
 
 const AdminEventTable = ({
-  onEventDelete,
   events = [],
   onEventSelect,
   selectedEvent,
 }: AdminEventTableProps) => {
-  const handleDeletClick = (evt: React.MouseEvent, row: EventOffering) => {
-    evt.stopPropagation();
-    onEventDelete(row);
-  };
-
   return (
     <TableContainer className="overflow-auto h-full">
       <Table stickyHeader aria-label="sticky table">
@@ -36,7 +28,6 @@ const AdminEventTable = ({
             <TableCell>Event Type</TableCell>
             <TableCell>Duration</TableCell>
             <TableCell>Image</TableCell>
-            <TableCell>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -69,17 +60,6 @@ const AdminEventTable = ({
                   height={60}
                   style={{ objectFit: "cover" }}
                 />
-              </TableCell>
-              <TableCell>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  className="m-2"
-                  onClick={(evt) => handleDeletClick(evt, row)}
-                >
-                  Delete
-                </Button>
               </TableCell>
             </TableRow>
           ))}

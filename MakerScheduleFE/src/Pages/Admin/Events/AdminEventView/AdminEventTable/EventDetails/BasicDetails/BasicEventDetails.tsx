@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type {
   CreateEventOffering,
   EventOffering,
@@ -16,15 +16,17 @@ import {
 } from "@ms/Pages/Admin/Events/AdminEventView/utils/event.utils";
 import { ImageUpload } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/ImageUpload/ImageUpload";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createEvent, patchEvent } from "@ms/api/event.api";
+import { createEvent, deleteEvent, patchEvent } from "@ms/api/event.api";
 import { z } from "zod";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
   selectAdminState,
+  setAdminDrawerOpen,
   setSelectedEvent,
 } from "@ms/redux/slices/adminSlice";
 import RestoreIcon from "@mui/icons-material/Restore";
+import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 const createEventvalidationSchema = z
   .object({
     eventName: z
@@ -35,7 +37,7 @@ const createEventvalidationSchema = z
       .min(3, { error: "Description must be at least 3 characters" }),
 
     duration: z.number().optional(),
-    thumbnailUrl: z.string().optional(),
+    thumbnailUrl: z.string().optional().nullable(),
     thumbnailFile: z
       .instanceof(File, { error: "Event Image is required" })
       .optional(),
@@ -55,7 +57,7 @@ const createEventInitialFormData = {
   eventTypeId: "",
   description: "",
   duration: undefined,
-  imageUrl: undefined,
+  thumbnailUrl: undefined,
   thumbnailFile: undefined,
 };
 
@@ -68,18 +70,13 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
   const { selectedEvent } = useAppSelector(selectAdminState);
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
-
-  const {
-    getValues,
-    control,
-    handleSubmit,
-    formState: { errors, dirtyFields },
-    reset,
-    watch,
-  } = useForm<CreateEventFormData>({
-    resolver: zodResolver(createEventvalidationSchema),
-    defaultValues: createEventInitialFormData,
-  });
+  const [showDeleteConfirmation, setShowDeleteConfirmation] =
+    useState<boolean>(false);
+  const { getValues, control, handleSubmit, formState, reset, watch } =
+    useForm<CreateEventFormData>({
+      resolver: zodResolver(createEventvalidationSchema),
+      defaultValues: createEventInitialFormData,
+    });
 
   useEffect(() => {
     if (!selectedEvent) return;
@@ -105,18 +102,12 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
   const handleOnClose = (refreshData = false) => {
     onClose(refreshData);
     reset(createEventInitialFormData);
-    queryClient.invalidateQueries({
-      queryKey: ["events"],
-    });
   };
 
   const handleSaveSuccess = (eventOffering: EventOffering) => {
     queryClient.setQueryData(["events"], (oldData: EventOffering[]) => {
       if (!oldData) return undefined;
-      return {
-        ...oldData,
-        data: [...oldData, eventOffering],
-      };
+      return [...oldData, eventOffering];
     });
     dispatch(setSelectedEvent(eventOffering));
   };
@@ -130,6 +121,17 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
     });
     reset(data);
     dispatch(setSelectedEvent(data));
+  };
+
+  const handleDeleteSuccess = () => {
+    if (!selectedEvent) return;
+
+    queryClient.setQueryData(["events"], (oldEvents: EventOffering[]) => {
+      if (!oldEvents) return oldEvents;
+      return oldEvents.filter((evt) => evt.id !== selectedEvent.id);
+    });
+    dispatch(setSelectedEvent(undefined));
+    dispatch(setAdminDrawerOpen(false));
   };
 
   const { mutate: saveEventQuery, isPending: isSavePending } = useMutation({
@@ -146,12 +148,25 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
     mutationKey: ["patchEvent"],
     mutationFn: ({ id, event }: { id: string; event: FormData }) =>
       patchEvent(id, event),
-    onSuccess: () => handleUpdateSuccess,
+    onSuccess: handleUpdateSuccess,
     meta: {
       successMessage: "Event Update",
       errorMessage: "Error Updating Event",
     },
   });
+
+  const { mutate: deleteEventMutation } = useMutation({
+    mutationKey: ["deleteEvent"],
+    mutationFn: deleteEvent,
+    onSuccess: handleDeleteSuccess,
+  });
+
+  const handleCancelDeleteEvent = () => setShowDeleteConfirmation(false);
+  const handleConfirmDeleteEvent = () => {
+    if (!selectedEvent?.id) return;
+
+    deleteEventMutation(selectedEvent.id);
+  };
 
   const handleSave = () => {
     if (!selectedEvent) return;
@@ -176,7 +191,7 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
 
     if (selectedEvent.id) {
       const allValues = getValues();
-      const dirtyValues = Object.keys(dirtyFields).reduce(
+      const dirtyValues = Object.keys(formState.dirtyFields).reduce(
         (acc: CreateEventFormData, key) => {
           (acc as any)[key] = allValues[key as keyof CreateEventFormData];
           return acc;
@@ -225,78 +240,94 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(handleSave)} className="flex flex-col h-full">
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-row gap-3 ">
-          <div className="flex flex-col gap-3 w-1/2">
-            <FormTextField name="eventName" label="Name" control={control} />
+    <>
+      <form
+        onSubmit={handleSubmit(handleSave)}
+        className="flex flex-col h-full"
+      >
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-row gap-3 ">
+            <div className="flex flex-col gap-3 w-1/2">
+              <FormTextField name="eventName" label="Name" control={control} />
+            </div>
+            <div className="flex flex-col gap-3 w-1/2">
+              <FormSelect
+                name="duration"
+                label={"Duration"}
+                control={control}
+                options={durationOptions}
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-3 w-1/2">
-            <FormSelect
-              name="duration"
-              label={"Duration"}
-              control={control}
-              options={durationOptions}
-            />
-          </div>
-        </div>
-        <div className="flex flex-row gap-3 ">
-          <div className="flex flex-col gap-3 w-1/2">
-            <FormSelect
-              name="eventTypeId"
-              label="Event Type"
-              control={control}
-              options={eventTypeOptions}
-            />
-          </div>
-          <div className="flex flex-col gap-3 w-1/2">
-            {thumbnailUrl || thumbnailFile ? (
-              <div className="flex flex-row ">
-                <div className="flex flex-col ">
-                  <img
-                    className="w-18 h-full object-cover mb-4"
-                    src={
-                      (thumbnailFile && URL.createObjectURL(thumbnailFile)) ||
-                      thumbnailUrl
-                    }
-                    alt="Event Preview"
+          <div className="flex flex-row gap-3 ">
+            <div className="flex flex-col gap-3 w-1/2">
+              <FormSelect
+                name="eventTypeId"
+                label="Event Type"
+                control={control}
+                options={eventTypeOptions}
+              />
+            </div>
+            <div className="flex flex-col gap-3 w-1/2">
+              {thumbnailUrl || thumbnailFile ? (
+                <div className="flex flex-row ">
+                  <div className="flex flex-col ">
+                    <img
+                      className="w-18 h-full object-cover mb-4"
+                      src={
+                        (thumbnailFile && URL.createObjectURL(thumbnailFile)) ||
+                        thumbnailUrl
+                      }
+                      alt="Event Preview"
+                    />
+                  </div>
+
+                  <span className="">
+                    <Button
+                      startIcon={<RestoreIcon />}
+                      onClick={handleThunbnailReset}
+                    >
+                      Reset
+                    </Button>
+                  </span>
+                </div>
+              ) : (
+                <div>
+                  <ImageUpload
+                    control={control}
+                    name="thumbnailFile"
+                    error={formState.errors.thumbnailFile?.message}
                   />
                 </div>
-
-                <span className="">
-                  <Button
-                    startIcon={<RestoreIcon />}
-                    onClick={handleThunbnailReset}
-                  >
-                    Reset
-                  </Button>
-                </span>
-              </div>
-            ) : (
-              <div>
-                <ImageUpload
-                  control={control}
-                  name="thumbnailFile"
-                  error={errors.thumbnailFile?.message}
-                />
-              </div>
-            )}
+              )}
+            </div>
           </div>
+          <FormTextField
+            name="description"
+            label="Description"
+            control={control}
+            multiline
+            rows={7}
+          />
         </div>
-        <FormTextField
-          name="description"
-          label="Description"
-          control={control}
-          multiline
-          rows={7}
+        <FormFooter
+          onCancel={handleOnClose}
+          areActionsDisabled={isSavePending || isPatchPending}
+          isLoading={isSavePending || isPatchPending}
+          showDelete={!selectedEvent?.meta?.isNew}
+          onDelete={() => setShowDeleteConfirmation(true)}
+          saveButtonText={selectedEvent?.meta?.isNew ? "Create" : "Update"}
         />
-      </div>
-      <FormFooter
-        onCancel={handleOnClose}
-        areActionsDisabled={isSavePending || isPatchPending}
-        isLoading={isSavePending || isPatchPending}
+      </form>
+
+      <ConfirmationDialog
+        open={showDeleteConfirmation}
+        onCancel={handleCancelDeleteEvent}
+        onConfirm={handleConfirmDeleteEvent}
+        title="Delete Event"
+        details="You sure? Because you cant come back from this!"
       />
-    </form>
+    </>
   );
 };
 

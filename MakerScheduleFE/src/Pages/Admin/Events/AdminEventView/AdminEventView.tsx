@@ -1,7 +1,6 @@
 import type { EventOffering } from "@ms/types/event.types";
 import { AdminEventTable } from "./AdminEventTable/AdminEventTable";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteEvent } from "@ms/api/event.api";
+
 import { useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
@@ -12,7 +11,6 @@ import {
 } from "@ms/redux/slices/adminSlice";
 import { EventsHeader } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/Header/Header";
 import type { ViewState } from "@ms/types/admin.types";
-import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { AdminEventDrawer } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/AdminEventDrawer/AdminEventDrawer";
 
@@ -30,45 +28,15 @@ const AdminEventView = ({
   const [searchString, setSearchString] = useState("");
   const [filterValue, setFilterValue] = useState("");
   const [filteredEvents, setFilteredEvents] = useState<EventOffering[]>([]);
-  const [eventToDelete, setEventToDelete] = useState<
-    EventOffering | undefined
-  >();
 
   const { events, appMetaData } = useAdminEventsData();
 
-  const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!events) return;
     setFilteredEvents(structuredClone(events));
   }, [events]);
-
-  const { mutate: deleteEventMutation } = useMutation({
-    mutationKey: ["deleteEvent"],
-    mutationFn: deleteEvent,
-    onSuccess: () => {
-      if (!eventToDelete) return;
-
-      queryClient.setQueryData(["events"], (oldEvents: EventOffering[]) => {
-        if (!oldEvents) return oldEvents;
-        return oldEvents.filter((evt) => evt.id !== eventToDelete.id);
-      });
-
-      setEventToDelete(undefined);
-    },
-  });
-
-  const handleDeletClick = (event: EventOffering) => {
-    setEventToDelete(event);
-  };
-
-  const handleCancelDeleteEvent = () => setEventToDelete(undefined);
-  const handleConfirmDeleteEvent = () => {
-    if (!eventToDelete?.id) return;
-
-    deleteEventMutation(eventToDelete.id);
-  };
 
   const { selectedEvent, selectedEventOccurrence } =
     useAppSelector(selectAdminState);
@@ -142,7 +110,6 @@ const AdminEventView = ({
       />
       <AdminEventTable
         events={filteredEvents}
-        onEventDelete={handleDeletClick}
         onEventSelect={handleEventSelect}
         selectedEvent={selectedEvent}
       />
@@ -150,14 +117,6 @@ const AdminEventView = ({
         onDrawerClose={handleDrawerClose}
         selectedTab={tabValue}
         setSelectedTab={setTabValue}
-      />
-
-      <ConfirmationDialog
-        open={!!eventToDelete}
-        onCancel={handleCancelDeleteEvent}
-        onConfirm={handleConfirmDeleteEvent}
-        title="Delete Event"
-        details="You sure? Because you cant come back from this!"
       />
     </>
   );

@@ -17,7 +17,6 @@ const useAdminEventsData = () => {
   } = useQuery({
     queryKey: ["events"],
     queryFn: getEvents,
-    staleTime: Infinity,
   });
 
   const { isError: domainLeaderError, isFetching: domainLeaderLoading } =

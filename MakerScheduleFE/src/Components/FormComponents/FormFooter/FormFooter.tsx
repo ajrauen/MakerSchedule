@@ -4,10 +4,10 @@ interface FormFooterProps {
   onCancel: () => void;
   onSubmit?: () => void;
   onDelete?: () => void;
-  areActionsDisabled: boolean;
-  isLoading: boolean;
-  isDeleting: boolean;
-  showDelete: boolean;
+  areActionsDisabled?: boolean;
+  isLoading?: boolean;
+  isDeleting?: boolean;
+  showDelete?: boolean;
   cancelButtonText?: string;
   saveButtonText?: string;
 }

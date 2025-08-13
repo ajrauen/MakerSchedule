@@ -191,12 +191,13 @@ public class DomainUserService(
         var allLeaderIds = leaderUsers.Select(l => l.Id).ToList();
 
         var domainUsers = await _context.DomainUsers.Include(du => du.User).Where(du => allLeaderIds.Contains(du.UserId)).ToListAsync();
+        
         var allLeaders = await _context.OccurrenceLeaders
             .Include(l => l.Occurrence)
+            .ThenInclude(o => o.Event) 
             .Where(o => o.Occurrence != null && !o.Occurrence.isDeleted)
             .ToListAsync();
 
-        // Normalize empty string occurrenceId to null
         if (currentOccurrenceId.HasValue && currentOccurrenceId.Value == Guid.Empty)
         {
             currentOccurrenceId = null;
@@ -212,7 +213,10 @@ public class DomainUserService(
                 if (currentOccurrenceId.HasValue && occLeader.Occurrence.Id == currentOccurrenceId.Value)
                     continue;
                 var occStart = occLeader.Occurrence.ScheduleStart!.Value;
-                var occEnd = occStart.AddMilliseconds(occLeader.Occurrence.Duration ?? 0);
+                
+                // ✅ Updated: Use Event.Duration instead of Occurrence.Duration
+                var occEnd = occStart.AddMinutes(occLeader.Occurrence.Event.Duration.Value);
+                
                 if (occStart < occurrenceEnd && occEnd > occurrenceStart.Value)
                 {
                     doubleBookedLeaderIds.Add(leaderId);
@@ -228,7 +232,10 @@ public class DomainUserService(
                 if (currentOccurrenceId.HasValue && o.Occurrence.Id == currentOccurrenceId.Value)
                     return false;
                 var occStart = o.Occurrence.ScheduleStart!.Value;
-                var occEnd = occStart.AddMilliseconds(o.Occurrence.Duration ?? 0);
+                
+                // ✅ Updated: Use Event.Duration instead of Occurrence.Duration
+                var occEnd = occStart.AddMinutes(o.Occurrence.Event.Duration.Value);
+                
                 return occStart < occurrenceEnd && occEnd > occurrenceStart.Value;
             })
             .Select(l => l.UserId)
@@ -246,7 +253,7 @@ public class DomainUserService(
             FirstName = l.FirstName,
             LastName = l.LastName,
             Roles = Array.Empty<string>(),
-            Email =  l.Email.ToString()
+            Email = l.Email.ToString()
         });
     }
 }

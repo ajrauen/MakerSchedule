@@ -13,7 +13,6 @@ public class Occurrence
     public Guid EventId { get; set; }
     public Event Event { get; set; } = null!;
     public ScheduleStart? ScheduleStart { get; set; }
-    public int? Duration { get; set; }
 
     // Navigation properties for many-to-many relationships
     public ICollection<OccurrenceAttendee> Attendees { get; set; } = new List<OccurrenceAttendee>();
@@ -26,7 +25,6 @@ public class Occurrence
     {
         EventId = eventId;
         ScheduleStart = ScheduleStart.Create(info.ScheduleStart);
-        Duration = info.Duration;
         Status = OccurrenceStatus.Pending;
     }
 } 
