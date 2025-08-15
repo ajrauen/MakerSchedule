@@ -23,13 +23,10 @@ const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
   const dispatch = useAppDispatch();
 
   const { refetch: fetchAvailableLeaders } = useQuery({
-    queryKey: ["available-leaders", occurrence.id],
+    queryKey: ["available-leaders"],
     queryFn: () => {
       const isoString = occurrence.scheduleStart;
-
-      const apiDuration = occurrence.duration ?? selectedEvent?.duration ?? 0;
-
-      if (!apiDuration) return;
+      const apiDuration = selectedEvent!.duration;
 
       return getAvailableDomainUserLeaders(
         isoString,
@@ -64,7 +61,7 @@ const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
 
   const handleRowSelect = (occ: Occurrence) => {
     dispatch(setSelectedEventOccurrence(occ));
-    if (!isOccurrenceInPast(occ)) {
+    if (!isOccurrenceInPast(occ) || !selectedEvent) {
       fetchAvailableLeaders();
     }
   };
@@ -84,7 +81,7 @@ const OccurenceRow = ({ occurrence }: OccurenceRowProps) => {
             end={
               new Date(
                 new Date(occurrence.scheduleStart).getTime() +
-                  (occurrence.duration ?? 0)
+                  (selectedEvent!.duration ?? 0)
               )
             }
           />

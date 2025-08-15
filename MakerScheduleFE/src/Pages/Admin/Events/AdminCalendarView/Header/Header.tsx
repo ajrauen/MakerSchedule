@@ -20,6 +20,7 @@ interface OccurrenceCalendarHeaderProps {
   eventTypes: EventType[];
   onSetViewState: (value: ViewState) => void;
   viewState: ViewState;
+  selectedDate: Date | null;
 }
 
 const OccurrenceCalendarHeader = ({
@@ -27,6 +28,7 @@ const OccurrenceCalendarHeader = ({
   eventTypes,
   onSetViewState,
   viewState,
+  selectedDate,
 }: OccurrenceCalendarHeaderProps) => {
   const dispatch = useAppDispatch();
 
@@ -42,7 +44,12 @@ const OccurrenceCalendarHeader = ({
   }, [eventTypes]);
 
   const handleCreateOccurrence = () => {
-    const today = new Date();
+    let today: Date;
+    if (selectedDate) {
+      today = new Date(selectedDate);
+    } else {
+      today = new Date();
+    }
     if (today.getHours() >= 12) {
       today.setDate(today.getDate() + 1);
     }

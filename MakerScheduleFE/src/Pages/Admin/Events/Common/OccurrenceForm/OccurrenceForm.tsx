@@ -23,8 +23,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import type { DomainUser } from "@ms/types/domain-user.types";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
-import { selectAdminState } from "@ms/redux/slices/adminSlice";
-import { useAppSelector } from "@ms/redux/hooks";
+import {
+  selectAdminState,
+  setSelectedEvent,
+} from "@ms/redux/slices/adminSlice";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 
@@ -50,6 +53,7 @@ const OccurrenceForm = ({
   const { selectedEvent, selectedEventOccurrence } =
     useAppSelector(selectAdminState);
   const { events } = useAdminEventsData();
+  const dispatch = useAppDispatch();
 
   const createOccurrenceValidationSchema = useMemo(() => {
     const isNewFromCalendar =
@@ -91,7 +95,7 @@ const OccurrenceForm = ({
     data: availableLeaderResponse,
     isFetching: isLoadingAvailableLeaders,
   } = useQuery({
-    queryKey: ["available-leaders", selectedEventOccurrence?.id],
+    queryKey: ["available-leaders"],
     queryFn: () => {
       const isoString = time.toISOString();
 
@@ -150,6 +154,11 @@ const OccurrenceForm = ({
 
   useEffect(() => {
     if (!selectedEventOccurrence) return;
+    if (
+      selectedEventOccurrence.meta?.componentOrigin !== "occurrenceCalendar" &&
+      !selectedEvent
+    )
+      return;
 
     const eventId = selectedEventOccurrence?.meta?.isNew
       ? selectedEvent?.id
@@ -164,7 +173,6 @@ const OccurrenceForm = ({
 
       reset({
         scheduleStart: defaultDate,
-        duration: selectedEvent?.duration,
         eventId,
         leaders:
           selectedEventOccurrence?.leaders?.map((leader) => leader.id) ?? [],
@@ -179,14 +187,13 @@ const OccurrenceForm = ({
       }
       reset({
         scheduleStart: scheduleStartDate,
-        duration: selectedEvent?.duration,
         eventId,
         leaders:
           selectedEventOccurrence?.leaders?.map((leader) => leader.id) ?? [],
       });
       setAvailableLeader();
     }
-  }, [selectedEventOccurrence]);
+  }, [selectedEventOccurrence, selectedEvent]);
 
   useEffect(() => {
     if (!availableLeaderResponse) return;
@@ -246,13 +253,27 @@ const OccurrenceForm = ({
     setValue("leaders", availableLeaders);
   };
 
+  const formEvent = watch("eventId");
+
+  useEffect(() => {
+    if (!formEvent) return;
+
+    const event = events.find((e) => e.id === formEvent);
+    dispatch(setSelectedEvent(event));
+  }, [formEvent]);
+
   useEffect(() => {
     if (selectedEventOccurrence?.status.toLowerCase() === "complete") return;
 
-    if (time) {
+    if (time && selectedEvent) {
       getAvailableLeaders();
     }
-  }, [time, getAvailableLeaders, selectedEventOccurrence?.status]);
+  }, [
+    time,
+    getAvailableLeaders,
+    selectedEventOccurrence?.status,
+    selectedEvent,
+  ]);
 
   const shouldDisableDate = (date: PickerValidDate) => {
     const today = new Date();
@@ -347,6 +368,7 @@ const OccurrenceForm = ({
             }
             multiSelect
             isLoading={isLoadingAvailableLeaders}
+            disabled={!selectedEvent}
           />
           {removedLeaders && removedLeaders.length > 0 && (
             <div>

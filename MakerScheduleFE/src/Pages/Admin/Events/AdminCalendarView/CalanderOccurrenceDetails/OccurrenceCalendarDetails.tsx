@@ -4,7 +4,6 @@ import { OccurrenceReadOnly } from "@ms/Pages/Admin/Events/Common/OccurrenceRead
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
   selectAdminState,
-  setAdminDrawerOpen,
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
 import type { Occurrence } from "@ms/types/occurrence.types";
@@ -15,12 +14,14 @@ interface OccurrenceCalendarDetailsProps {
   calendarStartDate: Date | null;
   calendarEndDate: Date | null;
   selectedEventType?: string;
+  onDrawerClose: () => void;
 }
 
 const OccurrenceCalendarDetails = ({
   calendarStartDate,
   calendarEndDate,
   selectedEventType,
+  onDrawerClose,
 }: OccurrenceCalendarDetailsProps) => {
   const { selectedEventOccurrence } = useAppSelector(selectAdminState);
   const isSelectedOccurrenceInPast = useMemo(() => {
@@ -79,18 +80,13 @@ const OccurrenceCalendarDetails = ({
     dispatch(setSelectedEventOccurrence(undefined));
   };
 
-  const handleCloseDrawer = () => {
-    dispatch(setSelectedEventOccurrence(undefined));
-    dispatch(setAdminDrawerOpen(false));
-  };
-
   return (
     <div className="flex flex-col h-full w-full pt-12">
       {selectedEventOccurrence && isSelectedOccurrenceInPast ? (
-        <OccurrenceReadOnly onBack={handleCloseDrawer} />
+        <OccurrenceReadOnly onBack={onDrawerClose} />
       ) : (
         <OccurrenceForm
-          onCancel={handleCloseDrawer}
+          onCancel={onDrawerClose}
           handleSaveSuccess={handleSaveSuccess}
           handleUpdateSuccess={handleUpdateSuccess}
           handleDeleteSuccess={handleDeleteSuccess}

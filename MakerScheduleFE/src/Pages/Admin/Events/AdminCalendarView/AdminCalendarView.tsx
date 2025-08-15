@@ -2,8 +2,11 @@ import { IconButton, Drawer } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { OccurrenceCalendar } from "./OccurrenceCalendar/OccurrenceCalendar";
 import { useState, useEffect } from "react";
-import { useAppSelector } from "@ms/redux/hooks";
-import { selectAdminState } from "@ms/redux/slices/adminSlice";
+import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
+import {
+  selectAdminState,
+  setSelectedEvent,
+} from "@ms/redux/slices/adminSlice";
 import { OccurrenceCalendarDetails } from "@ms/Pages/Admin/Events/AdminCalendarView/CalanderOccurrenceDetails/OccurrenceCalendarDetails";
 import { OccurrenceCalendarHeader } from "@ms/Pages/Admin/Events/AdminCalendarView/Header/Header";
 import type { ViewState } from "@ms/types/admin.types";
@@ -12,6 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { DatesSetArg } from "@fullcalendar/core/index.js";
 import { getOccurrences } from "@ms/api/occurrence.api";
 import type { Occurrence } from "@ms/types/occurrence.types";
+import type { DateClickArg } from "@fullcalendar/interaction/index.js";
 
 interface AdminCalendarViewProps {
   selectedEventType?: string;
@@ -33,10 +37,17 @@ const AdminCalendarView = ({
 
   const [calendarStartDate, setCalendarStartDate] = useState<Date | null>(null);
   const [calendarEndDate, setCalendarEndDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+
+  const dispatch = useAppDispatch();
 
   const handleDatesSet = (arg: DatesSetArg) => {
     setCalendarStartDate(arg.start);
     setCalendarEndDate(arg.end);
+  };
+
+  const handleDateClick = (arg: DateClickArg) => {
+    setSelectedDate(arg.date);
   };
 
   useEffect(() => {
@@ -67,16 +78,9 @@ const AdminCalendarView = ({
     }
   }, [occurrences]);
 
-  const handleCloseDrawer = () => {
-    setDrawerOpen(false);
-  };
-
   const handleDrawerClose = () => {
-    handleCloseDrawer();
-  };
-
-  const handleIconClose = () => {
-    handleCloseDrawer();
+    setDrawerOpen(false);
+    dispatch(setSelectedEvent(undefined));
   };
 
   const handleFilterChange = (value: string) => {
@@ -97,6 +101,7 @@ const AdminCalendarView = ({
         eventTypes={appMetaData.eventTypes || []}
         onFilterChange={handleFilterChange}
         onSetViewState={onViewStateChange}
+        selectedDate={selectedDate}
         viewState={viewState}
       />
 
@@ -104,6 +109,7 @@ const AdminCalendarView = ({
         selectedEventType={selectedEventType}
         occurrences={filteredOccurrences}
         onDateSet={handleDatesSet}
+        onDateClick={handleDateClick}
       />
 
       <Drawer
@@ -126,7 +132,7 @@ const AdminCalendarView = ({
       >
         <div className="flex flex-col h-full w-full">
           <div className="ml-auto absolute right-2 top-2 z-10">
-            <IconButton onClick={handleIconClose}>
+            <IconButton onClick={handleDrawerClose}>
               <CloseIcon />
             </IconButton>
           </div>
@@ -135,6 +141,7 @@ const AdminCalendarView = ({
             calendarEndDate={calendarEndDate}
             calendarStartDate={calendarStartDate}
             selectedEventType={selectedEventType}
+            onDrawerClose={handleDrawerClose}
           />
         </div>
       </Drawer>

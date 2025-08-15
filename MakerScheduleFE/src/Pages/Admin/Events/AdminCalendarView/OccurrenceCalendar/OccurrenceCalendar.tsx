@@ -1,7 +1,9 @@
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import interactionPlugin, {
+  type DateClickArg,
+} from "@fullcalendar/interaction";
 import type { Occurrence } from "@ms/types/occurrence.types";
 
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
@@ -12,26 +14,28 @@ import {
   setSelectedEventOccurrence,
 } from "@ms/redux/slices/adminSlice";
 import type { DatesSetArg, EventClickArg } from "@fullcalendar/core/index.js";
+import type { EventOffering } from "@ms/types/event.types";
 
 interface OccurrenceCalendarProps {
   selectedEventType?: string;
   onDateSet: (dates: DatesSetArg) => void;
-
+  onDateClick: (date: DateClickArg) => void;
   occurrences: Occurrence[];
 }
 
 function calculateEndTime(
-  occurrence: Occurrence | undefined
+  occurrence: Occurrence | undefined,
+  event: EventOffering | undefined
 ): string | undefined {
-  if (!occurrence?.scheduleStart || !occurrence?.duration) return undefined;
+  if (!occurrence?.scheduleStart || !event?.duration) return undefined;
   const start = new Date(occurrence.scheduleStart);
-  start.setMilliseconds(start.getMilliseconds() + occurrence.duration);
+  start.setMinutes(start.getMinutes() + event.duration);
   return start.toISOString();
 }
 
 const OccurrenceCalendar = ({
   onDateSet,
-
+  onDateClick,
   occurrences,
 }: OccurrenceCalendarProps) => {
   const { events } = useAdminEventsData();
@@ -47,7 +51,10 @@ const OccurrenceCalendar = ({
       id: `${item.eventId}_${item.id}`,
       title: item.eventName,
       start: item.scheduleStart,
-      end: calculateEndTime(item),
+      end: calculateEndTime(
+        item,
+        events.find((evt) => evt.id === item.eventId)
+      ),
       backgroundColor: getEventTypeColor(),
       extendedProps: {
         eventId: item.eventId,
@@ -70,7 +77,7 @@ const OccurrenceCalendar = ({
     };
 
     const event = events.find((evt) => evt.id === updateOccurrence.eventId);
-    setSelectedEvent(event);
+    dispatch(setSelectedEvent(event));
 
     dispatch(setSelectedEventOccurrence(updateOccurrence));
     dispatch(setAdminDrawerOpen(true));
@@ -94,6 +101,7 @@ const OccurrenceCalendar = ({
         dayMaxEvents={true}
         height="auto"
         datesSet={onDateSet}
+        dateClick={onDateClick}
       />
     </div>
   );
