@@ -50,11 +50,6 @@ const AdminEventTypesTable = ({ eventTypes }: AdminEventTableProps) => {
     },
   });
 
-  const handleDeletClick = (evt: React.MouseEvent, row: EventType) => {
-    evt.stopPropagation();
-    setEventTypeToDelete(row);
-  };
-
   const handleRowClick = (row: EventType) => {
     dispatch(setSelectedEventType(row));
     dispatch(setAdminDrawerOpen(true));
@@ -86,17 +81,6 @@ const AdminEventTypesTable = ({ eventTypes }: AdminEventTableProps) => {
                 }}
               >
                 <TableCell>{row.name}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    size="small"
-                    className="m-2"
-                    onClick={(evt) => handleDeletClick(evt, row)}
-                  >
-                    Delete
-                  </Button>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>

@@ -1,6 +1,7 @@
 namespace MakerSchedule.API.Extensions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Services;
+using MakerSchedule.Application.Services.EmailService;
 using MakerSchedule.Infrastructure.Data;
 using MakerSchedule.Infrastructure.Services.Storage;
 

@@ -21,8 +21,11 @@ public class EventTypeService(ILogger<EventTypeService> logger, IApplicationDbCo
         return types;
     }
 
-    public async Task<Guid> CreateEventTypeAsync(CreateEventTypeDTO eventTypeDTO)
+    public async Task<EventTypeDTO> CreateEventTypeAsync(CreateEventTypeDTO eventTypeDTO)
     {
+        if (string.IsNullOrWhiteSpace(eventTypeDTO.Name))
+            throw new ArgumentException("Event type name cannot be empty", nameof(eventTypeDTO.Name));
+
         var eventType = new EventType
         {
             Name = new EventTypeName(eventTypeDTO.Name)
@@ -31,27 +34,43 @@ public class EventTypeService(ILogger<EventTypeService> logger, IApplicationDbCo
         context.EventTypes.Add(eventType);
         await context.SaveChangesAsync();
 
-        return eventType.Id;
+        return new EventTypeDTO
+        {
+            Id = eventType.Id,
+            Name = eventType.Name.Value
+        };
     }
 
     public async Task<bool> DeleteEventTypeAsync(Guid eventTypeId)
     {
         var eventType = await context.EventTypes.FindAsync(eventTypeId);
-        if (eventType == null) return false;
+        if (eventType == null) throw new InvalidDataException("Event type not found");
 
         context.EventTypes.Remove(eventType);
         return await context.SaveChangesAsync() > 0;
     }
 
-    public async Task<bool> PatchEventTypeAsync(Guid eventTypeId, PatchEventTypeDTO eventTypeDTO)
+    public async Task<EventTypeDTO> PatchEventTypeAsync(Guid eventTypeId, PatchEventTypeDTO eventTypeDTO)
     {
+
+        if (eventTypeId == null) throw new ArgumentException("Event type not found", nameof(eventTypeId));
+
+
         var eventType = await context.EventTypes.FindAsync(eventTypeId);
-        if (eventType == null) return false;
+
 
         if (eventTypeDTO.Name != null)
             eventType.Name = new EventTypeName(eventTypeDTO.Name);
 
-        return await context.SaveChangesAsync() > 0;
+
+
+        await context.SaveChangesAsync();
+
+        return new EventTypeDTO
+        {
+            Id = eventType.Id,
+            Name = eventType.Name.Value
+        };
     }
 
 }

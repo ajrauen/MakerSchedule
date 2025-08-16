@@ -3,22 +3,22 @@ import { useQuery } from "@tanstack/react-query";
 
 const useAdminEventTypeData = () => {
   const {
-    data: eventMetadataResponse,
-    isError: eventMetadataError,
-    isFetching: metadataLoading,
+    data: eventTypes,
+    isError: eventTypesError,
+    isFetching: eventTypesLoading,
   } = useQuery({
     queryKey: ["eventTypes"],
     queryFn: getEventTypes,
     staleTime: Infinity,
   });
 
-  if (eventMetadataError) {
+  if (eventTypesError) {
     throw Error("Required app data missing");
   }
 
   return {
-    isLoading: metadataLoading,
-    eventTypes: eventMetadataResponse?.data ?? [],
+    isLoading: eventTypesLoading,
+    eventTypes: eventTypes ?? [],
   };
 };
 

@@ -11,7 +11,7 @@ const getEventTypes = async () => {
   };
   const types = await sendAxiosRequest<EventType[]>(req);
 
-  return types;
+  return types.data;
 };
 
 const createEventType = async (eventTypeData: CreateEventType) => {
@@ -22,9 +22,9 @@ const createEventType = async (eventTypeData: CreateEventType) => {
     data: eventTypeData,
   };
 
-  const type = await sendAxiosRequest<string>(req);
+  const type = await sendAxiosRequest<EventType>(req);
 
-  return type;
+  return type.data;
 };
 
 const patchEventType = async (eventTypeData: EventType) => {
@@ -34,9 +34,9 @@ const patchEventType = async (eventTypeData: EventType) => {
     url: url,
     data: eventTypeData,
   };
-  const type = await sendAxiosRequest<string>(req);
+  const type = await sendAxiosRequest<EventType>(req);
 
-  return type;
+  return type.data;
 };
 
 const deleteEventType = async (eventTypeId: string) => {

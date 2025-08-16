@@ -45,7 +45,7 @@ const EventTypeDetails = () => {
   const { mutate: saveEventTypeQuery, isPending: isSavePending } = useMutation({
     mutationKey: ["createEventType"],
     mutationFn: createEventType,
-    onSuccess: (res, createdEventType) => {
+    onSuccess: (newEventType) => {
       queryClient.invalidateQueries({
         queryKey: ["event"],
       });
@@ -53,10 +53,6 @@ const EventTypeDetails = () => {
         ["eventTypes"],
         (oldEventsTypes: EventType[]) => {
           if (!oldEventsTypes) return oldEventsTypes;
-          const newEventType: EventType = {
-            id: res.data,
-            name: createdEventType.name,
-          };
           dispatch(setSelectedEventType(newEventType));
           return [...oldEventsTypes, newEventType];
         }

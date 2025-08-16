@@ -21,8 +21,8 @@ public class EventTypesController(IEventTypeService eventTypeService) : Controll
     [HttpPost]
     public async Task<ActionResult<Guid>> CreateEventType([FromBody] CreateEventTypeDTO createEventTypeDTO)
     {
-        var eventTypeId = await eventTypeService.CreateEventTypeAsync(createEventTypeDTO);
-        return Ok(eventTypeId);
+        var eventTypeDto = await eventTypeService.CreateEventTypeAsync(createEventTypeDTO);
+        return Ok(eventTypeDto);
     }
 
 
@@ -40,11 +40,8 @@ public class EventTypesController(IEventTypeService eventTypeService) : Controll
     [HttpPatch("{eventTypeId}")]
     public async Task<IActionResult> PatchEventType(Guid eventTypeId, [FromBody] PatchEventTypeDTO eventTypeDTO)
     {
-        var updated = await eventTypeService.PatchEventTypeAsync(eventTypeId, eventTypeDTO);
-        if (updated)
-        {
-            return Ok(updated);
-        }
-        return NotFound();
+        var eventTypeDto = await eventTypeService.PatchEventTypeAsync(eventTypeId, eventTypeDTO);
+ 
+        return Ok(eventTypeDto);
     }
 }

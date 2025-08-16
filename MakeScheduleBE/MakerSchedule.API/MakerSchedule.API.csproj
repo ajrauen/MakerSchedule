@@ -28,7 +28,7 @@
   </ItemGroup>
 
 <ItemGroup>
-  <Content Include="..\MakerSchedule.Application\EmailTemplates\register-welcome.html">
+  <Content Include="..\MakerSchedule.Application\EmailTemplates\**\*">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     <Link>EmailTemplates\%(Filename)%(Extension)</Link>
   </Content>

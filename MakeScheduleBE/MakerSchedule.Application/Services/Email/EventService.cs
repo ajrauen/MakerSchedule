@@ -3,6 +3,7 @@ using MakerSchedule.Application.DTO.EventType;
 using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
+using MakerSchedule.Application.Services.Email.Models;
 using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Exceptions;
 using MakerSchedule.Domain.Utilties.ImageUtilities;
@@ -12,7 +13,7 @@ using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services;
 
-public class EventService(IApplicationDbContext context, ILogger<EventService> logger, IImageStorageService imageStorageService) : IEventService
+public class EventService(IApplicationDbContext context, ILogger<EventService> logger, IEmailService emailService, IImageStorageService imageStorageService) : IEventService
 {
     private readonly IApplicationDbContext _context = context;
     private readonly ILogger<EventService> _logger = logger;
@@ -505,13 +506,38 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
     public async Task<bool> DeleteOccuranceAsync(Guid occurrenceid)
     {
-        var occurrence = await _context.Occurrences.FirstOrDefaultAsync(o => o.Id == occurrenceid);
+        var occurrence = await _context.Occurrences.Include(o => o.Attendees).ThenInclude(a => a.User).Include(o => o.Event).FirstOrDefaultAsync(o => o.Id == occurrenceid);
         if (occurrence == null)
             throw new NotFoundException($"Occurrence with id {occurrenceid} not found", occurrenceid);
         occurrence.isDeleted = true;
         _context.Occurrences.Update(occurrence);
 
         await _context.SaveChangesAsync();
+
+        foreach(var attendee  in occurrence.Attendees)
+        { 
+            emailService.SendClassCanceledEmail( new ClassCanceledEmailModel
+            {
+                StudentName = attendee.User.FirstName,
+                EventName = occurrence.Event.EventName.Value,
+                ScheduleDate = occurrence.ScheduleStart.Value.ToString("MMMM dd, yyyy"),
+                ScheduleTime = occurrence.ScheduleStart.Value.ToString("hh:mm tt"),
+                ContactEmail = "andrewrauen@gmail.com",
+                ScheduleUrl = $"https://makerschedule.com/events/{occurrence.EventId}"
+            });
+        }
+
+
+        emailService.SendClassCanceledEmail( new ClassCanceledEmailModel
+        {
+            StudentName = "jack",
+            EventName = "test",
+            ScheduleDate = new DateTime(2023, 10, 10).ToString("MMMM dd, yyyy"),
+            ScheduleTime = new DateTime(2023, 10, 10, 14, 0, 0).ToString("hh:mm tt"),
+            ContactEmail = "andrewrauen@gmail.com",
+            ScheduleUrl = $"https://makerschedule.com/events/{occurrence.EventId}"
+        });
+
         return true;
     }
     

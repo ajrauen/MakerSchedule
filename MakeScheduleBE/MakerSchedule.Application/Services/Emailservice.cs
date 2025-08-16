@@ -1,16 +1,17 @@
 using System.Net.Mail;
 
+using MakerSchedule.Application.Constants;
 using MakerSchedule.Application.DTO.EmailRequest;
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Domain.Aggregates.User;
-using MakerSchedule.Domain.ValueObjects;
+using MakerSchedule.Application.Services.Email.Models;
+
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace MakerSchedule.Application.Services;
+namespace MakerSchedule.Application.Services.EmailService;
 
-public class EmailService(IConfiguration configuration, ILogger<Email> logger) : IEmailService
+public class EmailService(IConfiguration configuration, ILogger<EmailService> logger) : IEmailService
 {
 
     public async Task SendAsync(EmailRequest request)
@@ -33,20 +34,44 @@ public class EmailService(IConfiguration configuration, ILogger<Email> logger) :
 
     }
 
-    public async Task SendWelcomeEmailAsync(string templateName, string toEmail, Dictionary<string, object> data)
-    {
 
-        var testDictionay = new Dictionary<string, object>
+    public async void SendClassCanceledEmail( ClassCanceledEmailModel model)
+    {
+        var from = configuration["Email:SMTPUser"];
+
+        var template = await LoadEmailTemplateAsync(EmailTemplates.ClassCanceled);
+        var content = ProcessTemplatePlaceHolders(template, new Dictionary<string, object>
         {
-            { "FirstName", "Christy" },
-            { "Username", "Hot Rod" },
-        };
-        var template = await LoadEmailTemplateAsync("register-welcome.html");
-        var content = ProcessTemplatePlaceHolders(template, testDictionay);
+            { "StudentName", model.StudentName },
+            { "EventName", model.EventName },
+            { "ScheduleTime", model.ScheduleTime },
+            { "Location", model.Location }
+        });
 
         var request = new EmailRequest
         {
-            To = "christyfennewald@gmail.com",
+            To = model.ContactEmail,
+            Subject = "Class Canceled Notification",
+            Body = content,
+            IsHtml = true
+        };
+
+       await SendAsync(request);
+        logger.LogInformation("Class canceled email sent to {Email}", model.ContactEmail);
+    }
+
+    public async Task SendWelcomeEmailAsync(string toEmail, WelcomeEmailModel model)
+    {
+        var template = await LoadEmailTemplateAsync(EmailTemplates.Welcome);
+        var content = ProcessTemplatePlaceHolders(template, new Dictionary<string, object>
+    {
+        { "FirstName", model.FirstName },
+        { "Username", model.Username }
+    });
+
+        var request = new EmailRequest
+        {
+            To = toEmail,
             Subject = "Welcome to MakerSchedule",
             Body = content,
             IsHtml = true
@@ -54,7 +79,6 @@ public class EmailService(IConfiguration configuration, ILogger<Email> logger) :
 
         await SendAsync(request);
     }
-
     private SmtpClient createSmtpClient()
     {
         var host = configuration["Email:SmtpHost"];
@@ -129,15 +153,6 @@ public class EmailService(IConfiguration configuration, ILogger<Email> logger) :
         
         throw new FileNotFoundException($"Email template '{templateName}' not found. Checked: {Path.GetFullPath(binPath)} and {Path.GetFullPath(projectPath)}");
 
-
-        // var templatePath = Path.Combine("EmailTemplates", templateName);
-
-        // if (!File.Exists(templatePath))
-        // {
-        //     throw new FileNotFoundException($"Email template '{templateName}' not found at path '{templatePath}'.");
-        // }
-
-        // return await File.ReadAllTextAsync(templatePath);
     }
 
     private string ProcessTemplatePlaceHolders(string template, Dictionary<string, object> data)

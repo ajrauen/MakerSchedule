@@ -48,7 +48,7 @@ public class DomainUserProfileService(  IApplicationDbContext context, UserManag
             CreatedAt = DateTime.UtcNow,
             IsActive = true,
             PreferredContactMethod = dto.PreferredContactMethod,
-            Email = new Email(dto.Email),
+            Email = new MakerSchedule.Domain.ValueObjects.Email(dto.Email),
             PhoneNumber = new PhoneNumber(dto.PhoneNumber)
         };
 
@@ -84,7 +84,7 @@ public class DomainUserProfileService(  IApplicationDbContext context, UserManag
                     UpdatedAt = DateTime.UtcNow,
                     IsActive = true,
                     PreferredContactMethod = registrationDto.PreferredContactMethod,
-                    Email = new Email(registrationDto.Email),
+                    Email = new MakerSchedule.Domain.ValueObjects.Email(registrationDto.Email),
                     PhoneNumber = new PhoneNumber(registrationDto.PhoneNumber)
                 };
                 context.DomainUsers.Add(domainUser);

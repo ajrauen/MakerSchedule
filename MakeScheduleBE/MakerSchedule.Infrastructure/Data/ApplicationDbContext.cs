@@ -113,7 +113,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         {
             entity.Property(d => d.Email)
                 .HasConversion(
-                    email => email == null ? null : email.Value,
+                    email => email == null ? null : email.Value,        
                     value => value == null ? null : new MakerSchedule.Domain.ValueObjects.Email(value)
                 )
                 .HasColumnType("nvarchar(max)");

@@ -6,7 +6,7 @@ public interface IEventTypeService
 {
     
     Task<IEnumerable<EventTypeDTO>> GetAllEventTypesAsync();
-    Task<Guid> CreateEventTypeAsync(CreateEventTypeDTO eventTypeDTO);
+    Task<EventTypeDTO> CreateEventTypeAsync(CreateEventTypeDTO eventTypeDTO);
     Task<bool> DeleteEventTypeAsync(Guid eventTypeId);
-    Task<bool> PatchEventTypeAsync(Guid eventTypeId, PatchEventTypeDTO eventTypeDTO);
+    Task<EventTypeDTO> PatchEventTypeAsync(Guid eventTypeId, PatchEventTypeDTO eventTypeDTO);
 }
