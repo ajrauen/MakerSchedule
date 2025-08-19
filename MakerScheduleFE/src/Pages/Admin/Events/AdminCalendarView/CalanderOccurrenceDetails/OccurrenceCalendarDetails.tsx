@@ -13,14 +13,12 @@ import { useMemo } from "react";
 interface OccurrenceCalendarDetailsProps {
   calendarStartDate: Date | null;
   calendarEndDate: Date | null;
-  selectedEventType?: string;
   onDrawerClose: () => void;
 }
 
 const OccurrenceCalendarDetails = ({
   calendarStartDate,
   calendarEndDate,
-  selectedEventType,
   onDrawerClose,
 }: OccurrenceCalendarDetailsProps) => {
   const { selectedEventOccurrence } = useAppSelector(selectAdminState);
@@ -35,7 +33,7 @@ const OccurrenceCalendarDetails = ({
 
   const handleSaveSuccess = (createOccurrence: Occurrence) => {
     queryClient.setQueryData(
-      ["occurrences", calendarStartDate, calendarEndDate, selectedEventType],
+      ["occurrences", calendarStartDate, calendarEndDate],
       (oldData: Occurrence[]) => {
         if (!oldData) return undefined;
 
@@ -47,7 +45,7 @@ const OccurrenceCalendarDetails = ({
 
   const handleUpdateSuccess = (updateOccurrence: Occurrence) => {
     queryClient.setQueryData(
-      ["occurrences", calendarStartDate, calendarEndDate, selectedEventType],
+      ["occurrences", calendarStartDate, calendarEndDate],
       (oldData: Occurrence[]) => {
         if (!oldData) return undefined;
         const occurrenceIndex = oldData.findIndex(
@@ -68,7 +66,7 @@ const OccurrenceCalendarDetails = ({
 
   const handleDeleteSuccess = (deleteOccurrence: Occurrence) => {
     queryClient.setQueryData(
-      ["occurrences", calendarStartDate, calendarEndDate, selectedEventType],
+      ["occurrences", calendarStartDate, calendarEndDate],
       (oldData: Occurrence[]) => {
         if (!oldData) return undefined;
 

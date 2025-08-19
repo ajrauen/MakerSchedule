@@ -25,7 +25,6 @@ const AdminEventTable = ({
           <TableRow>
             <TableCell>Event Name</TableCell>
             <TableCell>Description</TableCell>
-            <TableCell>Event Type</TableCell>
             <TableCell>Duration</TableCell>
             <TableCell>Image</TableCell>
           </TableRow>
@@ -47,7 +46,6 @@ const AdminEventTable = ({
                   {row.description}
                 </div>
               </TableCell>
-              <TableCell>{row.eventType?.name}</TableCell>
               <TableCell>{row.duration && durationMap[row.duration]}</TableCell>
               <TableCell>
                 <img

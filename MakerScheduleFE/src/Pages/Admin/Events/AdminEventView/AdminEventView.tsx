@@ -91,9 +91,7 @@ const AdminEventView = ({
       }) || [];
 
     if (filterValue) {
-      filtered = filtered.filter(
-        (event) => event.eventType?.id === filterValue
-      );
+      filtered = filtered.filter(() => []);
     }
 
     setFilteredEvents(filtered);
@@ -103,7 +101,6 @@ const AdminEventView = ({
     <>
       <EventsHeader
         onSearch={handleSearch}
-        eventTypes={appMetaData.eventTypes || []}
         onFilterChange={handleFilterChange}
         onSetViewState={onViewStateChange}
         viewState={viewState}

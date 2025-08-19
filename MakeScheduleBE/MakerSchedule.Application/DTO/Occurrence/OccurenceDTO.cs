@@ -8,7 +8,6 @@ public class OccurrenceDTO
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public Guid EventId { get; set; } = Guid.NewGuid();
-    public string EventType { get; set; } = string.Empty;
     public string EventName { get; set; } = string.Empty;
     public DateTime ScheduleStart { get; set; }
     public ICollection<OccurrenceUserDTO> Attendees { get; set; } = Array.Empty<OccurrenceUserDTO>();

@@ -13,7 +13,6 @@ public class CreateEventDTO
     public required string Description { get; set; }
     public int Duration { get; set; }
     [Required]
-    public required Guid EventTypeId { get; set; }
     
     public required IFormFile FormFile  { get; set; }
 }

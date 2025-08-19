@@ -1,4 +1,4 @@
-import type { EventOffering, EventType } from "@ms/types/event.types";
+import type { EventOffering } from "@ms/types/event.types";
 
 import { BasicEventDetails } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/BasicDetails/BasicEventDetails";
 import { IconButton, Tab, Tabs } from "@mui/material";
@@ -15,11 +15,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import { EventOccurrences } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/EventOccurrences";
 
-interface CreateEventProps {
-  eventTypes: EventType[];
-}
-
-const EventDetails = ({ eventTypes }: CreateEventProps) => {
+const EventDetails = () => {
   const [value, setValue] = useState(0);
   // store a ref so that if an event is updated via API, we dont automatically switch tabs
   const selectedEventIdRef = useRef<string | undefined>(undefined);
@@ -111,7 +107,7 @@ const EventDetails = ({ eventTypes }: CreateEventProps) => {
             )}
           </Tabs>
           <TabPanel index={0} value={value}>
-            <BasicEventDetails onClose={handleClose} eventTypes={eventTypes} />
+            <BasicEventDetails onClose={handleClose} />
           </TabPanel>
           <TabPanel index={1} value={value}>
             <EventOccurrences />

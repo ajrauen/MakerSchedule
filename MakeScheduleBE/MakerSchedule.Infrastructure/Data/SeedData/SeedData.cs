@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using MakerSchedule.Domain.Aggregates.Event;
-using MakerSchedule.Domain.Aggregates.EventType;
 using MakerSchedule.Domain.Aggregates.User;
 using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.ValueObjects;
@@ -34,19 +33,6 @@ public class SeedData
         }
     };
 
-    // Removed SeedCustomers
-
-    // Seed EventTypes (use static GUIDs matching migration/SQL)
-    private static readonly Guid woodworkingTypeId = Guid.Parse("e25981d8-cd4d-412f-b261-eede0559c5f6");
-    private static readonly Guid sewingTypeId = Guid.Parse("dd74cd38-bf1d-4694-8b28-2cccbdf44fe9");
-    private static readonly Guid potteryTypeId = Guid.Parse("4861f65b-fff2-42b1-a5a1-e55a45bfc2ef");
-
-    public static List<EventType> SeedEventTypes => new List<EventType>
-    {
-        new EventType { Id = woodworkingTypeId, Name = new EventTypeName("Woodworking") },
-        new EventType { Id = potteryTypeId, Name = new EventTypeName("Pottery") },
-        new EventType { Id = sewingTypeId, Name = new EventTypeName("Sewing") }
-    };
 
     // Generate GUIDs for each event and store them for reuse - match migration GUIDs
     private static readonly Guid event1Id = Guid.Parse("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"); // Advanced Pottery
@@ -61,7 +47,6 @@ public class SeedData
             EventName = new EventName("Advanced Pottery"),
             Description = "Advanced pottery techniques for experienced artists. Wheel throwing and glazing. In this workshop, participants will explore complex forms and surface decoration methods, including carving, slip trailing, and underglaze painting. The instructor will demonstrate advanced wheel techniques, such as making large vessels and assembling multi-part pieces. You will also learn about glaze chemistry, firing schedules, and troubleshooting common issues. Bring your creative ideas and prepare to push your skills to the next level. All materials and firing fees are included. Prior pottery experience is required for this class.",
             Duration = new Duration(120 ),
-            EventTypeId = potteryTypeId
         },
         new Event
         {
@@ -69,7 +54,6 @@ public class SeedData
             EventName = new EventName("Woodworking Workshop"),
             Description = "Learn to build a simple wooden shelf. All materials provided. This hands-on workshop covers the basics of woodworking, including measuring, cutting, sanding, and assembling wood pieces. You will use both hand and power tools under the guidance of an experienced instructor. Safety procedures and tool maintenance will be emphasized throughout the session. By the end of the class, you will have constructed your own sturdy shelf to take home. The workshop also includes tips on finishing techniques, such as staining and sealing, to enhance the appearance and durability of your project. Suitable for all skill levels.",
             Duration = new Duration(180),
-            EventTypeId = woodworkingTypeId
         },
         new Event
         {
@@ -77,7 +61,6 @@ public class SeedData
             EventName = new EventName("Sewing Basics"),
             Description = "Introduction to sewing for beginners. Learn to use a sewing machine and create simple projects. This class covers the fundamentals of sewing, including threading a machine, selecting fabrics, reading patterns, and basic stitches. You will practice on scrap fabric before creating a simple project to take home. The instructor will provide guidance on choosing the right materials and tools for your projects. Perfect for those who want to start sewing their own clothes or home decor items. All equipment and materials are provided.",
             Duration = new Duration(90 ), 
-            EventTypeId = sewingTypeId
         }
     };
 
@@ -427,50 +410,7 @@ public class DatabaseSeeder
         await _context.SaveChangesAsync();
     }
 
-    // Add a method to seed EventTypes manually
-    private async Task SeedEventTypesAsync()
-    {
-        // Define the static GUIDs from SeedData
-        Guid woodworkingTypeId = Guid.Parse("e25981d8-cd4d-412f-b261-eede0559c5f6");
-        Guid potteryTypeId = Guid.Parse("4861f65b-fff2-42b1-a5a1-e55a45bfc2ef");
-        Guid sewingTypeId = Guid.Parse("dd74cd38-bf1d-4694-8b28-2cccbdf44fe9");
 
-        // Check if event types already exist
-        if (!await _context.EventTypes.AnyAsync())
-        {
-            _logger.LogInformation("Seeding EventTypes...");
-            
-            // Create event types with proper names
-            var woodworkingType = new EventType { 
-                Id = woodworkingTypeId, 
-                Name = new EventTypeName("Woodworking") 
-            };
-            
-            var potteryType = new EventType { 
-                Id = potteryTypeId, 
-                Name = new EventTypeName("Pottery") 
-            };
-            
-            var sewingType = new EventType { 
-                Id = sewingTypeId, 
-                Name = new EventTypeName("Sewing") 
-            };
-            
-            // Add them to the context
-            _context.EventTypes.Add(woodworkingType);
-            _context.EventTypes.Add(potteryType);
-            _context.EventTypes.Add(sewingType);
-            
-            // Save changes to the database
-            await _context.SaveChangesAsync();
-            
-            _logger.LogInformation("Successfully seeded EventTypes.");
-        }
-        else
-        {
-            _logger.LogInformation("EventTypes already exist, skipping seeding.");
-        }
-    }
     
     public async Task SeedAsync()
     {
@@ -493,8 +433,7 @@ public class DatabaseSeeder
             await SeedUserRolesAsync();
             await SeedAdminUserAsync();
             
-            // Seed EventTypes first - this is critical as Events depend on them
-            await SeedEventTypesAsync();
+
             
             await SeedLeadersAndCustomersAsync();
             await SeedEventLeadersAndAttendeesAsync();

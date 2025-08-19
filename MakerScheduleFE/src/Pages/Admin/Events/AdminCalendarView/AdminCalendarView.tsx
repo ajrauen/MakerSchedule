@@ -18,19 +18,16 @@ import type { Occurrence } from "@ms/types/occurrence.types";
 import type { DateClickArg } from "@fullcalendar/interaction/index.js";
 
 interface AdminCalendarViewProps {
-  selectedEventType?: string;
   onViewStateChange: (value: ViewState) => void;
   viewState: ViewState;
 }
 
 const AdminCalendarView = ({
-  selectedEventType,
   onViewStateChange,
   viewState,
 }: AdminCalendarViewProps) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { selectedEventOccurrence } = useAppSelector(selectAdminState);
-  const { appMetaData } = useAdminEventsData();
   const [filteredOccurrences, setFilteredOccurrences] = useState<Occurrence[]>(
     []
   );
@@ -61,14 +58,8 @@ const AdminCalendarView = ({
   }, [selectedEventOccurrence]);
 
   const { data: occurrences } = useQuery({
-    queryKey: [
-      "occurrences",
-      calendarStartDate,
-      calendarEndDate,
-      selectedEventType,
-    ],
-    queryFn: () =>
-      getOccurrences(calendarStartDate!, calendarEndDate!, selectedEventType),
+    queryKey: ["occurrences", calendarStartDate, calendarEndDate],
+    queryFn: () => getOccurrences(calendarStartDate!, calendarEndDate!),
     enabled: !!calendarStartDate && !!calendarEndDate,
   });
 
@@ -90,7 +81,8 @@ const AdminCalendarView = ({
       setFilteredOccurrences(occurrences ?? []);
     } else {
       setFilteredOccurrences(
-        occurrences.filter((occurrence) => occurrence.eventType === value)
+        []
+        // occurrences.filter((occurrence) => occurrence.eventType === value)
       );
     }
   };
@@ -98,7 +90,6 @@ const AdminCalendarView = ({
   return (
     <>
       <OccurrenceCalendarHeader
-        eventTypes={appMetaData.eventTypes || []}
         onFilterChange={handleFilterChange}
         onSetViewState={onViewStateChange}
         selectedDate={selectedDate}
@@ -106,7 +97,6 @@ const AdminCalendarView = ({
       />
 
       <OccurrenceCalendar
-        selectedEventType={selectedEventType}
         occurrences={filteredOccurrences}
         onDateSet={handleDatesSet}
         onDateClick={handleDateClick}
@@ -140,7 +130,6 @@ const AdminCalendarView = ({
           <OccurrenceCalendarDetails
             calendarEndDate={calendarEndDate}
             calendarStartDate={calendarStartDate}
-            selectedEventType={selectedEventType}
             onDrawerClose={handleDrawerClose}
           />
         </div>

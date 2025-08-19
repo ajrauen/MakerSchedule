@@ -3,12 +3,8 @@ import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import { useEffect, useMemo, useState } from "react";
-import type {
-  CreateEventOffering,
-  EventOffering,
-  EventType,
-} from "@ms/types/event.types";
+import { useEffect, useState } from "react";
+import type { CreateEventOffering, EventOffering } from "@ms/types/event.types";
 import {
   createSaveForm,
   createUpdateForm,
@@ -41,9 +37,6 @@ const createEventvalidationSchema = z
     thumbnailFile: z
       .instanceof(File, { error: "Event Image is required" })
       .optional(),
-    eventTypeId: z.string().min(1, {
-      error: "Event Type is required",
-    }),
   })
   .refine((data) => data.thumbnailUrl || data.thumbnailFile, {
     message: "A Thumbnail is required",
@@ -54,7 +47,6 @@ type CreateEventFormData = z.infer<typeof createEventvalidationSchema>;
 
 const createEventInitialFormData = {
   eventName: "",
-  eventTypeId: "",
   description: "",
   duration: undefined,
   thumbnailUrl: undefined,
@@ -63,10 +55,9 @@ const createEventInitialFormData = {
 
 interface BasicEventDetailsProps {
   onClose: (refreshData: boolean) => void;
-  eventTypes: EventType[];
 }
 
-const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
+const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
   const { selectedEvent } = useAppSelector(selectAdminState);
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
@@ -91,7 +82,6 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
         description: selectedEvent.description,
         eventName: selectedEvent.eventName,
         duration: selectedEvent.duration,
-        eventTypeId: selectedEvent.eventType?.id || "",
         thumbnailUrl: selectedEvent.thumbnailUrl,
         thumbnailFile: undefined,
       };
@@ -173,8 +163,7 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
   const handleSave = () => {
     if (!selectedEvent) return;
 
-    const { description, eventName, duration, thumbnailFile, eventTypeId } =
-      getValues();
+    const { description, eventName, duration, thumbnailFile } = getValues();
 
     if (selectedEvent.meta?.isNew) {
       if (!thumbnailFile) return;
@@ -183,7 +172,6 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
         description,
         eventName,
         duration: duration,
-        eventTypeId: eventTypeId,
         thumbnailFile,
       };
       const formEvent = createSaveForm(eventOffering);
@@ -201,15 +189,8 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
         {} as CreateEventFormData
       );
 
-      if (dirtyValues.eventTypeId) {
-        (dirtyValues as any).eventType = dirtyValues.eventTypeId;
-      }
-
       const dirtyValuesWithNumberEventType: Partial<CreateEventOffering> = {
         ...dirtyValues,
-        eventTypeId: dirtyValues.eventTypeId
-          ? dirtyValues.eventTypeId
-          : undefined,
       };
 
       const formEvent = createUpdateForm(dirtyValuesWithNumberEventType);
@@ -220,15 +201,6 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
       });
     }
   };
-
-  const eventTypeOptions = useMemo(() => {
-    const options = eventTypes.map((event) => ({
-      value: event.id ?? "",
-      label: event.name,
-    }));
-
-    return options;
-  }, [eventTypes]);
 
   console.log(getValues("thumbnailUrl"));
 
@@ -264,14 +236,7 @@ const BasicEventDetails = ({ onClose, eventTypes }: BasicEventDetailsProps) => {
             </div>
           </div>
           <div className="flex flex-row gap-3 ">
-            <div className="flex flex-col gap-3 w-1/2">
-              <FormSelect
-                name="eventTypeId"
-                label="Event Type"
-                control={control}
-                options={eventTypeOptions}
-              />
-            </div>
+            <div className="flex flex-col gap-3 w-1/2"></div>
             <div className="flex flex-col gap-3 w-1/2">
               {thumbnailUrl || thumbnailFile ? (
                 <div className="flex flex-row ">

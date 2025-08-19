@@ -1,22 +1,22 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MakerSchedule.Domain.ValueObjects;
 
-public record EventTypeName
+public record EventTagName
 {
     public string Value { get; }
-    public EventTypeName(string value)
+    public EventTagName(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            throw new ArgumentException("Event type name cannot be empty.", nameof(value));
+            throw new ArgumentException("Event tag name cannot be empty.", nameof(value));
         Value = value.Trim();
     }
 
-    public static ValueConverter<EventTypeName?, string?> Converter =>
-      new ValueConverter<EventTypeName?, string?>(
-          eventType => eventType == null ? (string?)null : eventType.Value,
-          value => value != null ? new EventTypeName(value) : null);
+    public static ValueConverter<EventTagName?, string?> Converter =>
+      new ValueConverter<EventTagName?, string?>(
+          eventTag => eventTag == null ? (string?)null : eventTag.Value,
+          value => value != null ? new EventTagName(value) : null);
 
-    public static implicit operator string?(EventTypeName? eventTypeName) => eventTypeName?.Value;
-    public static implicit operator EventTypeName(string eventTypeName) => new EventTypeName(eventTypeName);
+    public static implicit operator string?(EventTagName? eventTagName) => eventTagName?.Value;
+    public static implicit operator EventTagName(string eventTagName) => new EventTagName(eventTagName);
 
 }

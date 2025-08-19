@@ -17,7 +17,6 @@ import type { DatesSetArg, EventClickArg } from "@fullcalendar/core/index.js";
 import type { EventOffering } from "@ms/types/event.types";
 
 interface OccurrenceCalendarProps {
-  selectedEventType?: string;
   onDateSet: (dates: DatesSetArg) => void;
   onDateClick: (date: DateClickArg) => void;
   occurrences: Occurrence[];
@@ -42,10 +41,6 @@ const OccurrenceCalendar = ({
 
   const dispatch = useAppDispatch();
 
-  function getEventTypeColor(): string {
-    return "red";
-  }
-
   const convertToCalendarEvents = (occurrences: Occurrence[]) => {
     return occurrences.map((item) => ({
       id: `${item.eventId}_${item.id}`,
@@ -55,7 +50,7 @@ const OccurrenceCalendar = ({
         item,
         events.find((evt) => evt.id === item.eventId)
       ),
-      backgroundColor: getEventTypeColor(),
+      backgroundColor: "red",
       extendedProps: {
         eventId: item.eventId,
         occurrenceId: item.id,

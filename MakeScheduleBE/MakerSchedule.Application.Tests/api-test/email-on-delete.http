@@ -1,0 +1,79 @@
+### Variables
+@baseUrl = https://localhost:7018
+@eventTypeId = {{createEventType.response.body.id}}
+
+@eventId = {{createEvent.response.body.id}}
+@occurrenceId = {{createOccurrence.response.body.id}}
+
+
+### Create EventType
+# @name createEventType
+POST {{baseUrl}}/api/eventTypes
+Content-Type: application/json
+
+{
+  "name": "Test Woodworking Class"
+}
+
+
+### Create Event
+# @name createEvent
+POST {{baseUrl}}/api/events
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="eventName"
+
+Test Woodworking Class
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="description"
+
+A test woodworking class for API testing
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="duration"
+
+120
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="eventTypeId"
+
+{{eventTypeId}}
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="thumbnailUrl"
+
+https://example.com/test-image.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="FormFile"; filename="test-image.jpg"
+Content-Type: image/jpg
+
+< test-image.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Create Occurrence
+# @name createOccurrence
+POST {{baseUrl}}/api/occurrences
+Content-Type: application/json
+
+{
+  "eventId": "{{eventId}}",
+  "scheduleStart": "2025-08-20T14:00:00Z",
+  "maxAttendees": 10,
+  "location": "Workshop A"
+}
+
+### Add Attendee to Occurrence
+# @name addAttendee
+POST {{baseUrl}}/api/occurrences/{{occurrenceId}}/attendees
+Content-Type: application/json
+
+{
+  "userId": "test-user-id",
+  "email": "test@example.com",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+
+### Get the created occurrence (to verify)
+GET {{baseUrl}}/api/occurrences/{{occurrenceId}}
+
+### Delete the occurrence (this should trigger the email)
+DELETE {{baseUrl}}/api/occurrences/{{occurrenceId}}

@@ -1,5 +1,4 @@
 using MakerSchedule.Application.DTO.Event;
-using MakerSchedule.Application.DTO.EventType;
 using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
@@ -25,17 +24,12 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
     public async Task<IEnumerable<EventListDTO>> GetAllEventsAsync()
     {
         return await _context.Events
-            .Include(e => e.EventType)
             .Select(e => new EventListDTO
             {
                 Id = e.Id,
                 EventName = e.EventName.ToString(),
                 Description = e.Description,
-                EventType =  new EventTypeDTO
-                {
-                    Id = e.EventType != null ? e.EventType.Id : Guid.Empty,
-                    Name = e.EventType != null ? e.EventType.Name.Value : string.Empty
-                },
+        
                 Duration = e.Duration,
                 ThumbnailUrl = e.ThumbnailUrl,
             }).ToListAsync();
@@ -56,27 +50,14 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
         if (e == null) throw new NotFoundException("Event", id);
 
-        // Get the event type name using the EventTypeId from the event
-        var eventType = await _context.EventTypes
-            .Where(et => et.Id == e.EventTypeId)
-            .Select(et => et)
-            .FirstOrDefaultAsync();
 
-        if (eventType == null)
-        {
-            throw new NotFoundException("EventType", e.EventTypeId);
-        }
 
         return new EventDTO
         {
             Id = e.Id,
             EventName = e.EventName.ToString(),
             Description = e.Description,
-            EventType = new EventTypeDTO
-            {
-                Id = eventType.Id,
-                Name = eventType.Name.Value
-            },
+
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
             occurrences = e.Occurrences
@@ -100,7 +81,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
                     Status = o.Status,
                     EventName = o.Event.EventName.Value,
-                    EventType = o.Event.EventType.Name.Value
                 })
         };
     }
@@ -112,17 +92,12 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         {
             throw new ArgumentException("Image file is required for event creation", nameof(dto.FormFile));
         }
-        var eventType = await _context.EventTypes.FirstOrDefaultAsync(et => et.Id == dto.EventTypeId);
-        if (eventType == null)
-        {
-            throw new NotFoundException("EventType", dto.EventTypeId);
-        }
+    
 
         var e = new Event
         {
             EventName = new EventName(dto.EventName),
             Description = dto.Description,
-            EventTypeId = eventType.Id,
             Duration = dto.Duration > 0 ? new Duration(dto.Duration) : null,
         };
         _context.Events.Add(e);
@@ -170,11 +145,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Id = e.Id,
             EventName = e.EventName.ToString(),
             Description = e.Description,
-            EventType = new EventTypeDTO
-            {
-                Id = eventType.Id,
-                Name = eventType.Name.Value
-            },
+ 
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
             occurrences = new List<OccurrenceDTO>()
@@ -185,7 +156,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
     public async Task<EventDTO> PatchEventAsync(Guid eventId, PatchEventDTO dto)
     {
         var e = await _context.Events
-            .Include(ev => ev.EventType)
             .Include(ev => ev.Occurrences)
                 .ThenInclude(o => o.Attendees)
                     .ThenInclude(a => a.User)
@@ -204,15 +174,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             e.Description = dto.Description;
         if (dto.Duration.HasValue)
             e.Duration = new Duration(dto.Duration.Value);
-        if (dto.EventTypeId != null)
-        {
-            var eventType = await _context.EventTypes.FirstOrDefaultAsync(et => et.Id.ToString() == dto.EventTypeId);
-            if (eventType == null)
-            {
-                throw new NotFoundException($"EventType with id {dto.EventTypeId} not found", dto.EventTypeId);
-            }
-            e.EventTypeId = eventType.Id;
-        }
+
         if (dto.FormFile != null && dto.FormFile.Length > 0)
         {
             if (!string.IsNullOrEmpty(e.ThumbnailUrl))
@@ -260,22 +222,14 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         }
 
         await _context.SaveChangesAsync();
-        
-        if (e.EventType == null)
-        {
-            throw new InvalidOperationException($"Event {e.Id} has no associated EventType");
-        }
+  
         
         return new EventDTO
         {
             Id = e.Id,
             EventName = e.EventName.ToString(),
             Description = e.Description,
-            EventType = new EventTypeDTO
-            {
-                Id = e.EventType.Id,
-                Name = e.EventType.Name.Value
-            },
+     
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
             occurrences = e.Occurrences
@@ -299,7 +253,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
                     Status = o.Status,
                     EventName = o.Event.EventName.Value,
-                    EventType = o.Event.EventType.Name.Value
                 }).ToList()
         };
 
@@ -319,7 +272,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
     public async Task<OccurrenceDTO> CreateOccurrenceAsync(CreateOccurrenceDTO occurrenceDTO)
     {
 
-        var eventEntity = await _context.Events.Include(e => e.EventType).Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
+        var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
         if (eventEntity == null)
             throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
 
@@ -409,7 +362,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Attendees = attendeeDTOs,
             Leaders = leaderDTOs,
             EventName = eventEntity.EventName.Value,
-            EventType = eventEntity.EventType.Name.Value,
         };
     }
 
@@ -417,7 +369,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
     {
 
 
-        var eventEntity = await _context.Events.Include(e=> e.EventType).Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
+        var eventEntity = await _context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
         if (eventEntity == null)
             throw new NotFoundException($"Event with id {occurrenceDTO.EventId} not found", occurrenceDTO.EventId);
 
@@ -500,7 +452,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             ScheduleStart = DateTime.SpecifyKind(occurrence.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
             Status = occurrence.Status,
             EventName = occurrence.Event.EventName.Value,
-            EventType = occurrence.Event.EventType.Name.Value
         };
     }
 
@@ -564,10 +515,9 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
             var occurrences = await _context.Occurrences
                 .Include(o => o.Event)
-                    .ThenInclude(e => e.EventType)
+          
                 .Where(o => o.ScheduleStart >= searchDTO.StartDate && o.ScheduleStart <= searchDTO.EndDate)
                 .Where(o => !o.isDeleted)
-                .Where(o => string.IsNullOrEmpty(searchDTO.EventType) || o.Event.EventType.Name == searchDTO.EventType)
                 .Select(o => new OccurrenceDTO
                 {
                     Id = o.Id,
@@ -575,7 +525,6 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
                     Status = o.Status,
                     EventName = o.Event.EventName.Value, 
-                    EventType = o.Event.EventType.Name.Value,
                     Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
                     {
                         Id = a.UserId.ToString().ToLower(),

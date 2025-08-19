@@ -3,10 +3,8 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import TableViewIcon from "@mui/icons-material/TableView";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import type { EventType } from "@ms/types/event.types";
 import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
-import { useMemo } from "react";
 import { useAppDispatch } from "@ms/redux/hooks";
 import {
   setAdminDrawerOpen,
@@ -17,7 +15,6 @@ import type { ViewState } from "@ms/types/admin.types";
 
 interface OccurrenceCalendarHeaderProps {
   onFilterChange: (value: string) => void;
-  eventTypes: EventType[];
   onSetViewState: (value: ViewState) => void;
   viewState: ViewState;
   selectedDate: Date | null;
@@ -25,23 +22,11 @@ interface OccurrenceCalendarHeaderProps {
 
 const OccurrenceCalendarHeader = ({
   onFilterChange,
-  eventTypes,
   onSetViewState,
   viewState,
   selectedDate,
 }: OccurrenceCalendarHeaderProps) => {
   const dispatch = useAppDispatch();
-
-  const eventTypeOptions = useMemo(() => {
-    if (!eventTypes) return [];
-    const eventTypeOptions = eventTypes.map((eventType) => ({
-      value: eventType.name,
-      label: eventType.name,
-    }));
-    eventTypeOptions.unshift({ value: "", label: "All Event Types" });
-
-    return eventTypeOptions;
-  }, [eventTypes]);
 
   const handleCreateOccurrence = () => {
     let today: Date;
@@ -79,7 +64,7 @@ const OccurrenceCalendarHeader = ({
           label="Event Type"
           variant="standard"
           className="w-64"
-          options={eventTypeOptions}
+          options={[]}
           onChange={(event) => {
             const value =
               event.target && typeof event.target.value === "string"

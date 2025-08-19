@@ -45,18 +45,10 @@ const deleteOccurrence = async (occurrenceId: string) => {
   return occurrenceId;
 };
 
-const getOccurrences = async (
-  startDate: Date,
-  endDate: Date,
-  eventType: string | undefined
-) => {
+const getOccurrences = async (startDate: Date, endDate: Date) => {
   let url = `${BASE_OCCURRENCE_ENDPOINT}?`;
   if (startDate && endDate) {
     url += `startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}`;
-  }
-
-  if (eventType) {
-    url += `&eventType=${eventType}`;
   }
 
   const req: AxiosRequestConfig = {

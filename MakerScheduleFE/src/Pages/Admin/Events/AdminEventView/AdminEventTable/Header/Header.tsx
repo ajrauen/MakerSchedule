@@ -4,10 +4,9 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import TableViewIcon from "@mui/icons-material/TableView";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import type { EventOffering, EventType } from "@ms/types/event.types";
+import type { EventOffering } from "@ms/types/event.types";
 import AddIcon from "@mui/icons-material/Add";
 import { Button } from "@mui/material";
-import { useMemo } from "react";
 import { useAppDispatch } from "@ms/redux/hooks";
 import {
   setAdminDrawerOpen,
@@ -20,7 +19,6 @@ import type { ViewState } from "@ms/types/admin.types";
 interface EventsHeaderProps {
   onSearch: (value: string | undefined) => void;
   onFilterChange: (value: string) => void;
-  eventTypes: EventType[];
   onSetViewState: (value: ViewState) => void;
   viewState: ViewState;
 }
@@ -28,22 +26,10 @@ interface EventsHeaderProps {
 const EventsHeader = ({
   onSearch,
   onFilterChange,
-  eventTypes,
   onSetViewState,
   viewState,
 }: EventsHeaderProps) => {
   const dispatch = useAppDispatch();
-
-  const eventTypeOptions = useMemo(() => {
-    if (!eventTypes) return [];
-    const eventTypeOptions = eventTypes.map((eventType) => ({
-      value: eventType.id ?? "",
-      label: eventType.name,
-    }));
-    eventTypeOptions.unshift({ value: "", label: "All Event Types" });
-
-    return eventTypeOptions;
-  }, [eventTypes]);
 
   const handleCreateEvent = () => {
     const newEvent: EventOffering = {
@@ -99,7 +85,7 @@ const EventsHeader = ({
           label="Event Type"
           variant="standard"
           className="w-64"
-          options={eventTypeOptions}
+          options={[]}
           onChange={(event) => {
             const value =
               event.target && typeof event.target.value === "string"

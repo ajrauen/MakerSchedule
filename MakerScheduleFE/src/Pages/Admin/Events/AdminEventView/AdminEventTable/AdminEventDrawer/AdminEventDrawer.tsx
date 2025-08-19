@@ -104,10 +104,7 @@ const AdminEventDrawer = ({
             </Tabs>
 
             <TabPanel index={0} value={selectedTab}>
-              <BasicEventDetails
-                onClose={onDrawerClose}
-                eventTypes={appMetaData.eventTypes || []}
-              />
+              <BasicEventDetails onClose={onDrawerClose} />
             </TabPanel>
 
             <TabPanel index={1} value={selectedTab}>

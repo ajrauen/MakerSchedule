@@ -57,7 +57,6 @@ public class DomainUserServiceTests : IAsyncLifetime
             Id = "event1",
             EventName = new MakerSchedule.Domain.ValueObjects.EventName("Test Event"),
             Description = "Test event description",
-            EventType = MakerSchedule.Domain.Enums.EventTypeEnum.Woodworking
         };
         DbContext!.Events.Add(testEvent);
         await DbContext.SaveChangesAsync();

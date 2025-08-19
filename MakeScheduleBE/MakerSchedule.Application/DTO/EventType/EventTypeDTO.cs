@@ -1,7 +1,0 @@
-namespace MakerSchedule.Application.DTO.EventType;
-
-public class EventTypeDTO
-{
-   public Guid Id { get; set; }
-   public string Name { get; set; } = string.Empty;
-}

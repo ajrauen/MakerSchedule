@@ -1,16 +1,11 @@
 import type { CreateEventOffering } from "@ms/types/event.types";
 
 const createSaveForm = (event: CreateEventOffering) => {
-  if (!event.eventTypeId) {
-    throw new Error("Missing event type");
-  }
-
   const form = new FormData();
   form.append("eventName", event.eventName);
   form.append("description", event.description);
 
   if (event.duration) form.append("duration", event.duration.toString());
-  form.append("eventTypeId", event.eventTypeId.toString());
   form.append("FormFile", event.thumbnailFile);
 
   return form;
@@ -22,8 +17,6 @@ const createUpdateForm = (event: Partial<CreateEventOffering>) => {
   if (event.description) form.append("description", event.description);
   if (event.duration) form.append("duration", event.duration.toString());
 
-  if (event.eventTypeId)
-    form.append("eventTypeId", event.eventTypeId.toString());
   if (event.thumbnailFile) form.append("FormFile", event.thumbnailFile);
 
   return form;

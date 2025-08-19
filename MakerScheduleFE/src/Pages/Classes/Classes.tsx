@@ -22,7 +22,6 @@ const Classes = () => {
       scheduleStart: event?.scheduleStart,
       duration: event.duration,
       price: event.price || 0,
-      eventType: event.eventType,
       thumbnailUrl: event.thumbnailUrl
         ? event.thumbnailUrl
         : "https://www.akc.org/wp-content/uploads/2017/11/Pembroke-Welsh-Corgi-standing-outdoors-in-the-fall.jpg",

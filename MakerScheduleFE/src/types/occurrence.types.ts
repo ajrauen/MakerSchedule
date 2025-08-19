@@ -12,7 +12,6 @@ interface Occurrence {
   attendees?: OccurranceUsers[];
   leaders?: OccurranceUsers[];
   status: OccurrenceStaus;
-  eventType?: string;
   meta?: {
     isNew?: boolean;
     componentOrigin?: "occurrenceList" | "occurrenceCalendar";
