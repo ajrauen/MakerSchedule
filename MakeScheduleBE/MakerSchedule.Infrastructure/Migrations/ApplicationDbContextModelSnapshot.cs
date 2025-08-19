@@ -162,103 +162,119 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("05a33db3-dca0-40e4-ab35-3924e3eaf679"),
+                            Id = new Guid("1e93360a-f94b-42e2-a866-641e61fc249f"),
                             EventId = new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"),
-                            ScheduleStart = new DateTime(2025, 8, 11, 15, 30, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 12, 15, 30, 0, 0, DateTimeKind.Utc),
                             Status = 2,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("8cb4ffaf-dabc-4129-a82d-d1c4024041ce"),
+                            Id = new Guid("72d15c86-d916-4c70-af02-6daf1c2e4aca"),
                             EventId = new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"),
-                            ScheduleStart = new DateTime(2025, 8, 30, 20, 30, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 31, 20, 30, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("77e8214f-3535-4cc5-882d-d1e816b1c7dc"),
+                            Id = new Guid("7f167f14-4f8f-4c26-9d15-561fe9dc32de"),
                             EventId = new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"),
-                            ScheduleStart = new DateTime(2025, 7, 14, 16, 15, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 7, 15, 16, 15, 0, 0, DateTimeKind.Utc),
                             Status = 2,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("8096a167-f971-422b-8e0b-3fa20dfb97c7"),
+                            Id = new Guid("da5ad405-9d36-4463-af0f-98f987abef8f"),
                             EventId = new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"),
-                            ScheduleStart = new DateTime(2025, 9, 2, 17, 15, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 9, 3, 17, 15, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("02fa7df6-bf02-4b53-9e56-940c1937231f"),
+                            Id = new Guid("22e3a854-9d9a-41a0-a950-62ab00ad6e0e"),
                             EventId = new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"),
-                            ScheduleStart = new DateTime(2025, 8, 16, 21, 30, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 17, 21, 30, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("cd6fee30-02eb-4c30-bc45-622ce7ac813a"),
+                            Id = new Guid("cb8d1ece-abe8-4765-90f8-eb8d8fb822c6"),
                             EventId = new Guid("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"),
-                            ScheduleStart = new DateTime(2025, 8, 25, 14, 30, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 26, 14, 30, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("8589426f-eccf-4192-a8a9-de88c7824d71"),
+                            Id = new Guid("216efd15-c8b6-4974-831c-35e763f44a3d"),
                             EventId = new Guid("3709300b-3c35-4350-9f3c-277759214bbb"),
-                            ScheduleStart = new DateTime(2025, 8, 16, 20, 0, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 17, 20, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("b8e5c515-1443-431f-bcaf-680a4a9eab9a"),
+                            Id = new Guid("a4f75f34-c5d7-42d9-a74d-9e9d2bc7a46b"),
                             EventId = new Guid("3709300b-3c35-4350-9f3c-277759214bbb"),
-                            ScheduleStart = new DateTime(2025, 9, 19, 18, 0, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 9, 20, 18, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("6b6caca3-15c9-4aee-bea8-305cf1402e77"),
+                            Id = new Guid("2a3c1818-5d28-413b-83f0-7fa7e9654607"),
                             EventId = new Guid("3709300b-3c35-4350-9f3c-277759214bbb"),
-                            ScheduleStart = new DateTime(2025, 8, 4, 19, 45, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 5, 19, 45, 0, 0, DateTimeKind.Utc),
                             Status = 2,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("18b99252-9b25-4518-a0b7-f6d557a41338"),
+                            Id = new Guid("4069426d-9f86-401d-83ac-a82db9b0bd55"),
                             EventId = new Guid("3709300b-3c35-4350-9f3c-277759214bbb"),
-                            ScheduleStart = new DateTime(2025, 9, 12, 21, 30, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 9, 13, 21, 30, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("8f7131fc-e226-413c-815f-a524e570bbf8"),
+                            Id = new Guid("cc51575b-db40-49d9-bbfc-3144da58016c"),
                             EventId = new Guid("3709300b-3c35-4350-9f3c-277759214bbb"),
-                            ScheduleStart = new DateTime(2025, 8, 11, 14, 0, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 12, 14, 0, 0, 0, DateTimeKind.Utc),
                             Status = 2,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("ebf1a586-9683-477d-95da-05a964bd7b28"),
+                            Id = new Guid("28893cc0-89cc-4413-9109-a92f55aec4a7"),
                             EventId = new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"),
-                            ScheduleStart = new DateTime(2025, 8, 12, 16, 45, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 13, 16, 45, 0, 0, DateTimeKind.Utc),
                             Status = 2,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("481d89a6-6eca-4711-a160-444ae5aa05d6"),
+                            Id = new Guid("f4574aa5-80fd-458f-a422-a3f2cbfa6a61"),
+                            EventId = new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"),
+                            ScheduleStart = new DateTime(2025, 9, 18, 15, 0, 0, 0, DateTimeKind.Utc),
+                            Status = 1,
+                            isDeleted = false
+                        },
+                        new
+                        {
+                            Id = new Guid("9184d75f-09eb-48a4-8ce3-5937f4e92246"),
+                            EventId = new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"),
+                            ScheduleStart = new DateTime(2025, 7, 26, 14, 15, 0, 0, DateTimeKind.Utc),
+                            Status = 2,
+                            isDeleted = false
+                        },
+                        new
+                        {
+                            Id = new Guid("e8c9816d-c88b-4777-9221-4047589630d2"),
                             EventId = new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"),
                             ScheduleStart = new DateTime(2025, 9, 17, 15, 0, 0, 0, DateTimeKind.Utc),
                             Status = 1,
@@ -266,33 +282,17 @@ namespace MakerSchedule.Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("659e6c70-79c7-4930-b5f5-5403cb6b4d09"),
+                            Id = new Guid("9a13bcac-8120-4ae0-b224-e728d0b9251a"),
                             EventId = new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"),
-                            ScheduleStart = new DateTime(2025, 7, 25, 14, 15, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 8, 6, 14, 30, 0, 0, DateTimeKind.Utc),
                             Status = 2,
                             isDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("45e5c36a-c3b9-4dbd-b532-9bb81d6c54e1"),
+                            Id = new Guid("8f4bf6a8-c689-4116-8fc2-a90f31b96367"),
                             EventId = new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"),
-                            ScheduleStart = new DateTime(2025, 9, 16, 15, 0, 0, 0, DateTimeKind.Utc),
-                            Status = 1,
-                            isDeleted = false
-                        },
-                        new
-                        {
-                            Id = new Guid("8352a415-8b56-4a81-863c-b6183fa99a23"),
-                            EventId = new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"),
-                            ScheduleStart = new DateTime(2025, 8, 5, 14, 30, 0, 0, DateTimeKind.Utc),
-                            Status = 2,
-                            isDeleted = false
-                        },
-                        new
-                        {
-                            Id = new Guid("0845ac04-3fe6-4563-a05f-c2cc1a79ba62"),
-                            EventId = new Guid("5df8ac2c-b1af-4f9d-861d-a3e1e42b23ec"),
-                            ScheduleStart = new DateTime(2025, 9, 8, 14, 45, 0, 0, DateTimeKind.Utc),
+                            ScheduleStart = new DateTime(2025, 9, 9, 14, 45, 0, 0, DateTimeKind.Utc),
                             Status = 1,
                             isDeleted = false
                         });
@@ -429,10 +429,6 @@ namespace MakerSchedule.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Color")
                         .IsRequired()
