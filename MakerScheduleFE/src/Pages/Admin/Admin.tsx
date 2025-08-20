@@ -1,5 +1,6 @@
 import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import { AdminEvents } from "@ms/Pages/Admin/Events/Events";
+import { AdminEventTags } from "@ms/Pages/Admin/EventTags/EventTags";
 import { AdminUsers } from "@ms/Pages/Admin/User/User";
 import { useAppDispatch } from "@ms/redux/hooks";
 import {
@@ -52,7 +53,7 @@ const Admin = () => {
         <AdminUsers />
       </TabPanel>
       <TabPanel index={2} value={value}>
-        <div />
+        <AdminEventTags />
       </TabPanel>
     </div>
   );

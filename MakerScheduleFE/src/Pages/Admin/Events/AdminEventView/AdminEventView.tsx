@@ -29,7 +29,7 @@ const AdminEventView = ({
   const [filterValue, setFilterValue] = useState("");
   const [filteredEvents, setFilteredEvents] = useState<EventOffering[]>([]);
 
-  const { events, appMetaData } = useAdminEventsData();
+  const { events } = useAdminEventsData();
 
   const dispatch = useAppDispatch();
 

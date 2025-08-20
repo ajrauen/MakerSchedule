@@ -46,7 +46,7 @@ public class EventTagService(IApplicationDbContext context, ILogger<EventTagServ
 
     public async Task<EventTagDTO> GetEventTagByIdAsync(Guid eventTagId)
     {
-        var eventTag = await context.EventTags.FirstOrDefaultAsync(ev => ev.Id == eventTagId);
+        var eventTag = await context.EventTags.Include(et => et.Events).FirstOrDefaultAsync(ev => ev.Id == eventTagId);
 
         if (eventTag == null)
         {
@@ -57,7 +57,8 @@ public class EventTagService(IApplicationDbContext context, ILogger<EventTagServ
         {
             Id = eventTag.Id,
             Name = eventTag.Name.Value,
-            Color = eventTag.Color
+            Color = eventTag.Color,
+            EventIds = eventTag.Events.Select(e => e.Id).ToList()
         };
 
     }

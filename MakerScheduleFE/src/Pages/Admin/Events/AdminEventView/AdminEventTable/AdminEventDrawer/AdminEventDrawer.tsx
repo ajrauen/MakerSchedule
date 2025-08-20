@@ -1,4 +1,3 @@
-import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import {
   selectAdminState,
@@ -25,7 +24,6 @@ const AdminEventDrawer = ({
   selectedTab,
   setSelectedTab,
 }: AdminEventDrawerProps) => {
-  const { appMetaData } = useAdminEventsData();
   const { selectedEvent, adminDrawerOpen } = useAppSelector(selectAdminState);
 
   const dispatch = useAppDispatch();

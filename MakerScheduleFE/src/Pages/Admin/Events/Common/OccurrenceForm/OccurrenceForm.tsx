@@ -33,14 +33,14 @@ import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 
 interface OccurrenceFormProps {
   onCancel: () => void;
-  handleSaveSuccess: (response: Occurrence) => void;
+  handleCreateSuccess: (response: Occurrence) => void;
   handleUpdateSuccess: (response: Occurrence) => void;
   handleDeleteSuccess?: (Occurrence: Occurrence) => void;
 }
 
 const OccurrenceForm = ({
   onCancel,
-  handleSaveSuccess,
+  handleCreateSuccess,
   handleUpdateSuccess,
   handleDeleteSuccess,
 }: OccurrenceFormProps) => {
@@ -118,7 +118,7 @@ const OccurrenceForm = ({
       mutationFn: ({ occurrence }: { occurrence: CreateOccurrence }) =>
         createOccurrence(occurrence),
       onSuccess: (response: Occurrence) => {
-        handleSaveSuccess(response);
+        handleCreateSuccess(response);
       },
       meta: {
         successMessage: "Occurrence Created",

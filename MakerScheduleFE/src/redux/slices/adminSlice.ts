@@ -1,4 +1,5 @@
 import type { DomainUser } from "@ms/types/domain-user.types";
+import type { EventTag } from "@ms/types/event-tags.types";
 import type { EventOffering } from "@ms/types/event.types";
 import type { Occurrence } from "@ms/types/occurrence.types";
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
@@ -7,6 +8,7 @@ interface AdminState {
   selectedEvent?: EventOffering;
   selectedEventOccurrence?: Occurrence;
   selectedUser?: DomainUser;
+  selectedEventTag?: EventTag;
   adminDrawerOpen: boolean;
 }
 
@@ -36,7 +38,12 @@ export const adminSlice = createSlice({
     setSelectedUser: (state, action: PayloadAction<DomainUser | undefined>) => {
       state.selectedUser = action.payload;
     },
-
+    setSelectedEventTag: (
+      state,
+      action: PayloadAction<EventTag | undefined>
+    ) => {
+      state.selectedEventTag = action.payload;
+    },
     setAdminDrawerOpen: (state, action: PayloadAction<boolean>) => {
       state.adminDrawerOpen = action.payload;
     },
@@ -48,6 +55,7 @@ export const {
   setSelectedEventOccurrence,
   setSelectedUser,
   setAdminDrawerOpen,
+  setSelectedEventTag,
 } = adminSlice.actions;
 
 export const selectAdminState = (state: { admin: AdminState }) => state.admin;

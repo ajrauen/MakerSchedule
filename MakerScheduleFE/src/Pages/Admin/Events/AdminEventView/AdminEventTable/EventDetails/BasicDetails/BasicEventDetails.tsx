@@ -94,7 +94,7 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
     reset(createEventInitialFormData);
   };
 
-  const handleSaveSuccess = (eventOffering: EventOffering) => {
+  const handleCreateSuccess = (eventOffering: EventOffering) => {
     queryClient.setQueryData(["events"], (oldData: EventOffering[]) => {
       if (!oldData) return undefined;
       return [...oldData, eventOffering];
@@ -129,7 +129,7 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
   const { mutate: saveEventQuery, isPending: isSavePending } = useMutation({
     mutationKey: ["createEvent"],
     mutationFn: createEvent,
-    onSuccess: handleSaveSuccess,
+    onSuccess: handleCreateSuccess,
     meta: {
       successMessage: "Event Created",
       errorMessage: "Error Creating Event",

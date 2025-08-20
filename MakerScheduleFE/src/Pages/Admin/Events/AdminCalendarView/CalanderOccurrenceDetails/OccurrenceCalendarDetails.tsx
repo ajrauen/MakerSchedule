@@ -31,7 +31,7 @@ const OccurrenceCalendarDetails = ({
   const queryClient = useQueryClient();
   const dispatch = useAppDispatch();
 
-  const handleSaveSuccess = (createOccurrence: Occurrence) => {
+  const handleCreateSuccess = (createOccurrence: Occurrence) => {
     queryClient.setQueryData(
       ["occurrences", calendarStartDate, calendarEndDate],
       (oldData: Occurrence[]) => {
@@ -85,7 +85,7 @@ const OccurrenceCalendarDetails = ({
       ) : (
         <OccurrenceForm
           onCancel={onDrawerClose}
-          handleSaveSuccess={handleSaveSuccess}
+          handleCreateSuccess={handleCreateSuccess}
           handleUpdateSuccess={handleUpdateSuccess}
           handleDeleteSuccess={handleDeleteSuccess}
         />

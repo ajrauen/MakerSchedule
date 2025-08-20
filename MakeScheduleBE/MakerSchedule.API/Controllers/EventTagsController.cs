@@ -8,7 +8,7 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class EventTagController(IEventTagService eventTagService) : ControllerBase
+public class EventTagsController(IEventTagService eventTagService) : ControllerBase
 {
     [HttpPost]
     public async Task<ActionResult<EventTagDTO>> CreateEventTag(CreateEventTagDTO createTagDTO)
@@ -24,25 +24,25 @@ public class EventTagController(IEventTagService eventTagService) : ControllerBa
         return Ok(eventTags);
     }
 
-    [HttpGet("{eventTagId}")]
-    public async Task<ActionResult<EventTagDTO>> GetEventTagById(Guid eventTagId)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<EventTagDTO>> GetEventTagById(Guid id)
     {
-        var eventTag = await eventTagService.GetEventTagByIdAsync(eventTagId);
+        var eventTag = await eventTagService.GetEventTagByIdAsync(id);
 
         return Ok(eventTag);
     }
 
-    [HttpPatch]
-    public async Task<ActionResult<EventTagDTO>> PatchEventTag(Guid eventTagId, PatchEventTagDTO eventTagDto)
+    [HttpPatch("{id}")]
+    public async Task<ActionResult<EventTagDTO>> PatchEventTag(Guid id, [FromBody] PatchEventTagDTO eventTagDto)
     {
-        var updatedEventTag = await eventTagService.PatchEventTagAsync(eventTagId, eventTagDto);
+        var updatedEventTag = await eventTagService.PatchEventTagAsync(id, eventTagDto);
         return Ok(updatedEventTag);
     }
 
-    [HttpDelete]
-    public async Task<ActionResult<string>> DeleteEventTag(Guid eventTagId)
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<string>> DeleteEventTag(Guid id)
     {
-        var result = await eventTagService.DeleteEventTagAsync(eventTagId);
-        return Ok(eventTagId);
+        var result = await eventTagService.DeleteEventTagAsync(id);
+        return Ok(id);
     }
 }

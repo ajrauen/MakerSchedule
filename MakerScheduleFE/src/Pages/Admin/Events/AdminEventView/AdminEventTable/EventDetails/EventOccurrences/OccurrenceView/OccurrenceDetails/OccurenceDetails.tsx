@@ -15,7 +15,7 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
 
   const queryClient = useQueryClient();
 
-  const handleSaveSuccess = (occurrence: Occurrence) => {
+  const handleCreateSuccess = (occurrence: Occurrence) => {
     queryClient.setQueryData(
       ["event", occurrence.eventId],
       (oldData: EventOffering) => {
@@ -56,7 +56,7 @@ const OccurrenceDetails = ({ onCancel }: OccurrenceDetailsProps) => {
   return (
     <OccurrenceForm
       onCancel={onCancel}
-      handleSaveSuccess={handleSaveSuccess}
+      handleCreateSuccess={handleCreateSuccess}
       handleUpdateSuccess={handleUpdateSuccess}
     />
   );
