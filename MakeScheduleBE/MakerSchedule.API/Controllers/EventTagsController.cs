@@ -20,7 +20,7 @@ public class EventTagsController(IEventTagService eventTagService) : ControllerB
     [HttpGet]
     public async Task<ActionResult<IEnumerable<EventTagDTO>>> GetEventTags()
     {
-        var eventTags = await eventTagService.GetEventTagAsync();
+        var eventTags = await eventTagService.GetEventTagsAsync();
         return Ok(eventTags);
     }
 

@@ -1,9 +1,11 @@
 using MakerSchedule.Application.DTO.Event;
+using MakerSchedule.Application.DTO.EventTag;
 using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
 using MakerSchedule.Application.Services.Email.Models;
 using MakerSchedule.Domain.Aggregates.Event;
+using MakerSchedule.Domain.Entities;
 using MakerSchedule.Domain.Exceptions;
 using MakerSchedule.Domain.Utilties.ImageUtilities;
 using MakerSchedule.Domain.ValueObjects;
@@ -29,7 +31,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 Id = e.Id,
                 EventName = e.EventName.ToString(),
                 Description = e.Description,
-        
+                EventTagIds = e.EventTagIds.ToArray(),
                 Duration = e.Duration,
                 ThumbnailUrl = e.ThumbnailUrl,
             }).ToListAsync();
@@ -60,6 +62,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
+            EventTagIds = e.EventTagIds.ToArray() ,
             occurrences = e.Occurrences
                 .Where(o => !o.isDeleted)
                 .Select(o => new OccurrenceDTO
@@ -99,7 +102,9 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             EventName = new EventName(dto.EventName),
             Description = dto.Description,
             Duration = dto.Duration > 0 ? new Duration(dto.Duration) : null,
+           
         };
+        e.EventTagIds = dto.EventTagIds?.ToList() ?? new List<Guid>();
         _context.Events.Add(e);
         await _context.SaveChangesAsync();
 
@@ -140,12 +145,22 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             throw new InvalidOperationException("Failed to save event image", ex);
         }
 
+        // Fetch EventTag data for the return DTO
+        var eventTags = await _context.EventTags
+            .Where(et => e.EventTagIds.Contains(et.Id))
+            .Select(et => new EventTagDTO
+            {
+                Id = et.Id,
+                Name = et.Name.Value
+            })
+            .ToListAsync();
+
         return new EventDTO
         {
             Id = e.Id,
             EventName = e.EventName.ToString(),
             Description = e.Description,
- 
+            EventTagIds = eventTags.Select(et => et.Id).ToArray(),
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
             occurrences = new List<OccurrenceDTO>()
@@ -174,6 +189,15 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             e.Description = dto.Description;
         if (dto.Duration.HasValue)
             e.Duration = new Duration(dto.Duration.Value);
+
+        if (dto.EventTagIds != null)
+        {
+            e.EventTagIds = dto.EventTagIds.ToList();
+        }
+        else
+        {
+            e.EventTagIds = new List<Guid>();
+        }
 
         if (dto.FormFile != null && dto.FormFile.Length > 0)
         {
@@ -223,6 +247,15 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
         await _context.SaveChangesAsync();
   
+        // Fetch EventTag data separately since we're now using EventTagIds
+        var eventTags = await _context.EventTags
+            .Where(et => e.EventTagIds.Contains(et.Id))
+            .Select(et => new EventTagDTO
+            {
+                Id = et.Id,
+                Name = et.Name.Value
+            })
+            .ToArrayAsync();
         
         return new EventDTO
         {
@@ -232,6 +265,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
      
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
+            EventTagIds = eventTags.Select(et => et.Id).ToArray(),
             occurrences = e.Occurrences
                 .Where(o => !o.isDeleted)
                 .Select(o => new OccurrenceDTO

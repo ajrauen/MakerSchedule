@@ -12,6 +12,7 @@ import { TabPanel } from "@ms/Components/LayoutComponents/TabPanel/TabPanel";
 import { EventOccurrences } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/EventOccurrences/EventOccurrences";
 import { BasicEventDetails } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/BasicDetails/BasicEventDetails";
 import { getEvent } from "@ms/api/event.api";
+import { compareDeepObject } from "@ms/utils/object.utils";
 
 interface AdminEventDrawerProps {
   onDrawerClose: () => void;
@@ -43,7 +44,7 @@ const AdminEventDrawer = ({
   const detailedEvent = useMemo(() => {
     if (!eventData || selectedEvent?.meta?.isUpdated) return selectedEvent;
 
-    if (JSON.stringify(eventData) === JSON.stringify(selectedEvent)) {
+    if (compareDeepObject(eventData, selectedEvent)) {
       return selectedEvent;
     }
 

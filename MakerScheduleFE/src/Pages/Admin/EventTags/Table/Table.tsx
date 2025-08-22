@@ -27,18 +27,18 @@ const AdminEventTagsTable = ({
           </TableRow>
         </TableHead>
         <TableBody>
-          {eventTags.map((row, idx) => (
+          {eventTags.map((tag, idx) => (
             <TableRow
               key={idx}
               hover
-              selected={selectedEventTag?.id == row.id}
+              selected={selectedEventTag?.id == tag.id}
               onClick={() => {
-                onEdit(row);
+                onEdit(tag);
               }}
             >
-              <TableCell>{row.name}</TableCell>
+              <TableCell>{tag.name}</TableCell>
 
-              <TableCell>0 events</TableCell>
+              <TableCell>{tag.eventIds?.length ?? 0} events</TableCell>
             </TableRow>
           ))}
         </TableBody>

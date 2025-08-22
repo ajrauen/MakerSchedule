@@ -59,11 +59,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
                 .HasColumnType("nvarchar(max)");
         });
 
-        // Configure many-to-many relationship between Event and EventTag
-        modelBuilder.Entity<Event>()
-            .HasMany(e => e.EventTags)
-            .WithMany(et => et.Events);
-
         // Configure Occurrence entity
         modelBuilder.Entity<Occurrence>(entity =>
         {

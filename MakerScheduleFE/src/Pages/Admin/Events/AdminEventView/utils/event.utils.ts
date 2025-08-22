@@ -16,7 +16,12 @@ const createUpdateForm = (event: Partial<CreateEventOffering>) => {
   if (event.eventName) form.append("eventName", event.eventName);
   if (event.description) form.append("description", event.description);
   if (event.duration) form.append("duration", event.duration.toString());
-
+  if (event.eventTagIds && event.eventTagIds.length > 0) {
+    event.eventTagIds.forEach((tag) => {
+      form.append("EventTagIds", tag);
+    });
+  }
+  // Don't append anything for EventTagIds if array is empty - this will result in null/empty array on backend
   if (event.thumbnailFile) form.append("FormFile", event.thumbnailFile);
 
   return form;

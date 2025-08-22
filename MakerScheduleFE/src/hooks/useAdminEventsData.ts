@@ -1,4 +1,5 @@
 import { getDomainUsers } from "@ms/api/domain-user.api";
+import { getEventTags } from "@ms/api/event-tag.api";
 import { getEvents } from "@ms/api/event.api";
 import { getEventMetadata } from "@ms/api/metadata.api";
 import type { AdminEventsMetaData } from "@ms/types/application-metadata.types";
@@ -25,6 +26,12 @@ const useAdminEventsData = () => {
       staleTime: Infinity,
     });
 
+  const { isError: eventTagsError, isFetching: eventTagsLoading } = useQuery({
+    queryKey: ["eventTags"],
+    queryFn: () => getEventTags(),
+    staleTime: Infinity,
+  });
+
   const {
     data: eventMetadataResponse,
     isError: eventMetadataError,
@@ -35,12 +42,16 @@ const useAdminEventsData = () => {
     staleTime: Infinity,
   });
 
-  if (eventMetadataError || eventError || domainLeaderError) {
+  if (eventMetadataError || eventError || domainLeaderError || eventTagsError) {
     throw Error("Required app data missing");
   }
 
   return {
-    isLoading: eventsLoading || metadataLoading || domainLeaderLoading,
+    isLoading:
+      eventsLoading ||
+      metadataLoading ||
+      domainLeaderLoading ||
+      eventTagsLoading,
     events: events ?? [],
     appMetaData: eventMetadataResponse ?? defaultAppMetaData,
   };

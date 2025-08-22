@@ -3,7 +3,7 @@ import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { CreateEventOffering, EventOffering } from "@ms/types/event.types";
 import {
   createSaveForm,
@@ -11,7 +11,7 @@ import {
   durationOptions,
 } from "@ms/Pages/Admin/Events/AdminEventView/utils/event.utils";
 import { ImageUpload } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/ImageUpload/ImageUpload";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createEvent, deleteEvent, patchEvent } from "@ms/api/event.api";
 import { z } from "zod";
 import { FormFooter } from "@ms/Components/FormComponents/FormFooter/FormFooter";
@@ -23,6 +23,7 @@ import {
 } from "@ms/redux/slices/adminSlice";
 import RestoreIcon from "@mui/icons-material/Restore";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
+import { getEventTags } from "@ms/api/event-tag.api";
 const createEventvalidationSchema = z
   .object({
     eventName: z
@@ -31,7 +32,7 @@ const createEventvalidationSchema = z
     description: z
       .string()
       .min(3, { error: "Description must be at least 3 characters" }),
-
+    eventTagIds: z.array(z.string()),
     duration: z.number().optional(),
     thumbnailUrl: z.string().optional().nullable(),
     thumbnailFile: z
@@ -48,6 +49,7 @@ type CreateEventFormData = z.infer<typeof createEventvalidationSchema>;
 const createEventInitialFormData = {
   eventName: "",
   description: "",
+  eventTagIds: [],
   duration: undefined,
   thumbnailUrl: undefined,
   thumbnailFile: undefined,
@@ -69,6 +71,12 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
       defaultValues: createEventInitialFormData,
     });
 
+  const { data: eventTags } = useQuery({
+    queryKey: ["eventTags"],
+    queryFn: () => getEventTags(),
+    staleTime: Infinity,
+  });
+
   useEffect(() => {
     if (!selectedEvent) return;
 
@@ -84,10 +92,11 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
         duration: selectedEvent.duration,
         thumbnailUrl: selectedEvent.thumbnailUrl,
         thumbnailFile: undefined,
+        eventTagIds: selectedEvent?.eventTagIds ?? [],
       };
       reset(structuredClone(editEvent));
     }
-  }, [selectedEvent, reset]);
+  }, [selectedEvent]);
 
   const handleOnClose = (refreshData = false) => {
     onClose(refreshData);
@@ -100,6 +109,9 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
       return [...oldData, eventOffering];
     });
     dispatch(setSelectedEvent(eventOffering));
+    queryClient.invalidateQueries({
+      queryKey: ["eventTags"],
+    });
   };
 
   const handleUpdateSuccess = (data: EventOffering) => {
@@ -113,6 +125,9 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
       isUpdated: true,
     };
     dispatch(setSelectedEvent(data));
+    queryClient.invalidateQueries({
+      queryKey: ["eventTags"],
+    });
   };
 
   const handleDeleteSuccess = () => {
@@ -163,7 +178,8 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
   const handleSave = () => {
     if (!selectedEvent) return;
 
-    const { description, eventName, duration, thumbnailFile } = getValues();
+    const { description, eventName, duration, thumbnailFile, eventTagIds } =
+      getValues();
 
     if (selectedEvent.meta?.isNew) {
       if (!thumbnailFile) return;
@@ -173,6 +189,7 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
         eventName,
         duration: duration,
         thumbnailFile,
+        eventTagIds: eventTagIds,
       };
       const formEvent = createSaveForm(eventOffering);
       saveEventQuery(formEvent);
@@ -182,11 +199,12 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
     if (selectedEvent.id) {
       const allValues = getValues();
       const dirtyValues = Object.keys(formState.dirtyFields).reduce(
-        (acc: CreateEventFormData, key) => {
-          (acc as any)[key] = allValues[key as keyof CreateEventFormData];
+        (acc: Record<string, unknown>, key) => {
+          const value = allValues[key as keyof CreateEventFormData];
+          acc[key] = value === null ? undefined : value;
           return acc;
         },
-        {} as CreateEventFormData
+        {} as Record<string, unknown>
       );
 
       const dirtyValuesWithNumberEventType: Partial<CreateEventOffering> = {
@@ -202,8 +220,6 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
     }
   };
 
-  console.log(getValues("thumbnailUrl"));
-
   const thumbnailUrl = watch("thumbnailUrl");
   const thumbnailFile = watch("thumbnailFile");
 
@@ -214,6 +230,14 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
       thumbnailUrl: undefined,
     });
   };
+
+  const eventTagsOptions = useMemo(() => {
+    if (!eventTags) return [];
+    return eventTags.map((tag) => ({
+      value: tag.id,
+      label: tag.name,
+    }));
+  }, [eventTags]);
 
   return (
     <>
@@ -236,7 +260,15 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
             </div>
           </div>
           <div className="flex flex-row gap-3 ">
-            <div className="flex flex-col gap-3 w-1/2"></div>
+            <div className="flex flex-col gap-3 w-1/2">
+              <FormSelect
+                name="eventTagIds"
+                label={"Event Tags"}
+                control={control}
+                options={eventTagsOptions}
+                multiSelect
+              />
+            </div>
             <div className="flex flex-col gap-3 w-1/2">
               {thumbnailUrl || thumbnailFile ? (
                 <div className="flex flex-row ">
@@ -245,7 +277,7 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
                       className="w-18 h-full object-cover mb-4"
                       src={
                         (thumbnailFile && URL.createObjectURL(thumbnailFile)) ||
-                        thumbnailUrl
+                        (thumbnailUrl ?? undefined)
                       }
                       alt="Event Preview"
                     />

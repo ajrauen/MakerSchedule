@@ -10,14 +10,16 @@ interface EventOffering {
   price?: number;
   thumbnailUrl?: string;
   occurrences?: Occurrence[];
+  eventTagIds?: string[];
   meta?: Record<string, string | boolean | number>;
 }
 
 type CreateEventOffering = Omit<
   EventOffering,
-  "id" | "thumbnailUrl" | "occurrences"
+  "id" | "thumbnailUrl" | "occurrences" | "eventTagIds"
 > & {
   thumbnailFile: File;
+  eventTagIds: string[];
 };
 
 type UpdateEventOffering = Partial<CreateEventOffering> & {

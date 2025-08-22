@@ -7,5 +7,6 @@ public class PatchEventDTO
     public string? EventName { get; set; }
     public string? Description { get; set; }
     public int? Duration { get; set; }
+    public Guid[]? EventTagIds { get; set; }
     public IFormFile? FormFile { get; set; } 
 }

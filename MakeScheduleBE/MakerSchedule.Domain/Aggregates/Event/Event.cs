@@ -21,8 +21,7 @@ public class Event
     private readonly List<Occurrence> _occurrences = new();
     public IReadOnlyCollection<Occurrence> Occurrences => _occurrences.AsReadOnly();
 
-    private readonly List<EventTag> _eventTags = new();
-    public IReadOnlyCollection<EventTag> EventTags => _eventTags.AsReadOnly();
+    public List<Guid> EventTagIds { get; set; } = new();
     public string? ThumbnailUrl { get; set; }
 
     public Occurrence AddOccurrence(OccurrenceInfo info)
@@ -39,19 +38,6 @@ public class Event
         var occ = _occurrences.Find(o => o.Id == occurrenceId);
         if (occ != null)
             _occurrences.Remove(occ);
-    }
-
-    public void AddEventTag(EventTag tag)
-    {
-        if (tag == null) throw new ArgumentNullException(nameof(tag));
-        _eventTags.Add(tag);
-    }
-    
-    public void RemoveEventTag(Guid tagId)
-    {
-        var tag = _eventTags.Find(t => t.Id == tagId);
-        if (tag != null)
-            _eventTags.Remove(tag);
     }
 
 } 
