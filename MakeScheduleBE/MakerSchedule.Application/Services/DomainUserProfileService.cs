@@ -9,10 +9,11 @@ using MakerSchedule.Domain.Aggregates.User;
 using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.ValueObjects;
 using MakerSchedule.Application.DTO.DomainUserRegistration;
+using MakerSchedule.Application.Services.Email.Models;
 
 namespace MakerSchedule.Application.Services;
 
-public class DomainUserProfileService(  IApplicationDbContext context, UserManager<User> userManager, ILogger<DomainUserProfileService> logger) : IDomainUserProfileService
+public class DomainUserProfileService(  IApplicationDbContext context, UserManager<User> userManager, ILogger<DomainUserProfileService> logger, IEmailService emailService) : IDomainUserProfileService
 {
 
 
@@ -55,6 +56,11 @@ public class DomainUserProfileService(  IApplicationDbContext context, UserManag
         context.DomainUsers.Add(domainUser);
         await context.SaveChangesAsync();
 
+        await emailService.SendWelcomeEmailAsync(domainUser.Email.Value, new WelcomeEmailModel
+        {
+            FirstName = domainUser.FirstName,
+        });
+
         logger.LogInformation("Successfully created user with ID: {DomainUserId}", domainUser.Id);
 
         return domainUser.Id;
@@ -90,7 +96,6 @@ public class DomainUserProfileService(  IApplicationDbContext context, UserManag
                 context.DomainUsers.Add(domainUser);
                 await context.SaveChangesAsync();
                 logger.LogInformation("User registered successfully: {Email}", registrationDto.Email);
-                // Optionally sign in the user here if needed
             }
             else
             {
@@ -98,6 +103,11 @@ public class DomainUserProfileService(  IApplicationDbContext context, UserManag
                     registrationDto.Email,
                     string.Join(", ", result.Errors.Select(e => e.Description)));
             }
+
+           await emailService.SendWelcomeEmailAsync(registrationDto.Email, new WelcomeEmailModel
+            {
+                FirstName = registrationDto.FirstName,
+            });
 
             return result;
         }

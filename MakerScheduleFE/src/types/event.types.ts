@@ -7,7 +7,8 @@ interface EventOffering {
   attendees?: number[];
   leaders?: number[];
   duration?: number;
-  price?: number;
+  price: number;
+  classSize: number;
   thumbnailUrl?: string;
   occurrences?: Occurrence[];
   eventTagIds?: string[];

@@ -8,6 +8,8 @@ public class EventListDTO
     public string Description { get; set; } = String.Empty;
     public int? Duration { get; set; }
     public string? ThumbnailUrl { get; set; }
+    public int ClassSize { get; set; }
+    public decimal? Price { get; set; }
     
     public required Guid[] EventTagIds { get; set; } = Array.Empty<Guid>();
 }

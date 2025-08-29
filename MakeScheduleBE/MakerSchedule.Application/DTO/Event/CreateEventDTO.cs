@@ -13,5 +13,7 @@ public class CreateEventDTO
     public int Duration { get; set; }
     [Required]
     public Guid[]? EventTagIds { get; set; }
-    public required IFormFile FormFile  { get; set; }
+    public required IFormFile FormFile { get; set; }
+    public required int ClassSize { get; set; }
+    public decimal? Price { get; set; }
 }

@@ -24,6 +24,9 @@ public class Event
     public List<Guid> EventTagIds { get; set; } = new();
     public string? ThumbnailUrl { get; set; }
 
+    public int ClassSize { get; set; }
+    public decimal? Price { get; set; }
+
     public Occurrence AddOccurrence(OccurrenceInfo info)
     {
         if (info == null) throw new ArgumentNullException(nameof(info));

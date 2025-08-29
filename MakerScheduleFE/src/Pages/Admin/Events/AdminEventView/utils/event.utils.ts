@@ -4,6 +4,8 @@ const createSaveForm = (event: CreateEventOffering) => {
   const form = new FormData();
   form.append("eventName", event.eventName);
   form.append("description", event.description);
+  form.append("Price", event.price.toString());
+  form.append("ClassSize", event.classSize.toString());
 
   if (event.duration) form.append("duration", event.duration.toString());
   form.append("FormFile", event.thumbnailFile);
@@ -23,6 +25,8 @@ const createUpdateForm = (event: Partial<CreateEventOffering>) => {
   }
   // Don't append anything for EventTagIds if array is empty - this will result in null/empty array on backend
   if (event.thumbnailFile) form.append("FormFile", event.thumbnailFile);
+  if (event.price) form.append("Price", event.price.toString());
+  if (event.classSize) form.append("ClassSize", event.classSize.toString());
 
   return form;
 };

@@ -24,6 +24,7 @@ import {
 import RestoreIcon from "@mui/icons-material/Restore";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { getEventTags } from "@ms/api/event-tag.api";
+import { TextNumericFormat } from "@ms/Components/FormComponents/NumericFormat/TextNumericFormat";
 const createEventvalidationSchema = z
   .object({
     eventName: z
@@ -38,6 +39,8 @@ const createEventvalidationSchema = z
     thumbnailFile: z
       .instanceof(File, { error: "Event Image is required" })
       .optional(),
+    price: z.number().min(0, { message: "Price is required" }),
+    classSize: z.string().min(1, { message: "Class size is required" }),
   })
   .refine((data) => data.thumbnailUrl || data.thumbnailFile, {
     message: "A Thumbnail is required",
@@ -53,6 +56,8 @@ const createEventInitialFormData = {
   duration: undefined,
   thumbnailUrl: undefined,
   thumbnailFile: undefined,
+  price: 0,
+  classSize: "",
 };
 
 interface BasicEventDetailsProps {
@@ -93,6 +98,8 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
         thumbnailUrl: selectedEvent.thumbnailUrl,
         thumbnailFile: undefined,
         eventTagIds: selectedEvent?.eventTagIds ?? [],
+        price: selectedEvent.price,
+        classSize: selectedEvent.classSize.toString(),
       };
       reset(structuredClone(editEvent));
     }
@@ -178,8 +185,15 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
   const handleSave = () => {
     if (!selectedEvent) return;
 
-    const { description, eventName, duration, thumbnailFile, eventTagIds } =
-      getValues();
+    const {
+      description,
+      eventName,
+      duration,
+      thumbnailFile,
+      eventTagIds,
+      price,
+      classSize,
+    } = getValues();
 
     if (selectedEvent.meta?.isNew) {
       if (!thumbnailFile) return;
@@ -190,6 +204,8 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
         duration: duration,
         thumbnailFile,
         eventTagIds: eventTagIds,
+        price,
+        classSize: parseInt(classSize),
       };
       const formEvent = createSaveForm(eventOffering);
       saveEventQuery(formEvent);
@@ -212,7 +228,6 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
       };
 
       const formEvent = createUpdateForm(dirtyValuesWithNumberEventType);
-
       patchEventQuery({
         event: formEvent,
         id: selectedEvent.id,
@@ -256,6 +271,18 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
                 label={"Duration"}
                 control={control}
                 options={durationOptions}
+              />
+            </div>
+          </div>
+          <div className="flex flex-row gap-3 ">
+            <div className="flex flex-col gap-3 w-1/2">
+              <TextNumericFormat name="price" label="Price" control={control} />
+            </div>
+            <div className="flex flex-col gap-3 w-1/2">
+              <FormTextField
+                control={control}
+                name="classSize"
+                label="Class Size"
               />
             </div>
           </div>

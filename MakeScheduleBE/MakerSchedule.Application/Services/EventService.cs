@@ -34,6 +34,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 EventTagIds = e.EventTagIds.ToArray(),
                 Duration = e.Duration,
                 ThumbnailUrl = e.ThumbnailUrl,
+                ClassSize = e.ClassSize,
+                Price = e.Price
             }).ToListAsync();
     }
 
@@ -63,6 +65,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
             EventTagIds = e.EventTagIds.ToArray() ,
+            ClassSize = e.ClassSize,
+            Price = e.Price,
             occurrences = e.Occurrences
                 .Where(o => !o.isDeleted)
                 .Select(o => new OccurrenceDTO
@@ -102,7 +106,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             EventName = new EventName(dto.EventName),
             Description = dto.Description,
             Duration = dto.Duration > 0 ? new Duration(dto.Duration) : null,
-           
+            ClassSize = dto.ClassSize,
+            Price = dto.Price
         };
         e.EventTagIds = dto.EventTagIds?.ToList() ?? new List<Guid>();
         _context.Events.Add(e);
@@ -163,6 +168,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             EventTagIds = eventTags.Select(et => et.Id).ToArray(),
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
+            ClassSize = e.ClassSize,
+            Price = e.Price,
             occurrences = new List<OccurrenceDTO>()
         };
     }
@@ -198,6 +205,12 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         {
             e.EventTagIds = new List<Guid>();
         }
+
+        if (dto.ClassSize.HasValue)
+            e.ClassSize = dto.ClassSize.Value;
+
+        if(dto.Price.HasValue)
+            e.Price = dto.Price.Value;
 
         if (dto.FormFile != null && dto.FormFile.Length > 0)
         {
@@ -266,6 +279,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
             EventTagIds = eventTags.Select(et => et.Id).ToArray(),
+            ClassSize = e.ClassSize,
+            Price = e.Price,
             occurrences = e.Occurrences
                 .Where(o => !o.isDeleted)
                 .Select(o => new OccurrenceDTO

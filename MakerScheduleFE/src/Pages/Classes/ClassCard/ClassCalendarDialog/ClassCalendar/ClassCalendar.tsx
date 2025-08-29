@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import {
   LocalizationProvider,
   DateCalendar,
@@ -15,33 +15,29 @@ interface ClassCalendarProps {
 }
 
 export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
-  // Only allow the event's day to be selected
-  const eventDate = useMemo(() => {
-    if (!event?.occurrences?.[0]?.scheduleStart) return undefined;
-    const d = new Date(event.occurrences[0].scheduleStart);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, [event]);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  const [selectedDate, setSelectedDate] = useState<Date | null>(
-    eventDate ?? null
-  );
+  const isEventDay = (date: Date) => {
+    if (!event?.occurrences || event.occurrences.length === 0) return false;
 
-  const isEventDay = (date: Date) => eventDate && isSameDay(date, eventDate);
+    return event.occurrences.some((occurrence) =>
+      isSameDay(date, new Date(occurrence.scheduleStart))
+    );
+  };
 
   const CustomDay = (props: PickersDayProps) => {
     const { day, selected, outsideCurrentMonth, ...other } = props;
-    const eventDay = isEventDay(day);
 
-    if (!eventDay) {
-      return (
-        <PickersDay
-          {...other}
-          day={day}
-          outsideCurrentMonth={outsideCurrentMonth}
-          disabled
-        />
-      );
+    let cssClass = `border-2 font-bold rounded-full `;
+    if (selected) {
+      cssClass += "border-blue-700 bg-blue-700 text-white hover:!bg-blue-400";
+    } else {
+      cssClass +=
+        "border-blue-700 text-blue-700 bg-transparent hover:!bg-blue-400";
+
+      if (isEventDay(day)) {
+        cssClass += " !bg-blue-200";
+      }
     }
 
     return (
@@ -50,12 +46,7 @@ export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
         day={day}
         outsideCurrentMonth={outsideCurrentMonth}
         selected={selected}
-        className={
-          `border-2 font-bold rounded-full ` +
-          (selected
-            ? "border-blue-700 bg-blue-700 text-white hover:bg-blue-800"
-            : "border-blue-700 text-blue-700 bg-transparent hover:bg-blue-100")
-        }
+        className={cssClass}
       />
     );
   };
@@ -80,11 +71,6 @@ export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
           className="rounded-lg bg-gray-50"
         />
       </LocalizationProvider>
-      {eventDate && (
-        <div className="text-sm text-gray-500 mt-2">
-          Event runs on {eventDate.toLocaleDateString()}
-        </div>
-      )}
     </div>
   );
 };

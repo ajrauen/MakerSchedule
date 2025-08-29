@@ -30,7 +30,7 @@ const ClassCard = ({ event }: ClassCardProps) => {
     <Paper className="w-full " elevation={3}>
       <div className="flex lg:flex-row gap-4 bg-gray-100 flex-col w-full">
         <img
-          className="h-auto  object-fit w-full lg:w-1/3 lg-flex-shrink-0 lg:object-contain aspect-4/3 object-cover"
+          className="h-auto  object-fit w-full max-h-200px lg:w-1/3 lg-flex-shrink-0 lg:object-contain aspect-4/3 object-cover"
           src={event.thumbnailUrl}
           alt="filter"
         />
