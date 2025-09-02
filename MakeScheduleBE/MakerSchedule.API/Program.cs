@@ -1,6 +1,7 @@
 using MakerSchedule.API.Extensions;
 using MakerSchedule.Application.Services;
 using MakerSchedule.Infrastructure.Data;
+using MakerSchedule.Application;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
@@ -27,7 +28,8 @@ if (!builder.Environment.IsDevelopment())
 
 services.AddControllersWithErrorParser();
 
-services.AddCorsWithOptions();
+services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IApplicationAssemblyMarker).Assembly));services.AddCorsWithOptions();
+
 services.AddDatabase(configuration);
 
 services.AddIdentity<User, IdentityRole<Guid>>()

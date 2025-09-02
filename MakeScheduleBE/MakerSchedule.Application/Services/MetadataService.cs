@@ -26,11 +26,6 @@ public class MetadataService(IApplicationDbContext context) : IMetadataService
         return Task.FromResult(new EventsMetadataDTO
         {
             Durations = Durations,
-            // EventTypes = _context.EventTypes.Select(et => new EventTypeDTO
-            // {
-            //     Id = et.Id,
-            //     Name = et.Name
-            // }).ToArray()
         });
     }
 

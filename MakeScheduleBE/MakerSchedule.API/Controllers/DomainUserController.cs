@@ -1,7 +1,10 @@
+using MakerSchedule.Application.DomainUsers.Queries;
 using MakerSchedule.Application.DTO.DomainUser;
 using MakerSchedule.Application.DTO.DomainUserRegistration;
 using MakerSchedule.Application.DTO.User;
 using MakerSchedule.Application.Interfaces;
+
+using MediatR;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +14,7 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/domain-users")]
 [Produces("application/json")]
-public class DomainUsersController(IDomainUserService domainUserService, IDomainUserProfileService domainUserProfileService) : ControllerBase
+public class DomainUsersController(IDomainUserService domainUserService, IDomainUserProfileService domainUserProfileService, IMediator mediator) : ControllerBase
 {
 
     [HttpGet]
@@ -64,8 +67,8 @@ public class DomainUsersController(IDomainUserService domainUserService, IDomain
     [Route("available-leaders")]
     public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAvailableLeaders([FromBody] GetAvailableLeadersRequest request)
     {
-        IEnumerable<DomainUserListDTO> leaders = await domainUserService.GetAvailableOccurrenceLeadersAsync(request.StartTime, request.Duration, request.CurrentLeaderIds ?? [], request.OccurrenceId);
-
+        var query = new GetAvailableLeadersQuery(request.StartTime, request.Duration, request.CurrentLeaderIds ?? [], request.OccurrenceId);
+        var leaders = await mediator.Send(query);
         return Ok(leaders);
     }
 }
