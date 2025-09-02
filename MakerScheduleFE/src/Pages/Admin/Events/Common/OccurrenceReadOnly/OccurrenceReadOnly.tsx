@@ -1,7 +1,6 @@
 import { useAppSelector } from "@ms/redux/hooks";
 import { selectAdminState } from "@ms/redux/slices/adminSlice";
 import { Button } from "@mui/material";
-import { format } from "date-fns";
 
 interface OccurrencReadOnlyProps {
   onBack: () => void;
@@ -11,26 +10,12 @@ const OccurrenceReadOnly = ({ onBack }: OccurrencReadOnlyProps) => {
   const { selectedEventOccurrence: occurrence } =
     useAppSelector(selectAdminState);
 
-  // Defensive: handle missing or invalid scheduleStart
-  let startDate: Date | null = null;
-  let endDate: Date | null = null;
-  if (occurrence?.scheduleStart) {
-    startDate = new Date(occurrence.scheduleStart);
-    if (occurrence.duration) {
-      endDate = new Date(startDate.getTime() + occurrence.duration * 60000);
-    }
-  }
-
   return (
     <div className="p-3">
       {!occurrence ? (
         <div className="text-red-600">No occurrence selected.</div>
       ) : (
         <>
-          <div className="text-sm text-gray-500 mb-2">
-            {startDate ? format(startDate, "PPpp") : "No start time"}
-            {endDate && ` - ${format(endDate, "PPpp")}`}
-          </div>
           <div className="mb-2">
             <span className="font-semibold">Status:</span>{" "}
             {occurrence.status || "N/A"}

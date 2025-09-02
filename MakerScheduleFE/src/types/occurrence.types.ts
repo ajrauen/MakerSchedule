@@ -2,6 +2,7 @@ interface OccurranceUsers {
   id: string;
   firstName: string;
   lastName: string;
+  email: string;
 }
 
 interface Occurrence {

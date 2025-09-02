@@ -36,6 +36,7 @@ const ConfirmationDialog = ({
       onClose={onCancel}
       aria-labelledby="confirmation-dialog-title"
       aria-describedby="confirmation-dialog-description"
+      className="h-full"
       fullWidth
       {...props}
     >

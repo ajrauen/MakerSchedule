@@ -10,6 +10,12 @@ const createSaveForm = (event: CreateEventOffering) => {
   if (event.duration) form.append("duration", event.duration.toString());
   form.append("FormFile", event.thumbnailFile);
 
+  if (event.eventTagIds && event.eventTagIds.length > 0) {
+    event.eventTagIds.forEach((tag) => {
+      form.append("EventTagIds", tag);
+    });
+  }
+
   return form;
 };
 

@@ -10,9 +10,11 @@ public class CreateEventDTO
     public required string EventName { get; set; }
     [Required]
     public required string Description { get; set; }
-    public int Duration { get; set; }
     [Required]
-    public Guid[]? EventTagIds { get; set; }
+    public int Duration { get; set; }
+    public Guid[] EventTagIds { get; set; } = Array.Empty<Guid>();
+
+    [Required]
     public required IFormFile FormFile { get; set; }
     public required int ClassSize { get; set; }
     public decimal? Price { get; set; }

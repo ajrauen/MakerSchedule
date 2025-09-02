@@ -25,6 +25,7 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { getEventTags } from "@ms/api/event-tag.api";
 import { TextNumericFormat } from "@ms/Components/FormComponents/NumericFormat/TextNumericFormat";
+import { EventAttendees } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/BasicDetails/OccurrenceAttendees/OccurrenceAttendees";
 const createEventvalidationSchema = z
   .object({
     eventName: z
@@ -34,7 +35,9 @@ const createEventvalidationSchema = z
       .string()
       .min(3, { error: "Description must be at least 3 characters" }),
     eventTagIds: z.array(z.string()),
-    duration: z.number().optional(),
+    duration: z.number({
+      error: "Duration is required",
+    }),
     thumbnailUrl: z.string().optional().nullable(),
     thumbnailFile: z
       .instanceof(File, { error: "Event Image is required" })
@@ -94,7 +97,7 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
       const editEvent: CreateEventFormData = {
         description: selectedEvent.description,
         eventName: selectedEvent.eventName,
-        duration: selectedEvent.duration,
+        duration: selectedEvent.duration ?? 0,
         thumbnailUrl: selectedEvent.thumbnailUrl,
         thumbnailFile: undefined,
         eventTagIds: selectedEvent?.eventTagIds ?? [],
@@ -283,6 +286,7 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
                 control={control}
                 name="classSize"
                 label="Class Size"
+                restrict={/^\d*$/}
               />
             </div>
           </div>
@@ -338,6 +342,7 @@ const BasicEventDetails = ({ onClose }: BasicEventDetailsProps) => {
             rows={7}
           />
         </div>
+
         <FormFooter
           onCancel={handleOnClose}
           areActionsDisabled={isSavePending || isPatchPending}

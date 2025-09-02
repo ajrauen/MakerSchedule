@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MakerSchedule.Application.DTO.Event;
 using MakerSchedule.Application.Interfaces;
+using MakerSchedule.Application.DTO.Occurrence;
 
 namespace MakerSchedule.API.Controllers;
 
@@ -32,7 +33,7 @@ public class EventsController(IEventService _eventService) : ControllerBase
         var eventDto = await _eventService.CreateEventAsync(dto);
         return Ok(eventDto);
     }
-    
+
     [HttpPatch("{id}")]
     [Consumes("multipart/form-data")]
     public async Task<ActionResult<EventDTO>> PathchEvent([FromForm] PatchEventDTO dto, Guid id)
@@ -50,5 +51,16 @@ public class EventsController(IEventService _eventService) : ControllerBase
             return Ok(deleted);
         }
         return NotFound();
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> RegisterUserOccurrence([FromBody] RegisterUserOccurrenceDTO registerDTO)
+    {
+        var result = await _eventService.RegisterUserForOccurrenceAsync(registerDTO);
+        if (result)
+        {
+            return Ok();
+        }
+        return BadRequest();
     }
 }

@@ -30,6 +30,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@ms/redux/hooks";
 import { useAdminEventsData } from "@ms/hooks/useAdminEventsData";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
+import { OccurrenceAttendees } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/BasicDetails/OccurrenceAttendees/OccurrenceAttendees";
 
 interface OccurrenceFormProps {
   onCancel: () => void;
@@ -378,6 +379,8 @@ const OccurrenceForm = ({
               ))}
             </div>
           )}
+
+          <OccurrenceAttendees occurrence={selectedEventOccurrence} />
 
           <FormFooter
             showDelete={

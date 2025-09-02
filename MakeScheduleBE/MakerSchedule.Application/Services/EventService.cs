@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 using MakerSchedule.Application.DTO.Event;
 using MakerSchedule.Application.DTO.EventTag;
 using MakerSchedule.Application.DTO.Occurrence;
@@ -64,7 +66,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
-            EventTagIds = e.EventTagIds.ToArray() ,
+            EventTagIds = e.EventTagIds.ToArray(),
             ClassSize = e.ClassSize,
             Price = e.Price,
             occurrences = e.Occurrences
@@ -72,18 +74,20 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 .Select(o => new OccurrenceDTO
                 {
                     Id = o.Id,
-                    Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
+                    Attendees = o.Attendees.Select(a => new OccurrenceAttendeeDTO
                     {
-                        Id = a.UserId.ToString().ToLower(),
+                        Id = a.UserId,
                         FirstName = a.User?.FirstName ?? "",
-                        LastName = a.User?.LastName ?? ""
+                        LastName = a.User?.LastName ?? "",
+                        Email = a.User?.Email?.Value ?? ""
                     }).ToList(),
                     EventId = o.EventId,
-                    Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
+                    Leaders = o.Leaders.Select(l => new OccurrenceAttendeeDTO
                     {
-                        Id = l.UserId.ToString().ToLower(),
+                        Id = l.UserId,
                         FirstName = l.User?.FirstName ?? "",
-                        LastName = l.User?.LastName ?? ""
+                        LastName = l.User?.LastName ?? "",
+                        Email = l.User?.Email?.Value ?? ""
                     }).ToList(),
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
                     Status = o.Status,
@@ -99,7 +103,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         {
             throw new ArgumentException("Image file is required for event creation", nameof(dto.FormFile));
         }
-    
+
 
         var e = new Event
         {
@@ -107,6 +111,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
             Description = dto.Description,
             Duration = dto.Duration > 0 ? new Duration(dto.Duration) : null,
             ClassSize = dto.ClassSize,
+            EventTagIds = dto.EventTagIds?.ToList() ?? new List<Guid>(),
             Price = dto.Price
         };
         e.EventTagIds = dto.EventTagIds?.ToList() ?? new List<Guid>();
@@ -209,7 +214,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         if (dto.ClassSize.HasValue)
             e.ClassSize = dto.ClassSize.Value;
 
-        if(dto.Price.HasValue)
+        if (dto.Price.HasValue)
             e.Price = dto.Price.Value;
 
         if (dto.FormFile != null && dto.FormFile.Length > 0)
@@ -259,7 +264,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         }
 
         await _context.SaveChangesAsync();
-  
+
         // Fetch EventTag data separately since we're now using EventTagIds
         var eventTags = await _context.EventTags
             .Where(et => e.EventTagIds.Contains(et.Id))
@@ -269,13 +274,13 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 Name = et.Name.Value
             })
             .ToArrayAsync();
-        
+
         return new EventDTO
         {
             Id = e.Id,
             EventName = e.EventName.ToString(),
             Description = e.Description,
-     
+
             Duration = e.Duration,
             ThumbnailUrl = e.ThumbnailUrl,
             EventTagIds = eventTags.Select(et => et.Id).ToArray(),
@@ -286,18 +291,20 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 .Select(o => new OccurrenceDTO
                 {
                     Id = o.Id,
-                    Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
+                    Attendees = o.Attendees.Select(a => new OccurrenceAttendeeDTO
                     {
-                        Id = a.UserId.ToString().ToLower(),
+                        Id = a.UserId,
                         FirstName = a.User?.FirstName ?? "",
-                        LastName = a.User?.LastName ?? ""
+                        LastName = a.User?.LastName ?? "",
+                        Email = a.User?.Email?.Value ?? ""
                     }).ToList(),
                     EventId = o.EventId,
-                    Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
+                    Leaders = o.Leaders.Select(l => new OccurrenceAttendeeDTO
                     {
-                        Id = l.UserId.ToString().ToLower(),
+                        Id = l.UserId,
                         FirstName = l.User?.FirstName ?? "",
-                        LastName = l.User?.LastName ?? ""
+                        LastName = l.User?.LastName ?? "",
+                        Email = l.User?.Email?.Value ?? ""
                     }).ToList(),
                     ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart?.Value ?? DateTime.MinValue, DateTimeKind.Utc),
                     Status = o.Status,
@@ -349,8 +356,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         await _context.SaveChangesAsync();
 
         var uniqueLeaderIds = occurrenceDTO.Leaders.Distinct().ToList();
-        var leaderDTOs = new List<OccurrenceUserDTO>();
-        var attendeeDTOs = new List<OccurrenceUserDTO>();
+        var leaderDTOs = new List<OccurrenceAttendeeDTO>();
+        var attendeeDTOs = new List<OccurrenceAttendeeDTO>();
 
         var allUserIds = uniqueLeaderIds.Concat(occurrenceDTO.Attendees).Distinct().ToList();
         var users = await _context.DomainUsers
@@ -368,12 +375,13 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     AssignedAt = DateTime.UtcNow
                 };
                 _context.OccurrenceLeaders.Add(occurrenceLeader);
-                
-                leaderDTOs.Add(new OccurrenceUserDTO
+
+                leaderDTOs.Add(new OccurrenceAttendeeDTO
                 {
-                    Id = leaderId.ToString().ToLower(),
+                    Id = leaderId,
                     FirstName = leader.FirstName ?? "",
-                    LastName = leader.LastName ?? ""
+                    LastName = leader.LastName ?? "",
+                    Email = leader.Email?.Value ?? ""
                 });
             }
         }
@@ -389,19 +397,20 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     RegisteredAt = DateTime.UtcNow
                 };
                 _context.OccurrenceAttendees.Add(occurrenceAttendee);
-                
-                attendeeDTOs.Add(new OccurrenceUserDTO
+
+                attendeeDTOs.Add(new OccurrenceAttendeeDTO
                 {
-                    Id = attendeeId.ToString().ToLower(),
+                    Id = attendeeId,
                     FirstName = attendee.FirstName ?? "",
-                    LastName = attendee.LastName ?? ""
+                    LastName = attendee.LastName ?? "",
+                    Email = attendee.Email?.Value ?? ""
                 });
             }
         }
 
         await _context.SaveChangesAsync();
         _logger.LogInformation("Successfully created occurrence with {OccurrenceId}", newOccurrence.Id);
-        
+
         return new OccurrenceDTO
         {
             Id = newOccurrence.Id,
@@ -440,11 +449,11 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
         var uniqueLeaderIds = occurrenceDTO.Leaders.Distinct().ToList();
         var uniqueAttendeeIds = occurrenceDTO.Attendees.Distinct().ToList();
-        
-        var leaderDTOs = new List<OccurrenceUserDTO>();
-        var attendeeDTOs = new List<OccurrenceUserDTO>();
 
-        
+        var leaderDTOs = new List<OccurrenceAttendeeDTO>();
+        var attendeeDTOs = new List<OccurrenceAttendeeDTO>();
+
+
         // Fetch all users at once to avoid multiple DB calls
         var allUserIds = uniqueLeaderIds.Concat(uniqueAttendeeIds).Distinct().ToList();
         var users = await _context.DomainUsers
@@ -461,11 +470,12 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     UserId = leaderId,
                     AssignedAt = DateTime.UtcNow
                 };
-                leaderDTOs.Add(new OccurrenceUserDTO
+                leaderDTOs.Add(new OccurrenceAttendeeDTO
                 {
-                    Id = leaderId.ToString().ToLower(),
+                    Id = leaderId,
                     FirstName = leader.FirstName ?? "",
-                    LastName = leader.LastName ?? ""
+                    LastName = leader.LastName ?? "",
+                    Email = leader.Email?.Value ?? ""
                 });
                 _context.OccurrenceLeaders.Add(occurrenceLeader);
             }
@@ -481,11 +491,12 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                     UserId = attendeeId,
                     RegisteredAt = DateTime.UtcNow
                 };
-                attendeeDTOs.Add(new OccurrenceUserDTO
+                attendeeDTOs.Add(new OccurrenceAttendeeDTO
                 {
-                    Id = attendeeId.ToString().ToLower(),
+                    Id = attendeeId,
                     FirstName = attendee.FirstName ?? "",
-                    LastName = attendee.LastName ?? ""
+                    LastName = attendee.LastName ?? "",
+                    Email = attendee.Email?.Value ?? ""
                 });
                 _context.OccurrenceAttendees.Add(occurrenceAttendee);
             }
@@ -514,9 +525,9 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
         await _context.SaveChangesAsync();
 
-        foreach(var attendee  in occurrence.Attendees)
-        { 
-            emailService.SendClassCanceledEmail( new ClassCanceledEmailModel
+        foreach (var attendee in occurrence.Attendees)
+        {
+            emailService.SendClassCanceledEmail(new ClassCanceledEmailModel
             {
                 StudentName = attendee.User.FirstName,
                 EventName = occurrence.Event.EventName.Value,
@@ -528,7 +539,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         }
 
 
-        emailService.SendClassCanceledEmail( new ClassCanceledEmailModel
+        emailService.SendClassCanceledEmail(new ClassCanceledEmailModel
         {
             StudentName = "jack",
             EventName = "test",
@@ -540,7 +551,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
         return true;
     }
-    
+
     public async Task<IEnumerable<OccurrenceDTO>> GetOccurancesByDateAsync(SearchOccurrenceDTO searchDTO)
     {
         if (searchDTO.EndDate < searchDTO.StartDate)
@@ -562,31 +573,87 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
         else if (searchDTO.EndDate.Kind == DateTimeKind.Unspecified)
             searchDTO.EndDate = DateTime.SpecifyKind(searchDTO.EndDate, DateTimeKind.Local).ToUniversalTime();
 
-            var occurrences = await _context.Occurrences
-                .Include(o => o.Event)
-          
-                .Where(o => o.ScheduleStart >= searchDTO.StartDate && o.ScheduleStart <= searchDTO.EndDate)
-                .Where(o => !o.isDeleted)
-                .Select(o => new OccurrenceDTO
+        var occurrences = await _context.Occurrences
+            .Include(o => o.Event)
+            .Include(o => o.Attendees)
+                .ThenInclude(a => a.User)
+            .Where(o => o.ScheduleStart >= searchDTO.StartDate && o.ScheduleStart <= searchDTO.EndDate)
+            .Where(o => !o.isDeleted)
+            .Select(o => new OccurrenceDTO
+            {
+                Id = o.Id,
+                EventId = o.EventId,
+                ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
+                Status = o.Status,
+                EventName = o.Event.EventName.Value,
+                Attendees = o.Attendees.Select(a => new OccurrenceAttendeeDTO
                 {
-                    Id = o.Id,
-                    EventId = o.EventId,
-                    ScheduleStart = DateTime.SpecifyKind(o.ScheduleStart.Value, DateTimeKind.Utc),
-                    Status = o.Status,
-                    EventName = o.Event.EventName.Value, 
-                    Attendees = o.Attendees.Select(a => new OccurrenceUserDTO
-                    {
-                        Id = a.UserId.ToString().ToLower(),
-                        FirstName = a.User.FirstName ?? "",
-                        LastName = a.User.LastName ?? ""
-                    }).ToList(),
-                    Leaders = o.Leaders.Select(l => new OccurrenceUserDTO
-                    {
-                        Id = l.UserId.ToString().ToLower(),
-                        FirstName = l.User.FirstName ?? "",
-                        LastName = l.User.LastName ?? ""
-                    }).ToList()
-                }).ToListAsync();
+                    Id = a.UserId,
+                    FirstName = a.User.FirstName ?? "",
+                    LastName = a.User.LastName ?? "",
+                    Email = a.User.Email != null ? a.User.Email.Value : ""
+                }).ToList(),
+                Leaders = o.Leaders.Select(l => new OccurrenceAttendeeDTO
+                {
+                    Id = l.UserId,
+                    FirstName = l.User.FirstName ?? "",
+                    LastName = l.User.LastName ?? "",
+                    Email = l.User.Email != null ? l.User.Email.Value : ""
+                }).ToList()
+            }).ToListAsync();
         return occurrences;
     }
+
+    public async Task<bool> RegisterUserForOccurrenceAsync(RegisterUserOccurrenceDTO registerDTO)
+    {
+        if (registerDTO == null)
+            throw new ArgumentNullException(nameof(registerDTO));
+
+        using var transaction = await ((DbContext)_context).Database.BeginTransactionAsync();
+        
+        var occurrence = await _context.Occurrences
+            .Include(o => o.Attendees)
+            .Include(o => o.Event)
+            .FirstOrDefaultAsync(o => o.Id == registerDTO.OccurrenceId);
+            
+        if (occurrence == null)
+        {
+            throw new NotFoundException($"Occurrence with id {registerDTO.OccurrenceId} not found", registerDTO.OccurrenceId);
+        }
+
+        if (occurrence.ScheduleStart < DateTime.UtcNow)
+        {
+            throw new InvalidOperationException("Cannot register for past occurrences");
+        }
+
+        if (occurrence.Attendees.Count >= occurrence.Event.ClassSize)
+        {
+            throw new InvalidOperationException($"Class is full. Maximum capacity is {occurrence.Event.ClassSize} attendees.");
+        }
+
+        var user = await _context.DomainUsers.FirstOrDefaultAsync(du => du.Id == registerDTO.UserId);
+        if (user == null)
+        {
+            throw new NotFoundException($"User with id {registerDTO.UserId} not found", registerDTO.UserId);
+        }
+
+        if (occurrence.Attendees.Any(a => a.UserId == registerDTO.UserId))
+        {
+            throw new InvalidOperationException($"User with id {registerDTO.UserId} is already registered for occurrence {registerDTO.OccurrenceId}");
+        }
+
+        var newAttendee = new OccurrenceAttendee
+        {
+            UserId = registerDTO.UserId,
+            OccurrenceId = registerDTO.OccurrenceId,
+            RegisteredAt = DateTime.UtcNow
+        };
+
+        _context.OccurrenceAttendees.Add(newAttendee);
+
+        var result = await _context.SaveChangesAsync() > 0;
+        await transaction.CommitAsync();
+        return result;   
+    }
+
 }

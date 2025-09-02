@@ -15,4 +15,6 @@ public interface IEventService
     Task<bool> DeleteOccuranceAsync(Guid occurrenceGUID);
     Task<IEnumerable<OccurrenceDTO>> GetOccurancesByDateAsync(SearchOccurrenceDTO searchDTO);
 
+    Task<bool> RegisterUserForOccurrenceAsync(RegisterUserOccurrenceDTO registerDTO);
+
 }
