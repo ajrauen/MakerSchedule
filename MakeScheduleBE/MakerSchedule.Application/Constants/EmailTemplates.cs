@@ -1,8 +1,8 @@
 namespace MakerSchedule.Application.Constants;
 
-public static class EmailTemplates
+public sealed record EmailTemplateFileName(string Value)
 {
-    public const string ClassCanceled = "class-canceled.html";
-    public const string ClassRescheduled = "class-rescheduled.html";
-    public const string Welcome = "register-welcome.html";
+    public static readonly EmailTemplateFileName ClassCanceled = new("class-canceled.html");
+    public static readonly EmailTemplateFileName ClassRescheduled = new("class-rescheduled.html");
+    public static readonly EmailTemplateFileName Welcome = new("register-welcome.html");
 }

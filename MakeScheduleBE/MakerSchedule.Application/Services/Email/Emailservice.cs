@@ -3,7 +3,6 @@ using System.Net.Mail;
 using MakerSchedule.Application.Constants;
 using MakerSchedule.Application.DTO.EmailRequest;
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Application.Services.Email.Models;
 
 
 using Microsoft.Extensions.Configuration;
@@ -13,6 +12,26 @@ namespace MakerSchedule.Application.Services.EmailService;
 
 public class EmailService(IConfiguration configuration, ILogger<EmailService> logger) : IEmailService
 {
+
+    private SmtpClient createSmtpClient()
+    {
+        var host = configuration["Email:SmtpHost"];
+        var port = int.Parse(configuration["Email:SmtpPort"]);
+        var user = configuration["Email:SmtpUser"];
+        var pass = configuration["Email:SmtpPass"];
+        var enableSsl = bool.Parse(configuration["Email:EnableSsl"] ?? "true");
+
+        if (string.IsNullOrWhiteSpace(host) || port <= 0 || string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(pass))
+        {
+            throw new InvalidOperationException("Email configuration is invalid.");
+        }
+
+        return new SmtpClient(host, port)
+        {
+            Credentials = new System.Net.NetworkCredential(user, pass),
+            EnableSsl = enableSsl
+        };
+    }
 
     public async Task SendAsync(EmailRequest request)
     {
@@ -32,71 +51,6 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
             throw;
         }
 
-    }
-
-
-    public async void SendClassCanceledEmail( ClassCanceledEmailModel model)
-    {
-        var from = configuration["Email:SMTPUser"];
-
-        var template = await LoadEmailTemplateAsync(EmailTemplates.ClassCanceled);
-        var content = ProcessTemplatePlaceHolders(template, new Dictionary<string, object>
-        {
-            { "StudentName", model.StudentName },
-            { "EventName", model.EventName },
-            { "ScheduleTime", model.ScheduleTime },
-            { "Location", model.Location }
-        });
-
-        var request = new EmailRequest
-        {
-            To = model.ContactEmail,
-            Subject = "Class Canceled Notification",
-            Body = content,
-            IsHtml = true
-        };
-
-       await SendAsync(request);
-        logger.LogInformation("Class canceled email sent to {Email}", model.ContactEmail);
-    }
-
-    public async Task SendWelcomeEmailAsync(string toEmail, WelcomeEmailModel model)
-    {
-        var template = await LoadEmailTemplateAsync(EmailTemplates.Welcome);
-        var content = ProcessTemplatePlaceHolders(template, new Dictionary<string, object>
-    {
-        { "FirstName", model.FirstName },
-        { "Username", model.Username }
-    });
-
-        var request = new EmailRequest
-        {
-            To = toEmail,
-            Subject = "Welcome to MakerSchedule",
-            Body = content,
-            IsHtml = true
-        };
-
-        await SendAsync(request);
-    }
-    private SmtpClient createSmtpClient()
-    {
-        var host = configuration["Email:SmtpHost"];
-        var port = int.Parse(configuration["Email:SmtpPort"]);
-        var user = configuration["Email:SmtpUser"];
-        var pass = configuration["Email:SmtpPass"];
-        var enableSsl = bool.Parse(configuration["Email:EnableSsl"] ?? "true");
-
-        if (string.IsNullOrWhiteSpace(host) || port <= 0 || string.IsNullOrWhiteSpace(user) || string.IsNullOrWhiteSpace(pass))
-        {
-            throw new InvalidOperationException("Email configuration is invalid.");
-        }
-
-        return new SmtpClient(host, port)
-        {
-            Credentials = new System.Net.NetworkCredential(user, pass),
-            EnableSsl = enableSsl
-        };
     }
 
     private MailMessage createMessage(EmailRequest request)
@@ -131,11 +85,11 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
         return message;
     }
 
-    private async Task<string> LoadEmailTemplateAsync(string templateName)
+    public async Task<string> LoadEmailTemplateAsync(EmailTemplateFileName templateName)
     {
                 // Try bin directory first (where files are copied)
-        var binPath = Path.Combine("bin", "Debug", "net8.0", "EmailTemplates", templateName);
-        
+        var binPath = Path.Combine("bin", "Debug", "net8.0", "EmailTemplates", templateName.ToString());
+
         if (File.Exists(binPath))
         {
             logger.LogInformation("Found template at: {Path}", Path.GetFullPath(binPath));
@@ -143,8 +97,8 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
         }
         
         // Fallback to project directory (shouldn't be needed but just in case)
-        var projectPath = Path.Combine("EmailTemplates", templateName);
-        
+        var projectPath = Path.Combine("EmailTemplates", templateName.ToString());
+
         if (File.Exists(projectPath))
         {
             logger.LogInformation("Found template at: {Path}", Path.GetFullPath(projectPath));
@@ -155,15 +109,16 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
 
     }
 
-    private string ProcessTemplatePlaceHolders(string template, Dictionary<string, object> data)
+    public string ProcessTemplatePlaceHolders(string template, Dictionary<string, object> data)
     {
+        var templateContent = template;
         foreach (var kvp in data)
         {
             var placeholder = $"{{{{{kvp.Key}}}}}";
-            template = template.Replace(placeholder, kvp.Value?.ToString() ?? string.Empty);
+            templateContent = template.Replace(placeholder, kvp.Value?.ToString() ?? string.Empty);
         }
         
-        return template;
+        return templateContent;
     }
 
 }

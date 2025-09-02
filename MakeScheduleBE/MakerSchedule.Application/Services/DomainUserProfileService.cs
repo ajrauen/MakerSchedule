@@ -10,10 +10,12 @@ using MakerSchedule.Domain.Aggregates.DomainUser;
 using MakerSchedule.Domain.ValueObjects;
 using MakerSchedule.Application.DTO.DomainUserRegistration;
 using MakerSchedule.Application.Services.Email.Models;
+using MakerSchedule.Application.SendEmail.Commands;
+using MediatR;
 
 namespace MakerSchedule.Application.Services;
 
-public class DomainUserProfileService(  IApplicationDbContext context, UserManager<User> userManager, ILogger<DomainUserProfileService> logger, IEmailService emailService) : IDomainUserProfileService
+public class DomainUserProfileService(IApplicationDbContext context, UserManager<User> userManager, ILogger<DomainUserProfileService> logger, IMediator mediator) : IDomainUserProfileService
 {
 
 
@@ -56,10 +58,12 @@ public class DomainUserProfileService(  IApplicationDbContext context, UserManag
         context.DomainUsers.Add(domainUser);
         await context.SaveChangesAsync();
 
-        await emailService.SendWelcomeEmailAsync(domainUser.Email.Value, new WelcomeEmailModel
+        var command = new SendWelcomeEmailCommand(domainUser.Email.Value, new WelcomeEmailModel
         {
             FirstName = domainUser.FirstName,
         });
+
+        await mediator.Send(command);
 
         logger.LogInformation("Successfully created user with ID: {DomainUserId}", domainUser.Id);
 
@@ -104,10 +108,11 @@ public class DomainUserProfileService(  IApplicationDbContext context, UserManag
                     string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
-           await emailService.SendWelcomeEmailAsync(registrationDto.Email, new WelcomeEmailModel
+            var command = new SendWelcomeEmailCommand(registrationDto.Email, new WelcomeEmailModel
             {
                 FirstName = registrationDto.FirstName,
             });
+            await mediator.Send(command);
 
             return result;
         }

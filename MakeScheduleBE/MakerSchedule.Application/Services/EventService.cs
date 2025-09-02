@@ -5,18 +5,22 @@ using MakerSchedule.Application.DTO.EventTag;
 using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Application.Interfaces;
+using MakerSchedule.Application.SendEmail.Commands;
 using MakerSchedule.Application.Services.Email.Models;
 using MakerSchedule.Domain.Aggregates.Event;
 using MakerSchedule.Domain.Entities;
 using MakerSchedule.Domain.Exceptions;
 using MakerSchedule.Domain.Utilties.ImageUtilities;
 using MakerSchedule.Domain.ValueObjects;
+
+using MediatR;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.Services;
 
-public class EventService(IApplicationDbContext context, ILogger<EventService> logger, IEmailService emailService, IImageStorageService imageStorageService) : IEventService
+public class EventService(IApplicationDbContext context, ILogger<EventService> logger, IImageStorageService imageStorageService, IMediator mediator) : IEventService
 {
     private readonly IApplicationDbContext _context = context;
     private readonly ILogger<EventService> _logger = logger;
@@ -527,7 +531,7 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
 
         foreach (var attendee in occurrence.Attendees)
         {
-            emailService.SendClassCanceledEmail(new ClassCanceledEmailModel
+            var command = new SendClassCanceledEmailCommand(attendee.User.Email?.Value ?? "", new ClassCanceledEmailModel
             {
                 StudentName = attendee.User.FirstName,
                 EventName = occurrence.Event.EventName.Value,
@@ -536,18 +540,8 @@ public class EventService(IApplicationDbContext context, ILogger<EventService> l
                 ContactEmail = "andrewrauen@gmail.com",
                 ScheduleUrl = $"https://makerschedule.com/events/{occurrence.EventId}"
             });
+            await mediator.Send(command);
         }
-
-
-        emailService.SendClassCanceledEmail(new ClassCanceledEmailModel
-        {
-            StudentName = "jack",
-            EventName = "test",
-            ScheduleDate = new DateTime(2023, 10, 10).ToString("MMMM dd, yyyy"),
-            ScheduleTime = new DateTime(2023, 10, 10, 14, 0, 0).ToString("hh:mm tt"),
-            ContactEmail = "andrewrauen@gmail.com",
-            ScheduleUrl = $"https://makerschedule.com/events/{occurrence.EventId}"
-        });
 
         return true;
     }
