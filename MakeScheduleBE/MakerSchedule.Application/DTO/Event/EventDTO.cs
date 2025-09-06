@@ -18,7 +18,7 @@ public class EventDTO
     public required Guid[] EventTagIds { get; set; } = Array.Empty<Guid>();
     public int? Duration { get; set; }
     public string? ThumbnailUrl { get; set; }
-    public IEnumerable<OccurrenceDTO> occurrences { get; set; } = new List<OccurrenceDTO>();
+    public IEnumerable<OccurrenceDTO> Occurrences { get; set; } = new List<OccurrenceDTO>();
     public required int ClassSize { get; set; }
     public decimal? Price { get; set; }
 

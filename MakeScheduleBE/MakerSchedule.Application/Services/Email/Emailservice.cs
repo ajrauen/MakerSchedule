@@ -88,7 +88,7 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
     public async Task<string> LoadEmailTemplateAsync(EmailTemplateFileName templateName)
     {
                 // Try bin directory first (where files are copied)
-        var binPath = Path.Combine("bin", "Debug", "net8.0", "EmailTemplates", templateName.ToString());
+        var binPath = Path.Combine("bin", "Debug", "net8.0", "EmailTemplates", templateName.Value);
 
         if (File.Exists(binPath))
         {
@@ -97,7 +97,7 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
         }
         
         // Fallback to project directory (shouldn't be needed but just in case)
-        var projectPath = Path.Combine("EmailTemplates", templateName.ToString());
+        var projectPath = Path.Combine("EmailTemplates", templateName.Value);
 
         if (File.Exists(projectPath))
         {
@@ -105,7 +105,7 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
             return await File.ReadAllTextAsync(projectPath);
         }
         
-        throw new FileNotFoundException($"Email template '{templateName}' not found. Checked: {Path.GetFullPath(binPath)} and {Path.GetFullPath(projectPath)}");
+        throw new FileNotFoundException($"Email template '{templateName.Value}' not found. Checked: {Path.GetFullPath(binPath)} and {Path.GetFullPath(projectPath)}");
 
     }
 

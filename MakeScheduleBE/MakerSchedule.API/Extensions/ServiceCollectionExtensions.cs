@@ -11,8 +11,6 @@ public static class MakerScheduleExtensions
     {
         services.AddAutoMapper(typeof(MakerScheduleExtensions).Assembly);
 
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
-        services.AddScoped<IEventService, EventService>();
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
         services.AddScoped<MetadataService, MetadataService>();
         services.AddScoped<IEmailService, EmailService>();
@@ -27,8 +25,6 @@ public static class MakerScheduleExtensions
             : new AzureImageStorageService(serviceProvider.GetRequiredService<IConfiguration>());
         });
 
-        services.AddScoped<IDomainUserProfileService, DomainUserProfileService>();
-        services.AddScoped<IDomainUserService, DomainUserService>();
         
         // Register the database seeder
         services.AddScoped<DatabaseSeeder>();
