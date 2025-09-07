@@ -11,11 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using MediatR;
 
 using Microsoft.Extensions.Logging;
+using MakerSchedule.Application.Constants;
 namespace MakerSchedule.Application.Events.Commands;
 
 public class CreateEventCommandHandler(IApplicationDbContext context, IImageStorageService imageStorageService, ILogger<CreateEventCommandHandler> logger) : IRequestHandler<CreateEventCommand, EventDTO>
 {
-    private const double RequiredAspectRatio = 4.0 / 3.0;
     public async Task<EventDTO> Handle(CreateEventCommand request, CancellationToken cancellationToken)
     {
         var createEvent = request.CreateEventDTO;
@@ -27,7 +27,7 @@ public class CreateEventCommandHandler(IApplicationDbContext context, IImageStor
 
         var e = new Event
         {
-            EventName = new Domain.ValueObjects.EventName(createEvent.EventName),
+            EventName = new EventName(createEvent.EventName),
             Description = createEvent.Description,
             Duration = createEvent.Duration > 0 ? new Duration(createEvent.Duration) : null,
             ClassSize = createEvent.ClassSize,
@@ -47,12 +47,12 @@ public class CreateEventCommandHandler(IApplicationDbContext context, IImageStor
             {
                 if (ImageUtilities.IsSvg(stream))
                 {
-                    if (!ImageUtilities.IsSvgAspectRatioValid(stream, RequiredAspectRatio))
+                    if (!ImageUtilities.IsSvgAspectRatioValid(stream, EmailImage.RequiredAspectRatio))
                     {
                         throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
                     }
                 }
-                else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
+                else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, EmailImage.RequiredAspectRatio))
                 {
                     throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
                 }

@@ -6,8 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using MakerSchedule.Application.Exceptions;
 using MakerSchedule.Domain.ValueObjects;
 using MakerSchedule.Domain.Aggregates.Event;
+using MediatR;
 
-public class UpdateOccurrenceCommandHandler(IApplicationDbContext context, ILogger<UpdateOccurrenceCommand> logger, IImageStorageService imageStorageService) : IRequestHandler<UpdateOccurrenceCommand, OccurrenceDTO>
+public class UpdateOccurrenceCommandHandler(IApplicationDbContext context, ILogger<UpdateOccurrenceCommand> logger) : IRequestHandler<UpdateOccurrenceCommand, OccurrenceDTO>
 {
     public async Task<OccurrenceDTO> Handle(UpdateOccurrenceCommand request, CancellationToken cancellationToken)
     {

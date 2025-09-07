@@ -1,6 +1,9 @@
+using MakerSchedule.Application.DomainUsers.Queries;
 using MakerSchedule.Application.DTO.Metadata;
-using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Application.Services;
+using MakerSchedule.Application.Events.Queries;
+
+
+using MediatR;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,14 +12,15 @@ namespace MakerSchedule.API.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class MetadataController(MetadataService metadataService) : ControllerBase
+public class MetadataController(IMediator mediator) : ControllerBase
 {
 
     [HttpGet]
     [Route("events")]
     public async Task<ActionResult<EventsMetadataDTO>> GetEventsMetadata()
     {
-        var metadata = await metadataService.GetEventsMetadata();
+        var query = new GetEventMetaDataQuery();
+        var metadata = await mediator.Send(query);
         return Ok(metadata);
     }
 
@@ -24,7 +28,8 @@ public class MetadataController(MetadataService metadataService) : ControllerBas
     [Route("users")]
     public async Task<ActionResult<UserMetaDataDTO>> GetUsersMetadata()
     {
-        var metadata = await metadataService.GetUsersMetadata();
+        var query = new GetUserMetaDataQuery();
+        var metadata = await mediator.Send(query);
         return Ok(metadata);
     }
 

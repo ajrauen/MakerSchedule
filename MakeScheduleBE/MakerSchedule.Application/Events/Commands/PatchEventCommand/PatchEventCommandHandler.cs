@@ -10,11 +10,10 @@ using Microsoft.Extensions.Logging;
 using MakerSchedule.Domain.Utilties.ImageUtilities;
 using MakerSchedule.Application.DTO.Occurrence;
 using MakerSchedule.Application.DTO.EventTag;
+using MakerSchedule.Application.Constants;
 
 public class PatchEventCommandHandler(IApplicationDbContext context, ILogger<PatchEventCommandHandler> logger, IImageStorageService imageStorageService) : IRequestHandler<PatchEventCommand, EventDTO>
 {
-        private const double RequiredAspectRatio = 4.0 / 3.0;
-
      public async Task<EventDTO> Handle(PatchEventCommand request, CancellationToken cancellationToken)
     {
         var eventId = request.EventId;
@@ -75,12 +74,12 @@ public class PatchEventCommandHandler(IApplicationDbContext context, ILogger<Pat
                 {
                     if (ImageUtilities.IsSvg(stream))
                     {
-                        if (!ImageUtilities.IsSvgAspectRatioValid(stream, RequiredAspectRatio))
+                        if (!ImageUtilities.IsSvgAspectRatioValid(stream, EmailImage.RequiredAspectRatio))
                         {
                             throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
                         }
                     }
-                    else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, RequiredAspectRatio))
+                    else if (!ImageUtilities.IsEventImageAspectRatioValid(stream, EmailImage.RequiredAspectRatio))
                     {
                         throw new InvalidImageAspectRatioException("The uploaded image does not have the required 4:3 aspect ratio.");
                     }

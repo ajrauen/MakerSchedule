@@ -7,6 +7,7 @@ using MakerSchedule.Domain.Aggregates.User;
 using MakerSchedule.Domain.ValueObjects;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.DomainUsers.Commands;

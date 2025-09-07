@@ -12,7 +12,6 @@ public static class MakerScheduleExtensions
         services.AddAutoMapper(typeof(MakerScheduleExtensions).Assembly);
 
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
-        services.AddScoped<MetadataService, MetadataService>();
         services.AddScoped<IEmailService, EmailService>();
 
         services.AddScoped<IImageStorageService>(serviceProvider =>

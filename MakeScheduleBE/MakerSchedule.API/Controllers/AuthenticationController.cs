@@ -5,25 +5,18 @@ using Microsoft.AspNetCore.Mvc;
 
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using MediatR;
+using MakerSchedule.Application.Authentication.Commands;
 
 namespace MakerSchedule.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
-public class AuthController : ControllerBase
+public class AuthController(IMediator mediator, IWebHostEnvironment env) : ControllerBase
 {
     private const string REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
     
-    private readonly IAuthenticationService _authService;
-    private readonly IWebHostEnvironment _env;
-
-    public AuthController(IAuthenticationService authService, IWebHostEnvironment env)
-    {
-        _authService = authService;
-        _env = env;
-    }
-
 
         [HttpPost]
         [Route("login")]
@@ -32,7 +25,8 @@ public class AuthController : ControllerBase
             // Add debugging
             Console.WriteLine($"Login attempt for email: {login.Email}");
 
-            var result = await _authService.LoginAsync(login);
+            var command = new LoginCommand(login);
+            var result = await mediator.Send(command);
 
             Console.WriteLine($"Login result: {result.HasValue}");
 
@@ -60,7 +54,8 @@ public class AuthController : ControllerBase
                 return Unauthorized("Missing refresh token.");
             }
 
-            var result = await _authService.RefreshAsync(refreshToken);
+            var command  = new RefreshTokenCommand(refreshToken);
+            var result = await mediator.Send(command);
 
             if (result.HasValue)
             {
@@ -84,7 +79,8 @@ public class AuthController : ControllerBase
             return BadRequest("Invalid request");
         }
 
-        var success = await _authService.LogoutAsync(userId);
+        var command = new LogoutCommand(userId);
+        var success = await mediator.Send(command);
 
         if (success) {
             Response.Cookies.Delete(REFRESH_TOKEN_COOKIE_NAME);

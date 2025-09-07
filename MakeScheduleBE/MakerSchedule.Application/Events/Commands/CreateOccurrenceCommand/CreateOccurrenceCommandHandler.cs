@@ -12,9 +12,7 @@ using MakerSchedule.Domain.Exceptions;
 
 public class CreateOccurrenceCommandHandler(IApplicationDbContext context, ILogger<CreateOccurrenceCommandHandler> logger, IImageStorageService imageStorageService, IMediator mediator) : IRequestHandler<CreateOccurrenceCommand, OccurrenceDTO>
 {
-    private const double RequiredAspectRatio = 4.0 / 3.0;
-
-    public async Task<OccurrenceDTO> Handle(CreateOccurrenceCommand request, CancellationToken cancellationToken)
+        public async Task<OccurrenceDTO> Handle(CreateOccurrenceCommand request, CancellationToken cancellationToken)
     {
         var occurrenceDTO = request.CreateOccurrenceDTO;
         var eventEntity = await context.Events.Include(e => e.Occurrences).FirstOrDefaultAsync(e => e.Id == occurrenceDTO.EventId);
