@@ -23,30 +23,27 @@ public class CreateDomainUserCommandHandler(
         var dto = request.CreateDomainUserDTO;
         logger.LogInformation("Attempting to create user with email: {Email}", dto.Email);
 
-        // Use transaction to ensure both user creations succeed or both rollback
-        using var transaction = await ((DbContext)context).Database.BeginTransactionAsync(cancellationToken);
+        // Create the Identity User first
+        var user = new User
+        {
+            UserName = dto.Email,
+            Email = dto.Email
+        };
+
+        var userResult = await userManager.CreateAsync(user, dto.Password);
+        if (!userResult.Succeeded)
+        {
+            var errors = userResult.Errors.Select(e => e.Description);
+
+            if (errors.Any(e => e.Contains("already taken") || e.Contains("duplicate") || e.Contains("Email")))
+                throw new EmailAlreadyExistsException(dto.Email);
+
+            logger.LogError("Failed to create user: {Errors}", string.Join(", ", errors));
+            throw new InvalidOperationException($"Failed to create user: {string.Join(", ", errors)}");
+        }
 
         try
         {
-            // Create the Identity User
-            var user = new User
-            {
-                UserName = dto.Email,
-                Email = dto.Email
-            };
-
-            var userResult = await userManager.CreateAsync(user, dto.Password);
-            if (!userResult.Succeeded)
-            {
-                var errors = userResult.Errors.Select(e => e.Description);
-
-                if (errors.Any(e => e.Contains("already taken") || e.Contains("duplicate") || e.Contains("Email")))
-                    throw new EmailAlreadyExistsException(dto.Email);
-
-                logger.LogError("Failed to create user: {Errors}", string.Join(", ", errors));
-                throw new InvalidOperationException($"Failed to create user: {string.Join(", ", errors)}");
-            }
-
             // Create the Domain User
             var domainUser = new DomainUser
             {
@@ -64,9 +61,6 @@ public class CreateDomainUserCommandHandler(
             context.DomainUsers.Add(domainUser);
             await context.SaveChangesAsync(cancellationToken);
 
-            // Commit the transaction
-            await transaction.CommitAsync(cancellationToken);
-
             // Send welcome email (fire and forget - don't block the response)
             var welcomeEmailCommand = new SendWelcomeEmailCommand(domainUser.Email.Value, new WelcomeEmailModel
             {
@@ -78,10 +72,20 @@ public class CreateDomainUserCommandHandler(
             logger.LogInformation("Successfully created user with ID: {DomainUserId}", domainUser.Id);
             return domainUser.Id;
         }
-        catch
+        catch (Exception ex)
         {
-            // Rollback on any exception
-            await transaction.RollbackAsync(cancellationToken);
+            // Clean up the Identity user if domain user creation failed
+            try
+            {
+                await userManager.DeleteAsync(user);
+                logger.LogWarning("Cleaned up Identity user {Email} after domain user creation failed", dto.Email);
+            }
+            catch (Exception cleanupEx)
+            {
+                logger.LogError(cleanupEx, "Failed to cleanup Identity user {Email} after rollback", dto.Email);
+            }
+
+            logger.LogError(ex, "Failed to create domain user for {Email}", dto.Email);
             throw;
         }
     }

@@ -5,13 +5,13 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
-import type { User } from "@ms/types/users.types";
+import type { DomainUser } from "@ms/types/domain-user.types";
 
 interface AdminEventTableProps {
-  users: User[];
-  onEdit: (event: User) => void;
-  selectedUser?: User;
-  onEventDelete: (event: User) => void;
+  users: DomainUser[];
+  onEdit: (event: DomainUser) => void;
+  selectedUser?: DomainUser;
+  onEventDelete: (event: DomainUser) => void;
 }
 
 const AdminUsersTable = ({
@@ -20,7 +20,7 @@ const AdminUsersTable = ({
   onEventDelete,
   users = [],
 }: AdminEventTableProps) => {
-  const handleDeletClick = (evt: React.MouseEvent, row: User) => {
+  const handleDeletClick = (evt: React.MouseEvent, row: DomainUser) => {
     evt.stopPropagation();
     onEventDelete(row);
   };
@@ -48,12 +48,20 @@ const AdminUsersTable = ({
             >
               <TableCell>{`${row.firstName} ${row.lastName}`}</TableCell>
               <TableCell className="w-2/5">
-                <div
-                  className="line-clamp-2 break-words overflow-hidden"
-                  title={row.email}
-                >
-                  {row.email}
-                </div>
+                {row.email ? (
+                  <a
+                    href={`mailto:${row.email}`}
+                    className="line-clamp-2 break-words overflow-hidden text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                    title={`Click to email ${row.email}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {row.email}
+                  </a>
+                ) : (
+                  <div className="line-clamp-2 break-words overflow-hidden text-gray-400">
+                    No email
+                  </div>
+                )}
               </TableCell>
               <TableCell>
                 {row.roles?.length ? row.roles.join(", ") : "No roles assigned"}

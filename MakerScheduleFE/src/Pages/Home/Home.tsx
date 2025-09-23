@@ -1,8 +1,8 @@
 import { Login } from "@ms/Pages/Home/Login/Login";
 import { RegisterUser } from "@ms/Pages/Home/RegisterUser/RegisterUser";
 import { useIsLoggedIn } from "@ms/utils/auth.utils";
-// import { Link as MuiLink } from "@mui/material";
-// import { Link } from "@tanstack/react-router";
+import { Link as MuiLink } from "@mui/material";
+import { Link } from "@tanstack/react-router";
 import { refreshToken } from "@ms/api/authentication.api";
 import { useEffect } from "react";
 import { removeToken } from "@ms/utils/auth.utils";
@@ -16,6 +16,7 @@ const Home = () => {
     queryFn: refreshToken,
     enabled: isLoggedIn,
     retry: false,
+    throwOnError: false,
   });
 
   useEffect(() => {
@@ -54,7 +55,9 @@ const Home = () => {
                 </li>
               </>
             )}
-            <li>whatever</li>
+            <Link to={"profile"}>
+              <li>Profile</li>
+            </Link>
           </ul>
           <div>
             {/* <Link to={"classes"}> */}

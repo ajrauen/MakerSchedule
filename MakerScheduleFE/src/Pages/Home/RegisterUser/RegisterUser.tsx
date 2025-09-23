@@ -1,5 +1,5 @@
 import { Paper } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -20,6 +20,7 @@ const registerInitialFormData: RegisterDomainUserRequest = {
   phoneNumber: "",
   address: "",
   preferredContactMethod: "Phone",
+  roles: [],
 };
 
 const registerValidationSchema = z.object({
@@ -40,13 +41,14 @@ const registerValidationSchema = z.object({
   preferredContactMethod: z.enum(["Phone", "Email"], {
     message: "Preferred contact method is required",
   }),
+  roles: z.array(z.string()),
 });
 
 const RegisterUser = () => {
   const [isRegisterFormOpen, setIsRegisterFormOpen] = useState(false);
   const [errorCode, setErrorCode] = useState<string | undefined>();
 
-  const { control, handleSubmit, reset } = useForm<RegisterDomainUserRequest>({
+  const hookForm = useForm<RegisterDomainUserRequest>({
     resolver: zodResolver(registerValidationSchema),
     defaultValues: registerInitialFormData,
   });
@@ -77,7 +79,7 @@ const RegisterUser = () => {
 
   const submit = (data: RegisterDomainUserRequest) => {
     doRegister(data);
-    reset(undefined, { keepValues: true });
+    hookForm.reset(undefined, { keepValues: true });
   };
 
   const openRegisterForm = () => setIsRegisterFormOpen(true);
@@ -85,23 +87,25 @@ const RegisterUser = () => {
 
   return (
     <>
-      <span className="cursor-pointer" onClick={openRegisterForm}>
-        Register
-      </span>
-      <FormDialog
-        open={isRegisterFormOpen}
-        onSubmit={handleSubmit(submit)}
-        onClose={closeRegisterForm}
-        submitText="Register"
-        maxWidth="sm"
-        fullWidth
-      >
-        <Paper elevation={0} className="flex flex-col gap-4 p-2">
-          <h3 className="text-purple-300 text-2xl">Create an account</h3>
-          <span className="text-3xl mb-4">Register a new user</span>
-          <UserForm control={control} errorCode={errorCode} />
-        </Paper>
-      </FormDialog>
+      <FormProvider {...hookForm}>
+        <span className="cursor-pointer" onClick={openRegisterForm}>
+          Register
+        </span>
+        <FormDialog
+          open={isRegisterFormOpen}
+          onSubmit={hookForm.handleSubmit(submit)}
+          onClose={closeRegisterForm}
+          submitText="Register"
+          maxWidth="sm"
+          fullWidth
+        >
+          <Paper elevation={0} className="flex flex-col gap-4 p-2">
+            <h3 className="text-purple-300 text-2xl">Create an account</h3>
+            <span className="text-3xl mb-4">Register a new user</span>
+            <UserForm errorCode={errorCode} />
+          </Paper>
+        </FormDialog>
+      </FormProvider>
     </>
   );
 };

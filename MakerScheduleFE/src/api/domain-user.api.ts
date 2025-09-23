@@ -4,6 +4,7 @@ import type {
   RegisterDomainUserRequest,
 } from "@ms/types/domain-user.types";
 import type { AxiosRequestConfig } from "axios";
+import { email } from "node_modules/zod/v4/classic/index.d.cts";
 
 const BASE_DOMAIN_USER_ENDPOINT = "api/domain-users";
 
@@ -70,9 +71,73 @@ const getAvailableDomainUserLeaders = async (
   return response.data;
 };
 
+const sendPasswordResetRequest = async (email: string) => {
+  const requestData = {
+    email: email,
+  };
+
+  const req: AxiosRequestConfig = {
+    method: "POST",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/request-password-reset`,
+    withCredentials: true,
+    data: requestData,
+  };
+  const response = await sendRequest(req);
+
+  return response.data;
+};
+
+const validateResetPasswordToken = async (userId: string, token: string) => {
+  const requestData = {
+    userId: userId,
+    token: token,
+  };
+
+  const req: AxiosRequestConfig = {
+    method: "POST",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/validate-reset-password-token`,
+    withCredentials: true,
+    data: requestData,
+  };
+  const response = await sendRequest(req);
+
+  return response.data;
+};
+
+interface ResetPasswordRequest {
+  userId: string;
+  token: string;
+  newPassword: string;
+}
+
+const resetPassword = async ({
+  userId,
+  token,
+  newPassword,
+}: ResetPasswordRequest) => {
+  const requestData = {
+    userId,
+    token,
+    newPassword,
+  };
+
+  const req: AxiosRequestConfig = {
+    method: "POST",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/reset-password`,
+    withCredentials: true,
+    data: requestData,
+  };
+  const response = await sendRequest(req);
+
+  return response.data;
+};
+
 export {
   getDomainUserList,
   registerNewDomainUser,
   getAvailableDomainUserLeaders,
   getDomainUsers,
+  sendPasswordResetRequest,
+  validateResetPasswordToken,
+  resetPassword,
 };

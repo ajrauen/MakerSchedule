@@ -1,6 +1,8 @@
 import { Admin } from "@ms/Pages/Admin/Admin";
 import { Classes } from "@ms/Pages/Classes/Classes";
 import { Home } from "@ms/Pages/Home/Home";
+import { PasswordReset } from "@ms/Pages/PasswordReset/PasswordReset";
+import { UserProfile } from "@ms/Pages/UserProfile/UserProfile";
 import {
   createRootRoute,
   createRoute,
@@ -37,7 +39,25 @@ const getRouterTree = () => {
     component: Admin,
   });
 
-  const routeTree = rootRoute.addChildren([homeRoute, ClassRoute, AdminRoute]);
+  const UserProfileRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "/profile",
+    component: UserProfile,
+  });
+
+  const PasswordResetRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: "password-reset",
+    component: PasswordReset,
+  });
+
+  const routeTree = rootRoute.addChildren([
+    homeRoute,
+    ClassRoute,
+    AdminRoute,
+    UserProfileRoute,
+    PasswordResetRoute,
+  ]);
 
   const router = createRouter({
     routeTree,

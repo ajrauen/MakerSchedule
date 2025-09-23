@@ -115,7 +115,7 @@ public class EmailService(IConfiguration configuration, ILogger<EmailService> lo
         foreach (var kvp in data)
         {
             var placeholder = $"{{{{{kvp.Key}}}}}";
-            templateContent = template.Replace(placeholder, kvp.Value?.ToString() ?? string.Empty);
+            templateContent = templateContent.Replace(placeholder, kvp.Value?.ToString() ?? string.Empty);
         }
         
         return templateContent;

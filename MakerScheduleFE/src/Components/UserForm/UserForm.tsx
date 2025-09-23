@@ -2,14 +2,14 @@ import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextF
 import { FormHelperText } from "@mui/material";
 
 import { FormSelect } from "@ms/Components/FormComponents/FormSelect/FormSelect";
-import type { Control } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 
 interface UserFormProps {
-  control: Control;
   errorCode?: string;
 }
 
-const UserForm = ({ control, errorCode }: UserFormProps) => {
+const UserForm = ({ errorCode }: UserFormProps) => {
+  const { control } = useFormContext();
   return (
     <>
       <FormTextField label="Email" control={control} name="email" />

@@ -1,5 +1,5 @@
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
-import { FormHelperText, Paper } from "@mui/material";
+import { Button, FormHelperText, Paper } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,7 @@ import { useMutation } from "@tanstack/react-query";
 import { login } from "@ms/api/authentication.api";
 import { useState } from "react";
 import { FormDialog } from "@ms/Components/FormComponents/FormDialog";
+import { sendPasswordResetRequest } from "@ms/api/domain-user.api";
 
 const loginInitialFormData = {
   email: "a@b.com",
@@ -43,6 +44,11 @@ const Login = () => {
     onSuccess: () => setIsLoginFormOpen(false),
   });
 
+  const { mutate: doSendPasswordResetRequest } = useMutation({
+    mutationKey: ["sendPasswordResetRequest"],
+    mutationFn: sendPasswordResetRequest,
+  });
+
   const submit = () => {
     const { email, password } = getValues();
     const login: UserLogin = {
@@ -62,6 +68,13 @@ const Login = () => {
 
   const openLoginForm = () => setIsLoginFormOpen(true);
   const closeLoginForm = () => setIsLoginFormOpen(false);
+
+  const handeForgotPassword = () => {
+    const { email } = getValues();
+    if (email && email !== "") {
+      doSendPasswordResetRequest(email);
+    }
+  };
 
   return (
     <>
@@ -97,6 +110,9 @@ const Login = () => {
             <div className="flex-1 h-px bg-gray-300 relative top-[3px]" />
             <span className="mx-2 text-gray-300 text-xs  leading-0.5">or</span>
             <div className="flex-1 h-px bg-gray-300 relative top-[3px]" />
+          </div>
+          <div className="flex items-center align-middle mx-auto w-full">
+            <Button onClick={handeForgotPassword}>Forgot Password</Button>
           </div>
         </Paper>
       </FormDialog>

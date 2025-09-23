@@ -30,8 +30,8 @@ const useAdminUsersData = () => {
 
   return {
     isLoading: usersLoading || metadataLoading,
-    users: usersResponse?.data ?? [],
-    userMetaData: userMetadataResponse?.data ?? {
+    users: usersResponse ?? [],
+    userMetaData: userMetadataResponse ?? {
       roles: [],
     },
   };

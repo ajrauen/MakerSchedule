@@ -1,5 +1,4 @@
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Domain.ValueObjects;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
