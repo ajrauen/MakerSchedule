@@ -11,9 +11,6 @@ public class SendPasswordResetEmailCommandHandler(IEmailService emailService, IL
 {
     public async Task<bool> Handle(SendPasswordResetEmailCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Processing password reset email for {Email} with UserName: '{UserName}'", 
-            request.ToEmail, request.PasswordResetEmailModel.UserName);
-
         var template = await emailService.LoadEmailTemplateAsync(EmailTemplateFileName.PasswordReset);
         
         if (string.IsNullOrEmpty(template))
@@ -22,7 +19,6 @@ public class SendPasswordResetEmailCommandHandler(IEmailService emailService, IL
             throw new InvalidOperationException("Password reset email template not found");
         }
         
-        logger.LogInformation("Template loaded, length: {Length}", template.Length);
         
         var placeholders = new Dictionary<string, object>
         {
@@ -30,13 +26,8 @@ public class SendPasswordResetEmailCommandHandler(IEmailService emailService, IL
             { "ResetLink", request.PasswordResetEmailModel.ResetLink }
         };
         
-        logger.LogInformation("Template placeholders: UserName='{UserName}', ResetLink='{ResetLink}'", 
-            request.PasswordResetEmailModel.UserName, request.PasswordResetEmailModel.ResetLink);
-        
         var content = emailService.ProcessTemplatePlaceHolders(template, placeholders);
-        
-        logger.LogInformation("Processed content contains UserName placeholder: {ContainsUserName}", 
-            content.Contains("{{UserName}}"));
+
 
         var emailRequest = new EmailRequest
         {

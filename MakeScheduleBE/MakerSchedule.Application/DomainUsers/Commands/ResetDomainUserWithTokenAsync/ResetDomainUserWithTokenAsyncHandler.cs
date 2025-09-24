@@ -19,10 +19,9 @@ public class ResetDomainUserWithTokenAsyncHandler(
         if (user == null) 
         {
             logger.LogWarning("Password reset failed - user not found: {UserId}", request.guid);
-            return false; // Don't reveal that user doesn't exist
+            return false; 
         }
 
-        // Reset the password using the token and new password
         var result = await userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
 
         if (!result.Succeeded)

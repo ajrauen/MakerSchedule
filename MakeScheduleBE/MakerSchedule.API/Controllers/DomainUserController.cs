@@ -97,11 +97,15 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPost]
-    [Route("request-reset-password")]
+    [Route("request-password-reset")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
     {
         var email = new Email(request.Email);
-        var command = new RequestResetDomainUserPasswordAsync(email, $"{Request.Scheme}://{Request.Host}");
+
+        var hostValue = Request.Host.Host;
+        var fullUrl = $"https://{hostValue}:5173";
+        
+        var command = new RequestResetDomainUserPasswordAsync(email, fullUrl);
         var result = await mediator.Send(command);
 
         return Ok(new { Message = "If an account with that email exists, a password reset link has been sent." });
@@ -128,9 +132,14 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
     {
         var command = new ResetDomainUserWithTokenAsync(request.UserId, request.Token, request.NewPassword);
         var isSuccess = await mediator.Send(command);
-     
-        return Ok(new { Message = "The password has been reset successfully." });
 
+        if (isSuccess)
+        {
+            return Ok(new { Message = "Your password has been reset successfully." });
+        }
+
+        // Don't reveal specific failure reasons for security
+        return BadRequest(new { Message = "Unable to reset password. Please request a new reset link." });
     }
 
 }

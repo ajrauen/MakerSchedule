@@ -27,7 +27,7 @@ public class RequestResetDomainUserPasswordAsyncHandler(
 
         var resetToken = await userManager.GeneratePasswordResetTokenAsync(user);
 
-        var resetLink = $"{request.BaseUrl}/makerschedule/password-reset?token={Uri.EscapeDataString(resetToken)}&userId={user.Id}";
+        var resetLink = $"{request.BaseUrl}/password-reset?token={Uri.EscapeDataString(resetToken)}&userId={user.Id}";
 
         var userName = user.UserName ?? user.Email!;
         logger.LogInformation("Creating password reset email for user: {Email}, UserName: {UserName}", user.Email, userName);
