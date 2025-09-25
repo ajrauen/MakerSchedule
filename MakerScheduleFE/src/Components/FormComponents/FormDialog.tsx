@@ -15,6 +15,7 @@ type FormDialogProps = DialogProps & {
   open: boolean;
   submitText?: string;
   closeText?: string;
+  saveButtonDisabled?: boolean;
 };
 
 const FormDialog = ({
@@ -24,13 +25,13 @@ const FormDialog = ({
   title,
   children,
   open,
+  saveButtonDisabled = false,
   submitText = "Submit",
   closeText = "Close",
   ...props
 }: FormDialogProps) => {
   return (
     <Dialog open={open} {...props}>
-      <DialogTitle>{title}</DialogTitle>
       <form onSubmit={onSubmit}>
         {title ? <DialogTitle>{title}</DialogTitle> : null}
         <DialogContent>
@@ -40,7 +41,11 @@ const FormDialog = ({
           {children}
           <DialogActions>
             {onClose && <Button onClick={onClose}>{closeText}</Button>}
-            <Button variant="contained" type="submit">
+            <Button
+              variant="contained"
+              type="submit"
+              disabled={saveButtonDisabled}
+            >
               {submitText}
             </Button>
           </DialogActions>
