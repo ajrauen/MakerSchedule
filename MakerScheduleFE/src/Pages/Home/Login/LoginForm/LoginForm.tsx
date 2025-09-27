@@ -1,7 +1,6 @@
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
 import {
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
@@ -14,11 +13,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { UserLogin } from "@ms/types/auth.types";
 import { useMutation } from "@tanstack/react-query";
 import { login } from "@ms/api/authentication.api";
-import { FormDialog } from "@ms/Components/FormComponents/FormDialog";
 
 const loginInitialFormData = {
   email: "a@b.com",
-  password: "Tex@s123",
+  password: "C@ster123",
 };
 
 const loginValidationSchema = z.object({
@@ -42,11 +40,7 @@ interface LoginFormProps {
   isOpen: boolean;
 }
 
-const LoginForm = ({
-  closeFormDialog,
-  isOpen,
-  showForgotPassword,
-}: LoginFormProps) => {
+const LoginForm = ({ closeFormDialog, showForgotPassword }: LoginFormProps) => {
   const { getValues, control, handleSubmit, reset, formState, watch } =
     useForm<loginFormData>({
       resolver: zodResolver(loginValidationSchema),

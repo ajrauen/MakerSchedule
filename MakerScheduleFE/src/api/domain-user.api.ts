@@ -87,9 +87,9 @@ const sendPasswordResetRequest = async (email: string) => {
   return response.data;
 };
 
-const validateResetPasswordToken = async (userId: string, token: string) => {
+const validateResetPasswordToken = async (email: string, token: string) => {
   const requestData = {
-    userId: userId,
+    email: email,
     token: token,
   };
 
@@ -105,18 +105,18 @@ const validateResetPasswordToken = async (userId: string, token: string) => {
 };
 
 interface ResetPasswordRequest {
-  userId: string;
+  email: string;
   token: string;
   newPassword: string;
 }
 
 const resetPassword = async ({
-  userId,
+  email,
   token,
   newPassword,
 }: ResetPasswordRequest) => {
   const requestData = {
-    userId,
+    email,
     token,
     newPassword,
   };

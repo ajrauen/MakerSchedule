@@ -115,7 +115,8 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
     [Route("validate-reset-password-token")]
     public async Task<IActionResult> ValidateResetToken([FromBody] ValidateResetTokenRequest request)
     {
-        var command = new ValidateResetDomainUserTokenAsync(request.UserId, request.Token);
+        var email = new Email(request.Email);
+        var command = new ValidateResetDomainUserTokenAsync(email, request.Token);
         var isValid = await mediator.Send(command);
 
         if (isValid)
@@ -130,7 +131,8 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
     [Route("reset-password")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordWithTokenRequest request)
     {
-        var command = new ResetDomainUserWithTokenAsync(request.UserId, request.Token, request.NewPassword);
+        var email = new Email(request.Email);
+        var command = new ResetDomainUserWithTokenAsync(email, request.Token, request.NewPassword);
         var isSuccess = await mediator.Send(command);
 
         if (isSuccess)

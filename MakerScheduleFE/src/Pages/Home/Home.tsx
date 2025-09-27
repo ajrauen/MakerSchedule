@@ -1,12 +1,11 @@
 import { Login } from "@ms/Pages/Home/Login/Login";
 import { RegisterUser } from "@ms/Pages/Home/RegisterUser/RegisterUser";
-import { useIsLoggedIn } from "@ms/utils/auth.utils";
-import { Link as MuiLink } from "@mui/material";
 import { Link } from "@tanstack/react-router";
 import { refreshToken } from "@ms/api/authentication.api";
 import { useEffect } from "react";
 import { removeToken } from "@ms/utils/auth.utils";
 import { useQuery } from "@tanstack/react-query";
+import { useIsLoggedIn } from "@ms/hooks/useIsLoggedIn";
 
 const Home = () => {
   const isLoggedIn = useIsLoggedIn();
@@ -14,7 +13,7 @@ const Home = () => {
   const { error: isError } = useQuery({
     queryKey: ["refreshTokenOnLoad"],
     queryFn: refreshToken,
-    enabled: isLoggedIn,
+    enabled: !isLoggedIn,
     retry: false,
     throwOnError: false,
   });

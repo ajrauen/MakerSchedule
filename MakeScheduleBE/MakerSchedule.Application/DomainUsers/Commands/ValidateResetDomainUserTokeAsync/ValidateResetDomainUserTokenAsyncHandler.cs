@@ -12,13 +12,13 @@ public class ValidateResetDomainUserTokenAsyncHandler(
 {
     public async Task<bool> Handle(ValidateResetDomainUserTokenAsync request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Validating password reset token for user: {UserId}", request.guid);
+        logger.LogInformation("Validating password reset token for user: {Email}", request.Email);
 
-        var user = await userManager.FindByIdAsync(request.guid.ToString());
+        var user = await userManager.FindByEmailAsync(request.Email.Value);
 
         if (user == null) 
         {
-            logger.LogWarning("Password reset token validation failed - user not found: {UserId}", request.guid);
+            logger.LogWarning("Password reset token validation failed - user not found: {Email}", request.Email);
             return false; // Don't reveal that user doesn't exist
         }
 
@@ -30,7 +30,7 @@ public class ValidateResetDomainUserTokenAsyncHandler(
 
         if (!isValidToken)
         {
-            logger.LogWarning("Password reset token validation failed for user: {UserId}", request.guid);
+            logger.LogWarning("Password reset token validation failed for user: {Email}", request.Email);
             return false;
         }
 

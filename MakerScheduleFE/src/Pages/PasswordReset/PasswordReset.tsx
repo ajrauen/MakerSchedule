@@ -1,9 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { login } from "@ms/api/authentication.api";
 import {
   resetPassword,
   validateResetPasswordToken,
 } from "@ms/api/domain-user.api";
 import FormTextField from "@ms/Components/FormComponents/FormTextField/FormTextField";
+import type { UserLogin } from "@ms/types/auth.types";
 import { Button, Paper } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useSearch } from "@tanstack/react-router";
@@ -46,34 +48,51 @@ const passwordResetValidationSchema = z
 
 const PasswordReset = () => {
   const navigate = useNavigate();
-  const { userId, token } = useSearch({ strict: false });
+  const { email, token } = useSearch({ strict: false });
 
-  const { control, handleSubmit } = useForm<PasswordResetFormData>({
+  const { control, handleSubmit, getValues } = useForm<PasswordResetFormData>({
     resolver: zodResolver(passwordResetValidationSchema),
     defaultValues: passwordResetFormData,
   });
 
+  const onResetPasswordSuccess = () => {
+    const login: UserLogin = {
+      email,
+      password: getValues().password,
+    };
+    debugger;
+    doLogin({
+      creds: login,
+    });
+  };
+
   const { mutate: validateResetToken } = useMutation({
-    mutationFn: () => validateResetPasswordToken(userId, token),
-    onError: () =>
+    mutationFn: () => validateResetPasswordToken(email, token),
+  });
+
+  const { mutate: doLogin } = useMutation({
+    mutationKey: ["login"],
+    mutationFn: login,
+    onSuccess: () =>
       navigate({
-        to: "/home",
+        to: "/",
       }),
   });
 
   const { mutate: doResetPassword } = useMutation({
     mutationFn: resetPassword,
+    onSuccess: onResetPasswordSuccess,
   });
 
   useEffect(() => {
-    if (token && userId) {
+    if (token && email) {
       validateResetToken();
     }
-  }, [token, userId, validateResetToken]);
+  }, [token, email, validateResetToken]);
 
   const submit = (data: PasswordResetFormData) => {
     doResetPassword({
-      userId: userId,
+      email: email,
       token: token,
       newPassword: data.password,
     });

@@ -28,6 +28,7 @@ const login = async ({ creds }: LoginApiProps) => {
     withCredentials: true,
   };
   const response = await sendRequest(req);
+
   const data = response.data as { accessToken: string };
   setToken(data.accessToken);
   return response;
