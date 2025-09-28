@@ -25,7 +25,7 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import { ConfirmationDialog } from "@ms/Components/Dialogs/Confirmation";
 import { getEventTags } from "@ms/api/event-tag.api";
 import { TextNumericFormat } from "@ms/Components/FormComponents/NumericFormat/TextNumericFormat";
-import { EventAttendees } from "@ms/Pages/Admin/Events/AdminEventView/AdminEventTable/EventDetails/BasicDetails/OccurrenceAttendees/OccurrenceAttendees";
+
 const createEventvalidationSchema = z
   .object({
     eventName: z

@@ -4,7 +4,6 @@ import type {
   RegisterDomainUserRequest,
 } from "@ms/types/domain-user.types";
 import type { AxiosRequestConfig } from "axios";
-import { email } from "node_modules/zod/v4/classic/index.d.cts";
 
 const BASE_DOMAIN_USER_ENDPOINT = "api/domain-users";
 
