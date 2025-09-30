@@ -1,0 +1,106 @@
+# .github/workflows/docker-deploy.yml
+name: Deploy to VPS with Docker
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore MakeScheduleBE/MakerSchedule.sln
+
+      - name: Build application
+        run: dotnet build MakeScheduleBE/MakerSchedule.sln --configuration Release --no-restore
+
+      - name: Publish application
+        run: dotnet publish MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj --configuration Release --output ./publish --no-build
+
+      - name: Create deployment package
+        run: |
+          mkdir -p deployment
+          cp -r publish/* deployment/
+          cp docker-compose.production.yml deployment/docker-compose.yml
+
+      - name: Copy files to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          source: "deployment/*"
+          target: "/tmp/makerschedule-deploy"
+          strip_components: 1
+
+      - name: Deploy with Docker Compose
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            # Navigate to deployment directory
+            cd /tmp/makerschedule-deploy
+
+            # Create .env file with secrets
+            cat > .env << EOF
+            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            JWT_KEY=${{ secrets.JWT_KEY }}
+            EOF
+
+            # Create app directory and move files
+            mkdir -p app
+            mv *.dll *.json *.pdb *.deps.json *.runtimeconfig.json app/ 2>/dev/null || true
+
+            # Stop existing containers
+            docker-compose down 2>/dev/null || true
+
+            # Start services
+            docker-compose up -d
+
+            # Wait for services to be ready
+            echo "Waiting for services to start..."
+            sleep 10
+
+            # Check service status
+            docker-compose ps
+            docker-compose logs --tail=20
+
+            # Test the API
+            echo "Testing API endpoint..."
+            sleep 5
+            curl -f http://localhost:5000/health || echo "Health check endpoint not available"
+            curl -f http://localhost:5000/ || echo "API is starting up..."
+
+            # Show running containers
+            docker ps
+
+            # Cleanup old images (optional)
+            docker image prune -f
+
+      - name: Cleanup deployment files
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            # Keep the .env file and docker-compose.yml for manual management
+            rm -rf /tmp/makerschedule-deploy/app/*
+            echo "Deployment complete! Services are running in Docker containers."
+            echo "Use 'docker-compose logs -f' to view logs"
+            echo "Use 'docker-compose restart' to restart services"
