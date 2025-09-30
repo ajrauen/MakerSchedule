@@ -8,23 +8,23 @@ using Microsoft.OpenApi.Models;
 
 using MakerSchedule.API.Exceptions;
 using MakerSchedule.Domain.Aggregates.User;
-using Azure.Identity;
+// using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
 var configuration = builder.Configuration;
 
 // Add Key Vault configuration for production only
-if (!builder.Environment.IsDevelopment())
-{
-    var keyVaultUrl = configuration["KeyVault:Url"];
-    if (!string.IsNullOrEmpty(keyVaultUrl))
-    {
-        configuration.AddAzureKeyVault(
-            new Uri(keyVaultUrl),
-            new DefaultAzureCredential());
-    }
-}
+// if (!builder.Environment.IsDevelopment())
+// {
+//     var keyVaultUrl = configuration["KeyVault:Url"];
+//     if (!string.IsNullOrEmpty(keyVaultUrl))
+//     {
+//         configuration.AddAzureKeyVault(
+//             new Uri(keyVaultUrl),
+//             new DefaultAzureCredential());
+//     }
+// }
 
 services.AddControllersWithErrorParser();
 
