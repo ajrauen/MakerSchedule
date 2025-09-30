@@ -38,9 +38,12 @@ jobs:
             # Create secrets directory and file
             sudo mkdir -p /etc/makerschedule
             sudo tee /etc/makerschedule/secrets.env > /dev/null <<EOF
+            ASPNETCORE_ENVIRONMENT=Production
             ConnectionStrings__DefaultConnection=Host=localhost;Port=5432;Database=makerschedule;Username=appuser;Password=${{ secrets.DB_PASSWORD }}
             Jwt__Key=${{ secrets.JWT_KEY }}
-            AzureStorage__ConnectionString=${{ secrets.AZURE_STORAGE_CONNECTION }}
+            AzureStorage__ConnectionString=
+            UseAzureKeyVault=false
+            UseAzureStorage=false
             EOF
             sudo chmod 600 /etc/makerschedule/secrets.env
             sudo chown makerschedule:makerschedule /etc/makerschedule/secrets.env
