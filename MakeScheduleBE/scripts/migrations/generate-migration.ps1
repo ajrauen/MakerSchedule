@@ -13,9 +13,9 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 Set-Location (Join-Path $scriptDir ../..)
 Write-Host "Now in: $(Get-Location)"
 
-# Use Development environment for migration generation (doesn't matter for SQL Server)
+# Use Development environment for migration generation (doesn't matter for PostgreSQL)
 $env:ASPNETCORE_ENVIRONMENT = "Development"
-Write-Host "Generating SQL Server migration: $MigrationName"
+Write-Host "Generating PostgreSQL migration: $MigrationName"
 
 dotnet ef migrations add $MigrationName --project MakerSchedule.Infrastructure --startup-project MakerSchedule.API 
 

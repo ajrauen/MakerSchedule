@@ -1,20 +1,20 @@
 name: Update Azure Database
 
 on:
-  workflow_dispatch: # Manual trigger
-    inputs:
-      environment:
-        description: "Target environment"
-        required: true
-        default: "production"
-        type: choice
-        options:
-          - production
-          - staging
-  push:
-    branches: [main]
-    paths:
-      - "MakeScheduleBE/MakerSchedule.Infrastructure/Migrations/**"
+  workflow_dispatch:
+    # inputs:
+    #   environment:
+    #     description: "Target environment"
+    #     required: true
+    #     default: "production"
+    #     type: choice
+    #     options:
+    #       - production
+    #       - staging
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - "MakeScheduleBE/MakerSchedule.Infrastructure/Migrations/**"
 
 jobs:
   update-database:

@@ -4,12 +4,12 @@
 name: Build and deploy ASP.Net Core app to Azure Web App - makerSchedule
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "MakeScheduleBE/**"
-      - ".github/workflows/main_makerschedule.yml"
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "MakeScheduleBE/**"
+  #     - ".github/workflows/main_makerschedule.yml"
   workflow_dispatch:
 
 jobs:

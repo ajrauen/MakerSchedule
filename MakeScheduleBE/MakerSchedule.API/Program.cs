@@ -30,7 +30,7 @@ services.AddControllersWithErrorParser();
 
 services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(IApplicationAssemblyMarker).Assembly));services.AddCorsWithOptions();
 
-services.AddDatabase(configuration);
+services.AddPostgreSqlDatabase(configuration);
 
 services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()

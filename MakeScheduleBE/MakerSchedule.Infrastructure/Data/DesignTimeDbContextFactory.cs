@@ -19,9 +19,9 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
         var connectionString = config.GetConnectionString("DefaultConnection");
 
-        optionsBuilder.UseSqlServer(connectionString, sqlOptions =>
+        optionsBuilder.UseNpgsql(connectionString, npgsqlOptions =>
         {
-            sqlOptions.EnableRetryOnFailure();
+            npgsqlOptions.EnableRetryOnFailure();
         });
 
         return new ApplicationDbContext(optionsBuilder.Options);

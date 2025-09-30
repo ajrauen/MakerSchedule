@@ -45,7 +45,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
                 .HasConversion(
                     eventName => eventName.ToString(),
                     value => new EventName(value))
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("text");
         });
 
         // Configure EventTag entity
@@ -56,7 +56,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
                 .HasConversion(
                     name => name.Value,
                     value => new EventTagName(value))
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("text");
         });
 
         // Configure Occurrence entity
@@ -64,13 +64,16 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         {
              entity.Property(e => e.ScheduleStart)
                 .HasConversion(ScheduleStart.Converter)
-                .HasColumnType("datetime2");
+                .HasColumnType("timestamptz");
         });
 
         // Configure many-to-many: Users lead Occurrences
         modelBuilder.Entity<OccurrenceLeader>(entity =>
         {
             entity.HasKey(ol => ol.Id);
+            
+            entity.Property(ol => ol.AssignedAt)
+                .HasColumnType("timestamptz");
             
             entity.HasOne(ol => ol.Occurrence)
                 .WithMany(o => o.Leaders)
@@ -88,6 +91,9 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         modelBuilder.Entity<OccurrenceAttendee>(entity =>
         {
             entity.HasKey(oa => oa.Id);
+            
+            entity.Property(oa => oa.RegisteredAt)
+                .HasColumnType("timestamptz");
             
             entity.HasOne(oa => oa.Occurrence)
                 .WithMany(o => o.Attendees)
@@ -109,19 +115,22 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
         // Configure value objects for DomainUser
         modelBuilder.Entity<DomainUser>(entity =>
         {
+            entity.Property(d => d.CreatedAt)
+                .HasColumnType("timestamptz");
+                
             entity.Property(d => d.Email)
                 .HasConversion(
                     email => email == null ? null : email.Value,        
                     value => value == null ? null : new MakerSchedule.Domain.ValueObjects.Email(value)
                 )
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("text");
 
             entity.Property(d => d.PhoneNumber)
                 .HasConversion(
                     phone => phone == null ? null : phone.Value,
                     value => value == null ? null : new MakerSchedule.Domain.ValueObjects.PhoneNumber(value)
                 )
-                .HasColumnType("nvarchar(max)");
+                .HasColumnType("text");
         });
     }
 

@@ -1,0 +1,92 @@
+# .github/workflows/vps-deploy.yml
+name: Deploy to VPS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore MakeScheduleBE/MakerSchedule.sln
+
+      - name: Build application
+        run: dotnet build MakeScheduleBE/MakerSchedule.sln --configuration Release --no-restore
+
+      - name: Publish application
+        run: dotnet publish MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj --configuration Release --output ./publish --no-build
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            # Create secrets directory and file
+            sudo mkdir -p /etc/makerschedule
+            sudo tee /etc/makerschedule/secrets.env > /dev/null <<EOF
+            ConnectionStrings__DefaultConnection=Host=localhost;Port=5432;Database=makerschedule;Username=appuser;Password=${{ secrets.DB_PASSWORD }}
+            Jwt__Key=${{ secrets.JWT_KEY }}
+            AzureStorage__ConnectionString=${{ secrets.AZURE_STORAGE_CONNECTION }}
+            EOF
+            sudo chmod 600 /etc/makerschedule/secrets.env
+            sudo chown makerschedule:makerschedule /etc/makerschedule/secrets.env
+
+            # Stop the service if it exists
+            sudo systemctl stop makerschedule || true
+
+            # Create application directory
+            sudo mkdir -p /opt/makerschedule
+
+            # Backup current deployment (if exists)
+            if [ -d "/opt/makerschedule/current" ]; then
+              sudo mv /opt/makerschedule/current /opt/makerschedule/backup-$(date +%Y%m%d_%H%M%S)
+            fi
+
+            # Create new deployment directory
+            sudo mkdir -p /opt/makerschedule/current
+
+      - name: Copy files to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          source: "./publish/*"
+          target: "/tmp/makerschedule-deploy"
+          strip_components: 1
+
+      - name: Complete deployment
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          script: |
+            # Move files to final location
+            sudo mv /tmp/makerschedule-deploy/* /opt/makerschedule/current/
+            sudo chown -R makerschedule:makerschedule /opt/makerschedule/current
+            sudo chmod +x /opt/makerschedule/current/MakerSchedule.API
+
+            # Start the service
+            sudo systemctl start makerschedule
+            sudo systemctl enable makerschedule
+
+            # Check if service is running
+            sleep 5
+            sudo systemctl status makerschedule
