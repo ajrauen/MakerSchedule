@@ -35,6 +35,19 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           script: |
+            # Install PostgreSQL if not already installed
+            if ! command -v psql &> /dev/null; then
+              sudo apt update
+              sudo apt install -y postgresql postgresql-contrib
+              sudo systemctl start postgresql
+              sudo systemctl enable postgresql
+              
+              # Create database and user
+              sudo -u postgres psql -c "CREATE DATABASE makerschedule;" || true
+              sudo -u postgres psql -c "CREATE USER appuser WITH PASSWORD '${{ secrets.DB_PASSWORD }}';" || true
+              sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE makerschedule TO appuser;" || true
+            fi
+
             # Create secrets directory and file
             sudo mkdir -p /etc/makerschedule
             sudo tee /etc/makerschedule/secrets.env > /dev/null <<EOF
