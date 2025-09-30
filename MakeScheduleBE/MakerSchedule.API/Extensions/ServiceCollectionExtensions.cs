@@ -18,7 +18,7 @@ public static class MakerScheduleExtensions
         {
             return new LocalImageStorageService(
                 serviceProvider.GetRequiredService<IHostEnvironment>(),
-                serviceProvider.GetRequiredService<IHttpContextAccessor>())
+                serviceProvider.GetRequiredService<IHttpContextAccessor>());
 
 
             // var env = serviceProvider.GetService<IWebHostEnvironment>();
