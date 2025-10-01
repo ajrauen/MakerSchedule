@@ -4,6 +4,12 @@ name: Deploy to VPS with Docker
 on:
   push:
     branches: [main]
+    paths:
+      - "MakeScheduleBE/**"
+      - "docker-compose.production.yml"
+      - "docker-compose.simple.yml"
+      - "nginx.conf"
+      - ".github/workflows/docker-deploy.yml"
   workflow_dispatch: # Allow manual trigger
 
 jobs:

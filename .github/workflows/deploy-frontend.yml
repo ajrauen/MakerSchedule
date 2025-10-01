@@ -30,21 +30,12 @@ jobs:
         working-directory: MakerScheduleFE
         run: npm run build
 
-      - name: Test SSH Connection
-        uses: appleboy/ssh-action@v0.1.5
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-          timeout: 60s
-          command_timeout: 30s
-          script: |
-            echo "SSH connection successful!"
-            echo "Server info:"
-            uname -a
+      - name: Create deployment archive
+        run: |
+          cd MakerScheduleFE/dist
+          tar -czf ../../frontend-dist.tar.gz .
 
-      - name: Prepare frontend directory
+      - name: Deploy frontend files only
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -52,32 +43,31 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           timeout: 60s
-          command_timeout: 30s
+          command_timeout: 60s
           script: |
-            # Create frontend directory
+            echo "Starting frontend deployment..."
+
+            # Create frontend directory if it doesn't exist
             sudo mkdir -p /var/www/makerschedule
-
-            # Set proper ownership
             sudo chown -R $USER:$USER /var/www/makerschedule
 
-            # Clean previous deployment
-            rm -rf /var/www/makerschedule/*
+            # Create temporary directory for new files
+            mkdir -p /tmp/frontend-new
 
             echo "Frontend directory prepared"
 
-      - name: Copy built files to VPS
+      - name: Upload frontend files
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-          source: "MakerScheduleFE/dist/*"
-          target: "/var/www/makerschedule/"
-          strip_components: 2
-          timeout: 60s
+          source: "frontend-dist.tar.gz"
+          target: "/tmp/"
+          timeout: 120s
 
-      - name: Update nginx configuration
+      - name: Extract and deploy files
         uses: appleboy/ssh-action@v0.1.5
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -85,81 +75,25 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           timeout: 60s
-          command_timeout: 30s
+          command_timeout: 60s
           script: |
-            # Navigate to deployment directory
-            cd /tmp/makerschedule-deploy
+            echo "Extracting frontend files..."
+            cd /tmp
+            tar -xzf frontend-dist.tar.gz -C /tmp/frontend-new
 
-            # Create updated nginx config with frontend support
-            cat > nginx.conf << 'EOF'
-            events {
-                worker_connections 1024;
-            }
+            # Backup current frontend (if exists)
+            if [ -d "/var/www/makerschedule" ] && [ "$(ls -A /var/www/makerschedule)" ]; then
+              sudo mv /var/www/makerschedule /var/www/makerschedule.backup.$(date +%s)
+            fi
 
-            http {
-                include       /etc/nginx/mime.types;
-                default_type  application/octet-stream;
-                
-                # Rate limiting
-                limit_req_zone \$binary_remote_addr zone=api:10m rate=10r/s;
-                
-                # Upstream for API
-                upstream api {
-                    server makerschedule_api:5000;
-                }
-                
-                # Main server
-                server {
-                    listen 80;
-                    server_name makerschedule.duckdns.org;
-                    
-                    # Frontend static files
-                    location / {
-                        root /var/www/makerschedule;
-                        try_files \$uri \$uri/ /index.html;
-                        index index.html;
-                        
-                        # Cache static assets
-                        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)\$ {
-                            expires 1y;
-                            add_header Cache-Control "public, immutable";
-                        }
-                    }
-                    
-                    # API endpoints
-                    location /api/ {
-                        limit_req zone=api burst=20 nodelay;
-                        proxy_pass http://api/;
-                        proxy_set_header Host \$host;
-                        proxy_set_header X-Real-IP \$remote_addr;
-                        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                        proxy_set_header X-Forwarded-Proto \$scheme;
-                        proxy_connect_timeout 30s;
-                        proxy_send_timeout 30s;
-                        proxy_read_timeout 30s;
-                    }
-                    
-                    # Swagger UI
-                    location /swagger {
-                        proxy_pass http://api/swagger;
-                        proxy_set_header Host \$host;
-                        proxy_set_header X-Real-IP \$remote_addr;
-                        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-                        proxy_set_header X-Forwarded-Proto \$scheme;
-                    }
-                    
-                    # Let's Encrypt challenge
-                    location /.well-known/acme-challenge/ {
-                        root /var/www/certbot;
-                    }
-                }
-            }
-            EOF
+            # Deploy new frontend
+            sudo mkdir -p /var/www/makerschedule
+            sudo cp -r /tmp/frontend-new/* /var/www/makerschedule/
+            sudo chown -R www-data:www-data /var/www/makerschedule
 
-            # Restart nginx to apply new configuration
-            docker compose restart nginx
+            # Cleanup
+            rm -rf /tmp/frontend-new
+            rm -f /tmp/frontend-dist.tar.gz
 
             echo "Frontend deployed successfully!"
-            echo "Frontend URL: http://makerschedule.duckdns.org"
-            echo "API URL: http://makerschedule.duckdns.org/api"
-            echo "Swagger URL: http://makerschedule.duckdns.org/swagger/index.html"
+            echo "Frontend files are now served by the existing nginx configuration"
