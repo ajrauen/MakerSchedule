@@ -32,6 +32,7 @@ jobs:
           mkdir -p deployment
           cp -r publish/* deployment/
           cp docker-compose.production.yml deployment/docker-compose.yml
+          cp nginx.conf deployment/
 
       - name: Test SSH Connection
         uses: appleboy/ssh-action@v0.1.5
@@ -81,31 +82,37 @@ jobs:
             cat > .env << EOF
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             JWT_KEY=${{ secrets.JWT_KEY }}
+            DOMAIN_NAME=${{ secrets.DOMAIN_NAME }}
+            ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
             EOF
+
+            # Process nginx config with domain substitution
+            sed "s/\${DOMAIN_NAME}/${{ secrets.DOMAIN_NAME }}/g" nginx.conf > nginx.processed.conf
+            mv nginx.processed.conf nginx.conf
 
             # Create app directory and move files
             mkdir -p app
             mv *.dll *.json *.pdb *.deps.json *.runtimeconfig.json app/ 2>/dev/null || true
 
             # Stop existing containers
-            docker-compose down 2>/dev/null || true
+            docker compose down 2>/dev/null || true
 
             # Start services
-            docker-compose up -d
+            docker compose up -d
 
             # Wait for services to be ready
             echo "Waiting for services to start..."
             sleep 10
 
             # Check service status
-            docker-compose ps
-            docker-compose logs --tail=20
+            docker compose ps
+            docker compose logs --tail=20
 
             # Test the API
             echo "Testing API endpoint..."
-            sleep 5
-            curl -f http://localhost:5000/health || echo "Health check endpoint not available"
-            curl -f http://localhost:5000/ || echo "API is starting up..."
+            sleep 10
+            curl -f https://${{ secrets.DOMAIN_NAME }}/ || echo "HTTPS API is starting up..."
+            curl -f https://${{ secrets.DOMAIN_NAME }}/health || echo "Health check endpoint not available"
 
             # Show running containers
             docker ps
