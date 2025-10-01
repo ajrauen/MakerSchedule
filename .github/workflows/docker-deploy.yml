@@ -136,15 +136,32 @@ jobs:
             }
             EOF
 
-            # Create app directory and copy all files (preserve structure)
+            # Create app directory and copy application files first (before containers start)
             mkdir -p app
-            # Copy all files from the publish directory to preserve dependencies
-            cp -r * app/ 2>/dev/null || true
-            # Remove the nginx.conf from app directory to avoid confusion
-            rm -f app/nginx.conf app/docker-compose.yml app/.env
+
+            # Copy all application files (preserve structure)
+            cp MakerSchedule.API.dll app/
+            cp MakerSchedule.API.deps.json app/
+            cp MakerSchedule.API.runtimeconfig.json app/
+            cp MakerSchedule.API.staticwebassets.endpoints.json app/
+            cp MakerSchedule.API.pdb app/
+            cp MakerSchedule.Application.dll app/
+            cp MakerSchedule.Application.pdb app/
+            cp MakerSchedule.Domain.dll app/
+            cp MakerSchedule.Domain.pdb app/
+            cp MakerSchedule.Infrastructure.dll app/
+            cp MakerSchedule.Infrastructure.pdb app/
+            cp *.dll app/ 2>/dev/null || true
+            cp appsettings*.json app/
+            cp -r EmailTemplates app/ 2>/dev/null || true
+            cp -r runtimes app/ 2>/dev/null || true
+            cp web.config app/ 2>/dev/null || true
 
             # Create wwwroot directory for static files (required for Swagger UI)
             mkdir -p app/wwwroot
+
+            echo "Application files copied to app directory"
+            ls -la app/ | head -10
 
             # Create a temporary frontend directory with a simple index.html
             # This prevents nginx from failing when /var/www/makerschedule doesn't exist
