@@ -92,7 +92,7 @@ jobs:
             ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
             EOF
 
-            # Process nginx config (simple working version)
+            # Process nginx config (frontend + API version)
             cat > nginx.conf << 'EOF'
             events {
                 worker_connections 1024;
@@ -103,12 +103,31 @@ jobs:
                 }
                 server {
                     listen 80;
+                    
+                    # API endpoints (more specific routes first)
+                    location /api {
+                        proxy_pass http://api;
+                    }
+                    
+                    # Swagger UI
+                    location /swagger {
+                        proxy_pass http://swagger/index.html;
+                    }
+
+                    # Frontend static files
                     location / {
-                        proxy_pass http://api/;
+                        root /var/www/makerschedule;
+                        try_files $uri $uri/ /index.html;
+                        index index.html;
                     }
                 }
             }
             EOF
+
+            # Create frontend directory with a placeholder
+            sudo mkdir -p /var/www/makerschedule
+            echo '<html><body><h1>API is running, frontend pending...</h1><a href="/swagger/">API Docs</a></body></html>' | sudo tee /var/www/makerschedule/index.html > /dev/null
+            sudo chown -R www-data:www-data /var/www/makerschedule
 
             # Create app directory and copy application files (using working method)
             mkdir -p app
