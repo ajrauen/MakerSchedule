@@ -94,25 +94,21 @@ jobs:
             mkdir -p app
             mv *.dll *.json *.pdb *.deps.json *.runtimeconfig.json app/ 2>/dev/null || true
 
-            # Stop existing containers
-            docker compose down 2>/dev/null || true
-
-            # Start services
+            # Start services without SSL first
             docker compose up -d
 
             # Wait for services to be ready
             echo "Waiting for services to start..."
-            sleep 10
+            sleep 15
 
             # Check service status
             docker compose ps
             docker compose logs --tail=20
 
-            # Test the API
-            echo "Testing API endpoint..."
-            sleep 10
-            curl -f https://${{ secrets.DOMAIN_NAME }}/ || echo "HTTPS API is starting up..."
-            curl -f https://${{ secrets.DOMAIN_NAME }}/health || echo "Health check endpoint not available"
+            # Test the API via HTTP first
+            echo "Testing API endpoint via HTTP..."
+            curl -f http://${{ secrets.DOMAIN_NAME }}/ || echo "API is starting up..."
+            curl -f http://${{ secrets.DOMAIN_NAME }}/health || echo "Health check endpoint not available"
 
             # Show running containers
             docker ps
