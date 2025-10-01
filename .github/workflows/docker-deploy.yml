@@ -165,6 +165,24 @@ jobs:
             # Remove the nginx.conf from app directory to avoid confusion
             rm -f app/nginx.conf app/docker-compose.yml app/.env
 
+            # Create a temporary frontend directory with a simple index.html
+            # This prevents nginx from failing when /var/www/makerschedule doesn't exist
+            sudo mkdir -p /var/www/makerschedule
+            sudo tee /var/www/makerschedule/index.html > /dev/null << 'EOF'
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>MakerSchedule</title>
+            </head>
+            <body>
+                <h1>MakerSchedule API is running</h1>
+                <p>Frontend deployment is pending...</p>
+                <p><a href="/swagger/index.html">View API Documentation</a></p>
+            </body>
+            </html>
+            EOF
+            sudo chown -R www-data:www-data /var/www/makerschedule
+
             # Start services without SSL first
             echo "Stopping and removing existing containers..."
             docker compose down 2>/dev/null || true
