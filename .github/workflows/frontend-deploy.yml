@@ -30,9 +30,6 @@ jobs:
       - name: Build frontend
         working-directory: MakerScheduleFE
         run: npm run build
-        env:
-          NODE_ENV: production
-          VITE_SERVER_URI: /api
 
       - name: Create deployment package
         run: |

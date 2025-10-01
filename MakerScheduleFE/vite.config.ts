@@ -23,6 +23,13 @@ export default defineConfig(({ mode }) => ({
               path.resolve(__dirname, "../cert/localhost.pem")
             ),
           },
+          proxy: {
+            "/api": {
+              target: "https://localhost:7018",
+              changeOrigin: true,
+              secure: false,
+            },
+          },
         }
       : undefined,
 }));

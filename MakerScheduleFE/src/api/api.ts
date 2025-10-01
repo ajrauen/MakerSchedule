@@ -1,9 +1,8 @@
 import axios from "axios";
-import { SERVER_URI } from "@ms/common/env-constants";
 import type { AxiosRequestConfig, AxiosResponse } from "axios";
 
 const AxiosInstance = axios.create({
-  baseURL: SERVER_URI,
+  baseURL: "/",
   withCredentials: true,
 });
 
