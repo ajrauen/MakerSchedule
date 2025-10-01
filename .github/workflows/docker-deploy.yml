@@ -138,6 +138,7 @@ jobs:
             rm -f app/nginx.conf app/docker-compose.yml app/.env
 
             # Start services without SSL first
+            docker compose down
             docker compose up -d
 
             # Wait for services to be ready
