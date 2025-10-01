@@ -97,8 +97,13 @@ jobs:
             echo '<html><body><h1>API is running, frontend pending...</h1><a href="/swagger/">API Docs</a></body></html>' | sudo tee /var/www/makerschedule/index.html > /dev/null
             sudo chown -R www-data:www-data /var/www/makerschedule
 
-            # Create app directory and copy application files
+            # Stop containers first to release the app directory mount
+            echo "Stopping existing containers..."
+            docker compose down 2>/dev/null || true
+
+            # Now create app directory and copy application files (while containers are stopped)
             echo "Creating app directory..."
+            rm -rf app
             mkdir -p app
 
             # Copy all application files explicitly
@@ -142,10 +147,9 @@ jobs:
             EOF
             sudo chown -R www-data:www-data /var/www/makerschedule
 
-            # Start services without SSL first
-            echo "Restarting services with new files..."
-            # Use restart instead of down to preserve mounted volumes
-            docker compose up -d --force-recreate
+            # Now start containers - they will mount the populated app directory
+            echo "Starting containers with populated app directory..."
+            docker compose up -d
 
             # Wait for services to be ready
             echo "Waiting for services to start..."
