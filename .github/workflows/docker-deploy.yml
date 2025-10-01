@@ -101,29 +101,29 @@ jobs:
             echo "Stopping existing containers..."
             docker compose down 2>/dev/null || true
 
-            # Now create app directory and copy application files (while containers are stopped)
-            echo "Creating app directory..."
-            rm -rf app
+            # Clean and prepare app directory (don't delete it, just clear contents)
+            echo "Preparing app directory..."
             mkdir -p app
+            rm -rf app/*
 
             # Copy all application files explicitly
             echo "Copying application files..."
-            find . -maxdepth 1 -name "*.dll" -exec cp {} app/ \;
-            find . -maxdepth 1 -name "*.json" -exec cp {} app/ \;
-            find . -maxdepth 1 -name "*.pdb" -exec cp {} app/ \;
-            cp MakerSchedule.API app/ 2>/dev/null || echo "Warning: MakerSchedule.API not found"
+            cp *.dll app/
+            cp *.json app/
+            cp *.pdb app/ 2>/dev/null || true
+            cp MakerSchedule.API app/
 
             # Copy directories if they exist
-            [ -d "EmailTemplates" ] && cp -r EmailTemplates app/ || echo "Warning: EmailTemplates not found"
-            [ -d "runtimes" ] && cp -r runtimes app/ || echo "Warning: runtimes not found"
-            [ -d "wwwroot" ] && cp -r wwwroot app/ || mkdir -p app/wwwroot
+            cp -r EmailTemplates app/ 2>/dev/null || echo "Warning: EmailTemplates not found"
+            cp -r runtimes app/ 2>/dev/null || echo "Warning: runtimes not found"
+            cp -r wwwroot app/ 2>/dev/null || mkdir -p app/wwwroot
 
             echo "Files copied. Verifying critical files..."
             ls -la app/ | head -20
             echo "Checking for JWT library..."
             ls -la app/System.IdentityModel.Tokens.Jwt.dll 2>/dev/null && echo "JWT library found!" || echo "ERROR: JWT library missing!"
             echo "Total files in app directory:"
-            find app/ -type f | wc -l
+            ls app/ | wc -l
 
             # Verify nginx.conf is using the correct version from repository
             echo "Checking nginx.conf file..."
@@ -150,23 +150,6 @@ jobs:
             # Now start containers - they will mount the populated app directory
             echo "Starting containers with populated app directory..."
             docker compose up -d
-
-            # Wait for containers to be created
-            echo "Waiting for containers to be created..."
-            sleep 5
-
-            # Copy files directly into the running container (this bypasses mount issues)
-            echo "Copying files directly into API container..."
-            docker cp ./app/. makerschedule_api:/app/
-
-            # Verify files were copied into container
-            echo "Verifying files in container..."
-            docker exec makerschedule_api ls -la /app/ | head -20
-            docker exec makerschedule_api ls -la /app/System.IdentityModel.Tokens.Jwt.dll && echo "JWT library found in container!" || echo "ERROR: JWT library missing in container!"
-
-            # Restart API container to pick up the new files
-            echo "Restarting API container to use new files..."
-            docker compose restart api
 
             # Wait for services to be ready
             echo "Waiting for services to start..."
