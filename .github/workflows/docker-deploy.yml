@@ -151,6 +151,23 @@ jobs:
             echo "Starting containers with populated app directory..."
             docker compose up -d
 
+            # Wait for containers to be created
+            echo "Waiting for containers to be created..."
+            sleep 5
+
+            # Copy files directly into the running container (this bypasses mount issues)
+            echo "Copying files directly into API container..."
+            docker cp ./app/. makerschedule_api:/app/
+
+            # Verify files were copied into container
+            echo "Verifying files in container..."
+            docker exec makerschedule_api ls -la /app/ | head -20
+            docker exec makerschedule_api ls -la /app/System.IdentityModel.Tokens.Jwt.dll && echo "JWT library found in container!" || echo "ERROR: JWT library missing in container!"
+
+            # Restart API container to pick up the new files
+            echo "Restarting API container to use new files..."
+            docker compose restart api
+
             # Wait for services to be ready
             echo "Waiting for services to start..."
             sleep 30
