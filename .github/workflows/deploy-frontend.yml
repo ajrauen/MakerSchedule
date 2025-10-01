@@ -42,10 +42,13 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-          timeout: 60s
-          command_timeout: 60s
+          timeout: 120s
+          command_timeout: 120s
           script: |
             echo "Starting frontend deployment..."
+
+            # Wait a moment to avoid overwhelming SSH
+            sleep 5
 
             # Create frontend directory if it doesn't exist
             sudo mkdir -p /var/www/makerschedule
@@ -65,7 +68,8 @@ jobs:
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
           source: "frontend-dist.tar.gz"
           target: "/tmp/"
-          timeout: 120s
+          timeout: 180s
+          command_timeout: 180s
 
       - name: Extract and deploy files
         uses: appleboy/ssh-action@v0.1.5
@@ -74,8 +78,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
-          timeout: 60s
-          command_timeout: 60s
+          timeout: 120s
+          command_timeout: 120s
           script: |
             echo "Extracting frontend files..."
             cd /tmp
