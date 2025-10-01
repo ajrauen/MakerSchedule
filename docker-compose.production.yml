@@ -29,10 +29,10 @@ services:
         condition: service_healthy
     expose:
       - "5000"
-    volumes:
-      - ./app:/app
+    # volumes:
+    #   - ./app:/app
     working_dir: /app
-    command: dotnet MakerSchedule.API.dll --urls "http://0.0.0.0:5000"
+    command: sh -c "sleep infinity" # Keep container running so we can copy files
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=makerschedule;Username=appuser;Password=${DB_PASSWORD}

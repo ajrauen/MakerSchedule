@@ -147,9 +147,26 @@ jobs:
             EOF
             sudo chown -R www-data:www-data /var/www/makerschedule
 
-            # Now start containers - they will mount the populated app directory
-            echo "Starting containers with populated app directory..."
+            # Now start containers - they will keep running
+            echo "Starting containers..."
             docker compose up -d
+
+            # Wait for containers to be created
+            echo "Waiting for containers to be created..."
+            sleep 10
+
+            # Copy files into the running container
+            echo "Copying application files into container..."
+            docker cp app/. makerschedule_api:/app/
+
+            # Verify files were copied
+            echo "Verifying files in container..."
+            docker exec makerschedule_api ls -la /app/ | head -20
+            docker exec makerschedule_api ls -la /app/System.IdentityModel.Tokens.Jwt.dll && echo "JWT library found in container!" || echo "ERROR: JWT library missing in container!"
+
+            # Now start the actual application
+            echo "Starting the .NET application..."
+            docker exec -d makerschedule_api dotnet MakerSchedule.API.dll --urls "http://0.0.0.0:5000"
 
             # Wait for services to be ready
             echo "Waiting for services to start..."
