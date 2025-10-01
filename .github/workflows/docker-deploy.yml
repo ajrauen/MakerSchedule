@@ -165,6 +165,9 @@ jobs:
             # Remove the nginx.conf from app directory to avoid confusion
             rm -f app/nginx.conf app/docker-compose.yml app/.env
 
+            # Create wwwroot directory for static files (required for Swagger UI)
+            mkdir -p app/wwwroot
+
             # Create a temporary frontend directory with a simple index.html
             # This prevents nginx from failing when /var/www/makerschedule doesn't exist
             sudo mkdir -p /var/www/makerschedule
