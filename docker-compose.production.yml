@@ -38,6 +38,8 @@ services:
       - Jwt__Key=${JWT_KEY}
       - UseAzureKeyVault=false
       - UseAzureStorage=false
+    volumes:
+      - api_wwwroot:/app/wwwroot
     restart: unless-stopped
     networks:
       - makerschedule-network
@@ -69,6 +71,7 @@ services:
 
 volumes:
   postgres_data:
+  api_wwwroot:
   certbot_webroot:
   certbot_certs:
 

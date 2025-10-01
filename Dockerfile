@@ -11,8 +11,8 @@ COPY ./MakerSchedule.API ./
 COPY ./runtimes ./runtimes/
 COPY ./EmailTemplates ./EmailTemplates/
 
-# Create wwwroot directory
-RUN mkdir -p wwwroot
+# Create wwwroot directory structure for image uploads
+RUN mkdir -p wwwroot/images/events
 
 # Expose port
 EXPOSE 5000

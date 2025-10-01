@@ -93,10 +93,15 @@ jobs:
             ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
             EOF
 
-            # Create frontend directory with a placeholder
-            sudo mkdir -p /var/www/makerschedule
-            echo '<html><body><h1>API is running, frontend pending...</h1><a href="/swagger/">API Docs</a></body></html>' | sudo tee /var/www/makerschedule/index.html > /dev/null
-            sudo chown -R www-data:www-data /var/www/makerschedule
+            # Create frontend directory only if it doesn't exist
+            if [ ! -d /var/www/makerschedule ] || [ ! -f /var/www/makerschedule/index.html ]; then
+              echo "Frontend not deployed yet, creating placeholder..."
+              sudo mkdir -p /var/www/makerschedule
+              echo '<html><body><h1>API is running, frontend pending...</h1><a href="/swagger/">API Docs</a></body></html>' | sudo tee /var/www/makerschedule/index.html > /dev/null
+              sudo chown -R www-data:www-data /var/www/makerschedule
+            else
+              echo "Frontend already exists, keeping it..."
+            fi
 
             # Stop containers first
             echo "Stopping existing containers..."
@@ -110,24 +115,6 @@ jobs:
             # Verify nginx.conf is using the correct version from repository
             echo "Checking nginx.conf file..."
             head -20 nginx.conf
-
-            # Create a temporary frontend directory with a simple index.html
-            # This prevents nginx from failing when /var/www/makerschedule doesn't exist
-            sudo mkdir -p /var/www/makerschedule
-            sudo tee /var/www/makerschedule/index.html > /dev/null << 'EOF'
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>MakerSchedule</title>
-            </head>
-            <body>
-                <h1>MakerSchedule API is running</h1>
-                <p>Frontend deployment is pending...</p>
-                <p><a href="/swagger/index.html">View API Documentation</a></p>
-            </body>
-            </html>
-            EOF
-            sudo chown -R www-data:www-data /var/www/makerschedule
 
             # Build and start containers with the custom image
             echo "Building custom Docker image with application files..."
