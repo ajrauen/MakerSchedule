@@ -130,9 +130,12 @@ jobs:
             }
             EOF
 
-            # Create app directory and move files
+            # Create app directory and copy all files (preserve structure)
             mkdir -p app
-            mv *.dll *.json *.pdb *.deps.json *.runtimeconfig.json app/ 2>/dev/null || true
+            # Copy all files from the publish directory to preserve dependencies
+            cp -r * app/ 2>/dev/null || true
+            # Remove the nginx.conf from app directory to avoid confusion
+            rm -f app/nginx.conf app/docker-compose.yml app/.env
 
             # Start services without SSL first
             docker compose up -d
