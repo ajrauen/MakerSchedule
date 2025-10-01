@@ -100,7 +100,11 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
-app.UseHttpsRedirection();
+// Only redirect to HTTPS in production if SSL is properly configured
+if (!app.Environment.IsDevelopment() && app.Configuration["HTTPS_ENABLED"] == "true")
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles(); 
 app.UseRouting();
 app.UseCors("AllowAll");
