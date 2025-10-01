@@ -125,12 +125,13 @@ jobs:
                         root /var/www/makerschedule;
                         try_files \$uri \$uri/ /index.html;
                         index index.html;
-                        
-                        # Cache static assets
-                        location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)\$ {
-                            expires 1y;
-                            add_header Cache-Control "public, immutable";
-                        }
+                    }
+                    
+                    # Cache static assets (separate location block)
+                    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)\$ {
+                        root /var/www/makerschedule;
+                        expires 1y;
+                        add_header Cache-Control "public, immutable";
                     }
 
                     # API endpoints
