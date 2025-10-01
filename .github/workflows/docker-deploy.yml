@@ -97,24 +97,32 @@ jobs:
             echo '<html><body><h1>API is running, frontend pending...</h1><a href="/swagger/">API Docs</a></body></html>' | sudo tee /var/www/makerschedule/index.html > /dev/null
             sudo chown -R www-data:www-data /var/www/makerschedule
 
-            # Create app directory and copy application files (using working method)
+            # Create app directory and copy application files
+            echo "Creating app directory..."
             mkdir -p app
 
-            # Copy all application files using the method that worked manually
+            # Copy all application files explicitly
             echo "Copying application files..."
-            cp *.dll app/
-            cp *.json app/
-            cp *.config app/ 2>/dev/null || true
-            cp *.pdb app/ 2>/dev/null || true
-            cp MakerSchedule.API app/
-            cp -r EmailTemplates app/ 2>/dev/null || true
-            cp -r runtimes app/ 2>/dev/null || true
+            find . -maxdepth 1 -name "*.dll" -exec cp {} app/ \;
+            find . -maxdepth 1 -name "*.json" -exec cp {} app/ \;
+            find . -maxdepth 1 -name "*.pdb" -exec cp {} app/ \;
+            cp MakerSchedule.API app/ 2>/dev/null || echo "Warning: MakerSchedule.API not found"
 
-            # Create wwwroot directory for static files (required for Swagger UI)
-            mkdir -p app/wwwroot
+            # Copy directories if they exist
+            [ -d "EmailTemplates" ] && cp -r EmailTemplates app/ || echo "Warning: EmailTemplates not found"
+            [ -d "runtimes" ] && cp -r runtimes app/ || echo "Warning: runtimes not found"
+            [ -d "wwwroot" ] && cp -r wwwroot app/ || mkdir -p app/wwwroot
 
-            echo "Files copied. App directory contents:"
-            ls -la app/ | head -15
+            echo "Files copied. Verifying critical files..."
+            ls -la app/ | head -20
+            echo "Checking for JWT library..."
+            ls -la app/System.IdentityModel.Tokens.Jwt.dll 2>/dev/null && echo "JWT library found!" || echo "ERROR: JWT library missing!"
+            echo "Total files in app directory:"
+            find app/ -type f | wc -l
+
+            # Verify nginx.conf is using the correct version from repository
+            echo "Checking nginx.conf file..."
+            head -20 nginx.conf
 
             # Create a temporary frontend directory with a simple index.html
             # This prevents nginx from failing when /var/www/makerschedule doesn't exist
