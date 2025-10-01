@@ -166,12 +166,23 @@ jobs:
             rm -f app/nginx.conf app/docker-compose.yml app/.env
 
             # Start services without SSL first
-            docker compose down
+            echo "Stopping and removing existing containers..."
+            docker compose down 2>/dev/null || true
+
+            # Remove any existing containers with the same names
+            docker stop makerschedule_postgres makerschedule_api makerschedule_nginx makerschedule_certbot 2>/dev/null || true
+            docker rm makerschedule_postgres makerschedule_api makerschedule_nginx makerschedule_certbot 2>/dev/null || true
+
+            # Start new containers
             docker compose up -d
 
             # Wait for services to be ready
             echo "Waiting for services to start..."
-            sleep 15
+            sleep 30
+
+            # Check if containers are running
+            echo "Container status:"
+            docker ps -a
 
             # Check service status
             docker compose ps
@@ -179,8 +190,22 @@ jobs:
 
             # Test the API via HTTP first
             echo "Testing API endpoint via HTTP..."
+
+            # Check if nginx is running and listening
+            echo "Checking if nginx is listening on port 80..."
+            netstat -tlnp | grep :80 || echo "Nothing listening on port 80"
+
+            # Try to connect to the domain
             curl -f http://${{ secrets.DOMAIN_NAME }}/ || echo "API is starting up..."
             curl -f http://${{ secrets.DOMAIN_NAME }}/health || echo "Health check endpoint not available"
+
+            # If connection failed, check nginx logs
+            echo "Nginx container logs:"
+            docker logs makerschedule_nginx 2>/dev/null || echo "Nginx container not found"
+
+            # Check API container logs
+            echo "API container logs:"
+            docker logs makerschedule_api 2>/dev/null || echo "API container not found"
 
             # Show running containers
             docker ps
