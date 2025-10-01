@@ -86,9 +86,49 @@ jobs:
             ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL }}
             EOF
 
-            # Process nginx config with domain substitution
-            sed "s/\${DOMAIN_NAME}/${{ secrets.DOMAIN_NAME }}/g" nginx.conf > nginx.processed.conf
-            mv nginx.processed.conf nginx.conf
+            # Process nginx config with domain substitution (preserve nginx variables)
+            cat > nginx.conf << 'EOF'
+            events {
+                worker_connections 1024;
+            }
+
+            http {
+                include       /etc/nginx/mime.types;
+                default_type  application/octet-stream;
+
+                # Rate limiting
+                limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+
+                # Upstream for API
+                upstream api {
+                    server makerschedule_api:5000;
+                }
+
+                # HTTP server
+                server {
+                    listen 80;
+                    server_name ${{ secrets.DOMAIN_NAME }};
+
+                    # Let's Encrypt challenge
+                    location /.well-known/acme-challenge/ {
+                        root /var/www/certbot;
+                    }
+
+                    # API proxy for HTTP (fallback until SSL is ready)
+                    location / {
+                        limit_req zone=api burst=20 nodelay;
+                        proxy_pass http://api/;
+                        proxy_set_header Host $host;
+                        proxy_set_header X-Real-IP $remote_addr;
+                        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                        proxy_set_header X-Forwarded-Proto $scheme;
+                        proxy_connect_timeout 30s;
+                        proxy_send_timeout 30s;
+                        proxy_read_timeout 30s;
+                    }
+                }
+            }
+            EOF
 
             # Create app directory and move files
             mkdir -p app
