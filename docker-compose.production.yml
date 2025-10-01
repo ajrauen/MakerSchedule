@@ -22,17 +22,16 @@ services:
       - makerschedule-network
 
   api:
-    image: mcr.microsoft.com/dotnet/aspnet:8.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: makerschedule_api:latest
     container_name: makerschedule_api
     depends_on:
       postgres:
         condition: service_healthy
     expose:
       - "5000"
-    # volumes:
-    #   - ./app:/app
-    working_dir: /app
-    command: sh -c "sleep infinity" # Keep container running so we can copy files
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=Host=postgres;Port=5432;Database=makerschedule;Username=appuser;Password=${DB_PASSWORD}

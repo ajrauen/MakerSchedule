@@ -97,33 +97,14 @@ jobs:
             echo '<html><body><h1>API is running, frontend pending...</h1><a href="/swagger/">API Docs</a></body></html>' | sudo tee /var/www/makerschedule/index.html > /dev/null
             sudo chown -R www-data:www-data /var/www/makerschedule
 
-            # Stop containers first to release the app directory mount
+            # Stop containers first
             echo "Stopping existing containers..."
             docker compose down 2>/dev/null || true
 
-            # Clean and prepare app directory (don't delete it, just clear contents)
-            echo "Preparing app directory..."
-            mkdir -p app
-            rm -rf app/*
-
-            # Copy all application files explicitly
-            echo "Copying application files..."
-            cp *.dll app/
-            cp *.json app/
-            cp *.pdb app/ 2>/dev/null || true
-            cp MakerSchedule.API app/
-
-            # Copy directories if they exist
-            cp -r EmailTemplates app/ 2>/dev/null || echo "Warning: EmailTemplates not found"
-            cp -r runtimes app/ 2>/dev/null || echo "Warning: runtimes not found"
-            cp -r wwwroot app/ 2>/dev/null || mkdir -p app/wwwroot
-
-            echo "Files copied. Verifying critical files..."
-            ls -la app/ | head -20
-            echo "Checking for JWT library..."
-            ls -la app/System.IdentityModel.Tokens.Jwt.dll 2>/dev/null && echo "JWT library found!" || echo "ERROR: JWT library missing!"
-            echo "Total files in app directory:"
-            ls app/ | wc -l
+            # The published files are already here from the SCP step
+            # Docker will build the image using the Dockerfile which copies from ./publish/
+            echo "Application files ready for Docker build..."
+            ls -la | head -20
 
             # Verify nginx.conf is using the correct version from repository
             echo "Checking nginx.conf file..."
@@ -147,32 +128,16 @@ jobs:
             EOF
             sudo chown -R www-data:www-data /var/www/makerschedule
 
-            # Now start containers - they will keep running
+            # Build and start containers with the custom image
+            echo "Building custom Docker image with application files..."
+            docker compose build api
+
             echo "Starting containers..."
             docker compose up -d
 
-            # Wait for containers to be created
-            echo "Waiting for containers to be created..."
-            sleep 10
-
-            # Copy files into the running container
-            echo "Copying application files into container..."
-            docker cp app/. makerschedule_api:/app/
-
-            # Verify files were copied
-            echo "Verifying files in container..."
-            docker exec makerschedule_api ls -la /app/ | head -20
-            docker exec makerschedule_api ls -la /app/System.IdentityModel.Tokens.Jwt.dll && echo "JWT library found in container!" || echo "ERROR: JWT library missing in container!"
-
-            # Now start the actual application
-            echo "Starting the .NET application..."
-            docker exec -d makerschedule_api dotnet MakerSchedule.API.dll --urls "http://0.0.0.0:5000"
-
             # Wait for services to be ready
             echo "Waiting for services to start..."
-            sleep 30
-
-            # Check if containers are running
+            sleep 30            # Check if containers are running
             echo "Container status:"
             docker ps -a
 
