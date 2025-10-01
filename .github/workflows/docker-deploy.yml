@@ -39,6 +39,7 @@ jobs:
           cp -r publish/* deployment/
           cp docker-compose.production.yml deployment/docker-compose.yml
           cp nginx.conf deployment/
+          cp Dockerfile deployment/
 
       - name: Test SSH Connection
         uses: appleboy/ssh-action@v0.1.5
