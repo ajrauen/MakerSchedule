@@ -78,18 +78,18 @@
       when: not frontend_exists.stat.exists
 
     - name: Build Docker image
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ deploy_dir }}"
-        build: yes
+        build: always
         services:
           - api
       register: build_result
 
     - name: Start Docker containers
-      community.docker.docker_compose:
+      community.docker.docker_compose_v2:
         project_src: "{{ deploy_dir }}"
         state: present
-        restarted: yes
+        recreate: always
       register: deploy_result
 
     - name: Wait for API to be healthy
@@ -127,7 +127,7 @@
     - name: Rollback on failure
       block:
         - name: Stop failed containers
-          community.docker.docker_compose:
+          community.docker.docker_compose_v2:
             project_src: "{{ deploy_dir }}"
             state: absent
 
