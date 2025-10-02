@@ -1,0 +1,85 @@
+name: Deploy Frontend with Ansible
+
+on:
+  # Disabled auto-trigger for now - use manual trigger or enable when ready
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - "MakerScheduleFE/**"
+  #     - "ansible/**"
+  #     - ".github/workflows/ansible-deploy-frontend.yml"
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: MakerScheduleFE/package-lock.json
+
+      - name: Install dependencies
+        working-directory: MakerScheduleFE
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: MakerScheduleFE
+        run: npm run build
+
+      - name: Copy frontend build and Ansible files to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          source: "MakerScheduleFE/dist/*,ansible/*"
+          target: "/tmp/ansible-frontend-deploy"
+          strip_components: 0
+          timeout: 120s
+
+      - name: Run Ansible Playbook on VPS
+        uses: appleboy/ssh-action@v0.1.5
+        env:
+          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          timeout: 300s
+          command_timeout: 600s
+          envs: DOMAIN_NAME
+          script: |
+            cd /tmp/ansible-frontend-deploy
+
+            # Install Ansible if not present
+            if ! command -v ansible &> /dev/null; then
+              echo "Installing Ansible..."
+              sudo apt-get update
+              sudo apt-get install -y ansible rsync
+              ansible-galaxy collection install community.docker:>=3.0.0
+            fi
+
+            # Run playbook with environment variables
+            export DOMAIN_NAME="${DOMAIN_NAME}"
+
+            # Run on localhost (we're already on the server)
+            ansible-playbook -i "localhost," -c local ansible/deploy-frontend.yml \
+              -e "frontend_dir=/var/www/makerschedule" \
+              -e "frontend_build_dir=/tmp/ansible-frontend-deploy/MakerScheduleFE/dist" \
+              -e "domain_name=${DOMAIN_NAME}" \
+              -e "ansible_python_interpreter=/usr/bin/python3"
+
+            # Cleanup
+            rm -rf /tmp/ansible-frontend-deploy
+
+      - name: Cleanup
+        if: always()
+        run: echo "Frontend deployment completed"

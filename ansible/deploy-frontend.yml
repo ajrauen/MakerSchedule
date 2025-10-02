@@ -3,10 +3,11 @@
 # Usage: ansible-playbook -i inventory/production.yml deploy-frontend.yml
 
 - name: Deploy MakerSchedule Frontend
-  hosts: production
+  hosts: all
   become: yes
   vars:
     frontend_dir: /var/www/makerschedule
+    frontend_build_dir: ../MakerScheduleFE/dist
     app_user: www-data
 
   tasks:
@@ -14,8 +15,10 @@
       command: cp -r {{ frontend_dir }} {{ frontend_dir }}.backup
       args:
         creates: "{{ frontend_dir }}.backup"
-      when: frontend_dir is directory
       ignore_errors: yes
+      when:
+        - frontend_dir is defined
+        - ansible_os_family == "Debian"
 
     - name: Ensure frontend directory exists
       file:
@@ -26,14 +29,14 @@
         mode: "0755"
 
     - name: Copy frontend build files
-      synchronize:
-        src: ../MakerScheduleFE/dist/
+      copy:
+        src: "{{ frontend_build_dir }}/"
         dest: "{{ frontend_dir }}/"
-        delete: yes
-        owner: no
-        group: no
-        rsync_opts:
-          - "--chown={{ app_user }}:{{ app_user }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: "0755"
+        remote_src: yes
+      when: frontend_build_dir is defined
 
     - name: Set proper permissions
       file:
@@ -47,7 +50,7 @@
       command: docker exec makerschedule_nginx nginx -t
       register: nginx_test
       changed_when: false
-
+      ignore_errors: yes
     - name: Reload nginx
       command: docker exec makerschedule_nginx nginx -s reload
       when: nginx_test.rc == 0
