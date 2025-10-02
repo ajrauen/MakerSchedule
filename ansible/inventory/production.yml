@@ -1,0 +1,21 @@
+---
+# Production Inventory
+production:
+  hosts:
+    makerschedule_vps:
+      ansible_host: 159.65.105.67
+      ansible_user: root
+      ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+      ansible_python_interpreter: /usr/bin/python3
+
+      # Application variables
+      domain_name: makerschedule.duckdns.org
+      app_environment: Production
+
+      # Paths
+      deploy_dir: /tmp/makerschedule-deploy
+      frontend_dir: /var/www/makerschedule
+
+  vars:
+    # Common variables for all production hosts
+    ansible_ssh_common_args: "-o StrictHostKeyChecking=no"

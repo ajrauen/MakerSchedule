@@ -1,0 +1,141 @@
+---
+# MakerSchedule Backend Deployment Playbook
+# Usage: ansible-playbook -i inventory/production.yml deploy-backend.yml
+
+- name: Deploy MakerSchedule Backend API
+  hosts: production
+  become: yes
+  vars:
+    deploy_dir: /tmp/makerschedule-deploy
+    app_user: www-data
+
+  tasks:
+    - name: Ensure deployment directory exists
+      file:
+        path: "{{ deploy_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Copy application files
+      synchronize:
+        src: ../publish/
+        dest: "{{ deploy_dir }}/"
+        delete: yes
+        rsync_opts:
+          - "--exclude=*.pdb"
+          - "--exclude=appsettings.Development.json"
+
+    - name: Copy Docker configuration files
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ deploy_dir }}/{{ item.dest }}"
+        mode: "0644"
+      loop:
+        - {
+            src: "../docker-compose.production.yml",
+            dest: "docker-compose.yml",
+          }
+        - { src: "../Dockerfile", dest: "Dockerfile" }
+        - { src: "../nginx.conf", dest: "nginx.conf" }
+
+    - name: Create .env file from GitHub Secrets
+      copy:
+        content: |
+          DB_PASSWORD={{ lookup('env', 'DB_PASSWORD') }}
+          JWT_KEY={{ lookup('env', 'JWT_KEY') }}
+          DOMAIN_NAME={{ lookup('env', 'DOMAIN_NAME') }}
+          ADMIN_EMAIL={{ lookup('env', 'ADMIN_EMAIL') }}
+        dest: "{{ deploy_dir }}/.env"
+        mode: "0600"
+
+    - name: Check if frontend exists (don't overwrite)
+      stat:
+        path: /var/www/makerschedule/index.html
+      register: frontend_exists
+
+    - name: Create placeholder frontend (only if not exists)
+      block:
+        - name: Create frontend directory
+          file:
+            path: /var/www/makerschedule
+            state: directory
+            owner: "{{ app_user }}"
+            group: "{{ app_user }}"
+            mode: "0755"
+
+        - name: Create placeholder index.html
+          copy:
+            content: |
+              <html>
+              <body>
+                <h1>API is running, frontend pending...</h1>
+                <a href="/swagger/">API Docs</a>
+              </body>
+              </html>
+            dest: /var/www/makerschedule/index.html
+            owner: "{{ app_user }}"
+            group: "{{ app_user }}"
+      when: not frontend_exists.stat.exists
+
+    - name: Build Docker image
+      community.docker.docker_compose:
+        project_src: "{{ deploy_dir }}"
+        build: yes
+        services:
+          - api
+      register: build_result
+
+    - name: Start Docker containers
+      community.docker.docker_compose:
+        project_src: "{{ deploy_dir }}"
+        state: present
+        restarted: yes
+      register: deploy_result
+
+    - name: Wait for API to be healthy
+      uri:
+        url: "https://{{ domain_name }}/api/health"
+        status_code: 200
+      register: health_check
+      retries: 10
+      delay: 3
+      until: health_check.status == 200
+      ignore_errors: yes
+
+    - name: Check container status
+      community.docker.docker_container_info:
+        name: makerschedule_api
+      register: api_container
+
+    - name: Display deployment status
+      debug:
+        msg: |
+          Deployment Status: {{ 'SUCCESS' if api_container.container.State.Status == 'running' else 'FAILED' }}
+          Container Status: {{ api_container.container.State.Status }}
+          Health: {{ 'OK' if health_check.status == 200 else 'UNHEALTHY' }}
+
+    - name: Get container logs (if failed)
+      command: docker logs makerschedule_api --tail=50
+      register: container_logs
+      when: api_container.container.State.Status != 'running' or health_check.status != 200
+
+    - name: Display error logs
+      debug:
+        msg: "{{ container_logs.stdout_lines }}"
+      when: container_logs is defined
+
+    - name: Rollback on failure
+      block:
+        - name: Stop failed containers
+          community.docker.docker_compose:
+            project_src: "{{ deploy_dir }}"
+            state: absent
+
+        - name: Fail deployment
+          fail:
+            msg: "Deployment failed! Containers rolled back."
+      when: api_container.container.State.Status != 'running'
+
+    - name: Cleanup old Docker images
+      command: docker image prune -f
+      when: deploy_result.changed

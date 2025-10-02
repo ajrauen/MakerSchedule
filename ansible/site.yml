@@ -1,0 +1,29 @@
+---
+# Complete site deployment playbook
+# Deploys both backend and frontend
+
+- import_playbook: deploy-backend.yml
+- import_playbook: deploy-frontend.yml
+
+- name: Post-deployment checks
+  hosts: production
+  tasks:
+    - name: Verify full stack is running
+      uri:
+        url: "https://{{ domain_name }}/{{ item }}"
+        status_code: 200
+      loop:
+        - "" # Frontend
+        - "api/health" # Backend health
+        - "swagger/index.html" # API docs
+
+    - name: Display deployment summary
+      debug:
+        msg: |
+          ✅ MakerSchedule Deployment Complete!
+
+          Frontend: https://{{ domain_name }}
+          API Docs: https://{{ domain_name }}/swagger
+          API Health: https://{{ domain_name }}/api/health
+
+          Deployment Time: {{ ansible_date_time.iso8601 }}

@@ -1,0 +1,57 @@
+name: Deploy with Ansible
+
+on:
+  #   push:
+  #     branches: [main]
+  #     paths:
+  #       - "MakeScheduleBE/**"
+  #       - "ansible/**"
+  #       - ".github/workflows/ansible-deploy.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build and Publish
+        run: |
+          dotnet restore MakeScheduleBE/MakerSchedule.sln
+          dotnet build MakeScheduleBE/MakerSchedule.sln --configuration Release --no-restore
+          dotnet publish MakeScheduleBE/MakerSchedule.API/MakerSchedule.API.csproj --configuration Release --output ./publish --no-build
+
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+          ansible-galaxy collection install community.docker
+
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy with Ansible
+        env:
+          # Pass GitHub Secrets as environment variables
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ANSIBLE_HOST_KEY_CHECKING: "False"
+        run: |
+          cd ansible
+          ansible-playbook -i inventory/production.yml deploy-backend.yml
+
+      - name: Cleanup
+        if: always()
+        run: rm -f ~/.ssh/id_ed25519

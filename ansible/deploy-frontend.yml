@@ -1,0 +1,77 @@
+---
+# MakerSchedule Frontend Deployment Playbook
+# Usage: ansible-playbook -i inventory/production.yml deploy-frontend.yml
+
+- name: Deploy MakerSchedule Frontend
+  hosts: production
+  become: yes
+  vars:
+    frontend_dir: /var/www/makerschedule
+    app_user: www-data
+
+  tasks:
+    - name: Create backup of existing frontend
+      command: cp -r {{ frontend_dir }} {{ frontend_dir }}.backup
+      args:
+        creates: "{{ frontend_dir }}.backup"
+      when: frontend_dir is directory
+      ignore_errors: yes
+
+    - name: Ensure frontend directory exists
+      file:
+        path: "{{ frontend_dir }}"
+        state: directory
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: "0755"
+
+    - name: Copy frontend build files
+      synchronize:
+        src: ../MakerScheduleFE/dist/
+        dest: "{{ frontend_dir }}/"
+        delete: yes
+        owner: no
+        group: no
+        rsync_opts:
+          - "--chown={{ app_user }}:{{ app_user }}"
+
+    - name: Set proper permissions
+      file:
+        path: "{{ frontend_dir }}"
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: "0755"
+        recurse: yes
+
+    - name: Test nginx configuration
+      command: docker exec makerschedule_nginx nginx -t
+      register: nginx_test
+      changed_when: false
+
+    - name: Reload nginx
+      command: docker exec makerschedule_nginx nginx -s reload
+      when: nginx_test.rc == 0
+
+    - name: Verify deployment
+      uri:
+        url: "https://{{ domain_name }}/"
+        status_code: 200
+      register: frontend_check
+      retries: 3
+      delay: 2
+
+    - name: Display deployment result
+      debug:
+        msg: "Frontend deployed successfully! Visit https://{{ domain_name }}"
+      when: frontend_check.status == 200
+
+    - name: Rollback on failure
+      block:
+        - name: Restore backup
+          command: rsync -a --delete {{ frontend_dir }}.backup/ {{ frontend_dir }}/
+          when: frontend_dir + '.backup' is directory
+
+        - name: Fail deployment
+          fail:
+            msg: "Frontend deployment failed! Rolled back to previous version."
+      when: frontend_check.status != 200
