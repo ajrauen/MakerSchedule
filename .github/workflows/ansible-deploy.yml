@@ -32,38 +32,54 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ansible rsync
           ansible-galaxy collection install community.docker:>=3.0.0
+      - name: Copy Ansible files to VPS
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          source: "ansible/*,publish/*,Dockerfile,docker-compose.production.yml,nginx.conf"
+          target: "/tmp/ansible-deploy"
+          strip_components: 0
+          timeout: 120s
 
-      - name: Setup SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-
-          # Start SSH agent and add key with passphrase
-          eval $(ssh-agent -s)
-          echo "${{ secrets.VPS_SSH_PASSPHRASE }}" | SSH_ASKPASS_REQUIRE=never ssh-add ~/.ssh/id_ed25519 || \
-            DISPLAY=:0 SSH_ASKPASS=$(mktemp) sh -c 'echo "${{ secrets.VPS_SSH_PASSPHRASE }}" > $SSH_ASKPASS && chmod +x $SSH_ASKPASS && ssh-add ~/.ssh/id_ed25519'
-
-          # Add host to known_hosts
-          ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Test SSH Connection
-        run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} "echo 'SSH connection successful'"
-
-      - name: Deploy with Ansible
+      - name: Run Ansible Playbook on VPS
+        uses: appleboy/ssh-action@v0.1.5
         env:
-          # Pass GitHub Secrets as environment variables
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           JWT_KEY: ${{ secrets.JWT_KEY }}
           DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          ANSIBLE_HOST_KEY_CHECKING: "False"
-        run: |
-          cd ansible
-          # Override inventory host with GitHub secret
-          ansible-playbook -i inventory/production.yml deploy-backend.yml \
-            -e "ansible_host=${{ secrets.VPS_HOST }}"
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          passphrase: ${{ secrets.VPS_SSH_PASSPHRASE }}
+          timeout: 300s
+          command_timeout: 600s
+          envs: DB_PASSWORD,JWT_KEY,DOMAIN_NAME,ADMIN_EMAIL
+          script: |
+            cd /tmp/ansible-deploy
+
+            # Install Ansible if not present
+            if ! command -v ansible &> /dev/null; then
+              echo "Installing Ansible..."
+              sudo apt-get update
+              sudo apt-get install -y ansible
+              ansible-galaxy collection install community.docker:>=3.0.0
+            fi
+
+            # Run playbook with environment variables
+            export DB_PASSWORD="${DB_PASSWORD}"
+            export JWT_KEY="${JWT_KEY}"
+            export DOMAIN_NAME="${DOMAIN_NAME}"
+            export ADMIN_EMAIL="${ADMIN_EMAIL}"
+
+            # Run on localhost (we're already on the server)
+            ansible-playbook -i "localhost," -c local ansible/deploy-backend.yml \
+              -e "deploy_dir=/tmp/makerschedule-deploy" \
+              -e "ansible_python_interpreter=/usr/bin/python3"
 
       - name: Cleanup
         if: always()
