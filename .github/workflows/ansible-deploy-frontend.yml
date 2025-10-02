@@ -2,12 +2,12 @@ name: Deploy Frontend with Ansible
 
 on:
   # Disabled auto-trigger for now - use manual trigger or enable when ready
-  # push:
-  #   branches: [main]
-  #   paths:
-  #     - "MakerScheduleFE/**"
-  #     - "ansible/**"
-  #     - ".github/workflows/ansible-deploy-frontend.yml"
+  push:
+    branches: [main]
+    paths:
+      - "MakerScheduleFE/**"
+      - "ansible/**"
+      - ".github/workflows/ansible-deploy-frontend.yml"
   workflow_dispatch: # Manual trigger only
 
 jobs:
