@@ -38,7 +38,18 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+
+          # Start SSH agent and add key with passphrase
+          eval $(ssh-agent -s)
+          echo "${{ secrets.VPS_SSH_PASSPHRASE }}" | SSH_ASKPASS_REQUIRE=never ssh-add ~/.ssh/id_ed25519 || \
+            DISPLAY=:0 SSH_ASKPASS=$(mktemp) sh -c 'echo "${{ secrets.VPS_SSH_PASSPHRASE }}" > $SSH_ASKPASS && chmod +x $SSH_ASKPASS && ssh-add ~/.ssh/id_ed25519'
+
+          # Add host to known_hosts
           ssh-keyscan -H ${{ secrets.VPS_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Test SSH Connection
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.VPS_HOST }} "echo 'SSH connection successful'"
 
       - name: Deploy with Ansible
         env:
@@ -50,7 +61,9 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
           cd ansible
-          ansible-playbook -i inventory/production.yml deploy-backend.yml
+          # Override inventory host with GitHub secret
+          ansible-playbook -i inventory/production.yml deploy-backend.yml \
+            -e "ansible_host=${{ secrets.VPS_HOST }}"
 
       - name: Cleanup
         if: always()
