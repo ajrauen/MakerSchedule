@@ -2,15 +2,27 @@ import { sendRequest } from "@ms/api/api.utils";
 import type {
   DomainUser,
   RegisterDomainUserRequest,
+  UpdateDomainUserRequest,
 } from "@ms/types/domain-user.types";
 import type { AxiosRequestConfig } from "axios";
 
 const BASE_DOMAIN_USER_ENDPOINT = "api/domain-users";
 
+const getActiveUser = async () => {
+  const req: AxiosRequestConfig = {
+    method: "GET",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}`,
+    withCredentials: true,
+  };
+  const response = await sendRequest<DomainUser>(req);
+
+  return response.data;
+};
+
 const getDomainUserList = async () => {
   const req: AxiosRequestConfig = {
     method: "GET",
-    url: BASE_DOMAIN_USER_ENDPOINT,
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/all`,
     withCredentials: true,
   };
   const response = await sendRequest<DomainUser[]>(req);
@@ -131,6 +143,47 @@ const resetPassword = async ({
   return response.data;
 };
 
+const updateUserProfile = async ({
+  userId,
+  data,
+}: {
+  userId: string;
+  data: UpdateDomainUserRequest;
+}) => {
+  const req: AxiosRequestConfig = {
+    method: "PUT",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/${userId}`,
+    withCredentials: true,
+    data: data,
+  };
+  const response = await sendRequest(req);
+
+  return response.data;
+};
+
+const updateUserPassword = async ({
+  userId,
+  currentPassword,
+  newPassword,
+}: {
+  userId: string;
+  currentPassword: string;
+  newPassword: string;
+}) => {
+  const req: AxiosRequestConfig = {
+    method: "PUT",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/${userId}/change-password`,
+    withCredentials: true,
+    data: {
+      currentPassword,
+      newPassword,
+    },
+  };
+  const response = await sendRequest(req);
+
+  return response.data;
+};
+
 export {
   getDomainUserList,
   registerNewDomainUser,
@@ -138,5 +191,8 @@ export {
   getDomainUsers,
   sendPasswordResetRequest,
   validateResetPasswordToken,
+  getActiveUser,
   resetPassword,
+  updateUserPassword,
+  updateUserProfile,
 };

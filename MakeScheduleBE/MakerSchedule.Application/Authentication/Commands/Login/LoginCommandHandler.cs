@@ -21,7 +21,7 @@ public class LoginCommandHandler(
         if (user == null || !await userManager.CheckPasswordAsync(user, login.Password))
         {
             logger.LogWarning("Login failed for email: {Email}", login.Email);
-            return null;
+            throw new UnauthorizedAccessException("Invalid email or password.");
         }
 
         var accessToken = jwtService.GenerateToken(user);

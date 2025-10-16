@@ -6,7 +6,16 @@ interface RegisterDomainUserRequest {
   phoneNumber: string;
   address: string;
   preferredContactMethod: "Phone" | "Email";
-  roles: string[];
+}
+
+type UpdateDomainUserRequest = Partial<
+  Partial<Omit<RegisterDomainUserRequest, "password">>
+>;
+
+interface UpdateUserPassword {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 interface DomainUser {
@@ -21,4 +30,10 @@ interface UserMetaData {
   roles: string[];
 }
 
-export { type RegisterDomainUserRequest, type DomainUser, type UserMetaData };
+export {
+  type RegisterDomainUserRequest,
+  type UpdateDomainUserRequest,
+  type DomainUser,
+  type UserMetaData,
+  type UpdateUserPassword,
+};

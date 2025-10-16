@@ -17,7 +17,9 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<Applicatio
             .Build();
 
         var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-        var connectionString = config.GetConnectionString("DefaultConnection");
+        // Try PostgreSQL connection string first, then fall back to DefaultConnection
+        var connectionString = config.GetConnectionString("DefaultPostgreSQLConnection") 
+            ?? config.GetConnectionString("DefaultConnection");
 
         optionsBuilder.UseNpgsql(connectionString, npgsqlOptions =>
         {

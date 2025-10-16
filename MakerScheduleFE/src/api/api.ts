@@ -39,7 +39,10 @@ AxiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
-      if (originalRequest.url?.includes("/refresh")) {
+      if (
+        originalRequest.url?.includes("/refresh") ||
+        originalRequest.url?.includes("/login")
+      ) {
         return Promise.reject(error);
       }
       if (isRefreshing) {

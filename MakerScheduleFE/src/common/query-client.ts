@@ -5,11 +5,11 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      retry: 1,
+      retry: false,
       throwOnError: true,
     },
     mutations: {
-      retry: 1,
+      retry: false,
     },
   },
   queryCache: new QueryCache({

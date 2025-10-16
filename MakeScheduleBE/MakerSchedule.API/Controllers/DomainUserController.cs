@@ -3,23 +3,40 @@ using MakerSchedule.Application.DomainUsers.Commands;
 using MakerSchedule.Application.DTO.DomainUser;
 using MakerSchedule.Application.DTO.DomainUserRegistration;
 using MakerSchedule.Application.DTO.User;
-using MakerSchedule.Application.Interfaces;
 
 using MediatR;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MakerSchedule.Domain.ValueObjects;
+using MakerSchedule.API.Services;
 
 namespace MakerSchedule.API.Controllers;
 
 [ApiController]
 [Route("api/domain-users")]
 [Produces("application/json")]
-public class DomainUsersController(IMediator mediator) : ControllerBase
+public class DomainUsersController(IMediator mediator, IUserAuthorizationService authService) : ControllerBase
 {
-
     [HttpGet]
+    [Authorize]
+    public async Task<ActionResult<DomainUserDTO>> GetCurrentUser()
+    {
+        var userId = authService.GetCurrentUserId();
+
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        var query = new GetDomainUserByUserIdQuery(userId.Value);
+        var user = await mediator.Send(query);
+        return Ok(user);
+    }
+
+
+    [HttpGet("all")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<IEnumerable<DomainUserListDTO>>> GetAllDomainUsersAsync([FromQuery] string? role = null)
     {
         if (string.IsNullOrEmpty(role))
@@ -36,7 +53,9 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
         }
     }
 
-    [HttpGet("{id}")]
+
+    [HttpGet("{id:guid}")]
+    [Authorize(Roles = "Admin,Leader")]
     public async Task<ActionResult<DomainUserDTO>> GetById(Guid id)
     {
         var query = new GetDomainUserByIdQuery(id);
@@ -45,6 +64,7 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteDomainUserByIdAsync(Guid id)
     {
         var command = new DeleteDomainUserByIdCommand(id);
@@ -59,17 +79,21 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize]
     public async Task<IActionResult> UpdateDomainUserProfile(Guid id, [FromBody] UpdateUserProfileDTO dto)
     {
-        var command = new UpdateUserProfileCommand(id, dto);
-        var success = await mediator.Send(command);
+        var domainUser = await mediator.Send(new GetDomainUserByIdQuery(id));
 
-        if (success)
+        var isAuthorized = authService.IsAuthorizedForUserResource(domainUser.UserId);
+
+        if (!isAuthorized)
         {
-            return NoContent();
+            return Forbid();
         }
 
-        return NotFound();
+        var command = new UpdateUserProfileCommand(id, dto);
+        var updatedUser = await mediator.Send(command);
+        return Ok(updatedUser);
     }
 
     [HttpPost]
@@ -104,7 +128,7 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
 
         var hostValue = Request.Host.Host;
         var fullUrl = $"https://{hostValue}:5173";
-        
+
         var command = new RequestResetDomainUserPasswordAsync(email, fullUrl);
         var result = await mediator.Send(command);
 
@@ -133,15 +157,31 @@ public class DomainUsersController(IMediator mediator) : ControllerBase
     {
         var email = new Email(request.Email);
         var command = new ResetDomainUserWithTokenAsync(email, request.Token, request.NewPassword);
-        var isSuccess = await mediator.Send(command);
+        await mediator.Send(command);
 
-        if (isSuccess)
+        return Ok(new { Message = "Your password has been reset successfully." });
+  
+    }
+
+    [HttpPut]
+    [Route("{id:guid}/change-password")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordRequest request)
+    {
+        var domainUser = await mediator.Send(new GetDomainUserByIdQuery(id));
+
+        var isAuthorized= authService.IsAuthorizedForUserResource(domainUser.UserId);
+
+        if (!isAuthorized)
         {
-            return Ok(new { Message = "Your password has been reset successfully." });
+            return Forbid();
         }
 
-        // Don't reveal specific failure reasons for security
-        return BadRequest(new { Message = "Unable to reset password. Please request a new reset link." });
+        var command = new ChangeDomainUserPassword(id, request.CurrentPassword, request.NewPassword);
+        await mediator.Send(command);
+
+        return Ok();
+
     }
 
 }

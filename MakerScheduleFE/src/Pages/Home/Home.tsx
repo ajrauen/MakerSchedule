@@ -1,29 +1,8 @@
-import { Login } from "@ms/Pages/Home/Login/Login";
-import { RegisterUser } from "@ms/Pages/Home/RegisterUser/RegisterUser";
 import { Link } from "@tanstack/react-router";
-import { refreshToken } from "@ms/api/authentication.api";
-import { useEffect } from "react";
-import { removeToken } from "@ms/utils/auth.utils";
-import { useQuery } from "@tanstack/react-query";
-import { useIsLoggedIn } from "@ms/hooks/useIsLoggedIn";
+
+import { Header } from "@ms/Components/Header/Header";
 
 const Home = () => {
-  const isLoggedIn = useIsLoggedIn();
-
-  const { error: isError } = useQuery({
-    queryKey: ["refreshTokenOnLoad"],
-    queryFn: refreshToken,
-    enabled: !isLoggedIn,
-    retry: false,
-    throwOnError: false,
-  });
-
-  useEffect(() => {
-    if (isError) {
-      removeToken();
-    }
-  }, [isError]);
-
   return (
     <div className="w-full h-full ">
       <div className="w-full h-full absolute">
@@ -176,35 +155,7 @@ const Home = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-3  w-full p-4 bg-purple-300/30 absolute top-0 left-0 z-1000">
-        <div>Place Holder</div>
-        <div className="justify-self-center flex flex-col items-center">
-          <h5 className="!text-white text-3xl">Seeded Chaos</h5>
-          <div className="flex flex-row gap-3"></div>
-        </div>
-        <div className="justify-self-end text-white">
-          <ul className="flex gap-2">
-            {!isLoggedIn && (
-              <>
-                <li className="border-r-[1px] pr-2">
-                  <Login />
-                </li>
-                <li>
-                  <RegisterUser />
-                </li>
-              </>
-            )}
-            <Link to={"profile"}>
-              <li>Profile</li>
-            </Link>
-          </ul>
-          <div>
-            {/* <Link to={"classes"}> */}
-            {/* <MuiLink>Class Scheduel</MuiLink>
-            </Link> */}
-          </div>
-        </div>
-      </div>
+      <Header />
     </div>
   );
 };

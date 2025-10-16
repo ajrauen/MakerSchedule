@@ -1,18 +1,21 @@
 namespace MakerSchedule.API.Extensions;
 using MakerSchedule.Application.Interfaces;
-using MakerSchedule.Application.Services;
 using MakerSchedule.Application.Services.EmailService;
 using MakerSchedule.Infrastructure.Data;
 using MakerSchedule.Infrastructure.Services.Storage;
+using MakerSchedule.API.Services;
 
 public static class MakerScheduleExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        services.AddHttpContextAccessor();
         services.AddAutoMapper(typeof(MakerScheduleExtensions).Assembly);
 
         services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
         services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IUserAuthorizationService, UserAuthorizationService>();
+
 
         services.AddScoped<IImageStorageService>(serviceProvider =>
         {

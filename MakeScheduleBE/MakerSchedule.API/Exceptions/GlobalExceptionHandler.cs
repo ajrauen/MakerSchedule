@@ -27,7 +27,14 @@ public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : I
         var (statusCode, errorCode, message) = exception switch
         {
             BaseException baseException => (baseException.StatusCode, baseException.ErrorCode, baseException.Message),
+            KeyNotFoundException => (StatusCodes.Status404NotFound, "NOT_FOUND", exception.Message),
+            UnauthorizedAccessException => (StatusCodes.Status401Unauthorized, "UNAUTHORIZED", exception.Message),
+            NullReferenceException => (StatusCodes.Status404NotFound, "NOT_FOUND", exception.Message),
+            ArgumentOutOfRangeException => (StatusCodes.Status400BadRequest, "BAD_REQUEST", exception.Message),
+            ArgumentNullException => (StatusCodes.Status400BadRequest, "BAD_REQUEST", exception.Message),
+            ArgumentException => (StatusCodes.Status400BadRequest, "BAD_REQUEST", exception.Message),
             InvalidOperationException => (StatusCodes.Status400BadRequest, "VALIDATION_ERROR", exception.Message),
+            Microsoft.IdentityModel.Tokens.SecurityTokenException => (StatusCodes.Status401Unauthorized, "INVALID_TOKEN", "Invalid or expired token"),
             _ => (StatusCodes.Status500InternalServerError, "INTERNAL_SERVER_ERROR", "An unexpected error occurred")
         };
 

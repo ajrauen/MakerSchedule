@@ -4,20 +4,21 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MakerSchedule.Domain.Aggregates.User;
+using MakerSchedule.Application.DTO.DomainUser;
+using MakerSchedule.Application.Exceptions;
 
 namespace MakerSchedule.Application.DomainUsers.Commands;
 
 public class UpdateUserProfileCommandHandler(
     IApplicationDbContext context,
-    UserManager<User> userManager,
-    ILogger<UpdateUserProfileCommandHandler> logger) : IRequestHandler<UpdateUserProfileCommand, bool>
+    UserManager<User> userManager) : IRequestHandler<UpdateUserProfileCommand, DomainUserDTO>
 {
-    public async Task<bool> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
+    public async Task<DomainUserDTO> Handle(UpdateUserProfileCommand request, CancellationToken cancellationToken)
     {
         var userDTO = request.UpdateUserProfileDTO;
-        var userId = request.UserId;
-          var domainUser = await context.DomainUsers.Include(du => du.User).FirstOrDefaultAsync(du => du.UserId == userId);
-        if (domainUser == null) return false;
+        var id = request.id;
+        var domainUser = await context.DomainUsers.Include(du => du.User).FirstOrDefaultAsync(du => du.Id  == id);
+        if (domainUser == null) throw new NullReferenceException($"Domain user with UserId {id} not found.");
 
         bool userWasUpdated = false;
         if (userDTO.FirstName != null) { domainUser.FirstName = userDTO.FirstName; userWasUpdated = true; }
@@ -39,7 +40,20 @@ public class UpdateUserProfileCommandHandler(
             context.DomainUsers.Update(domainUser);
             context.Users.Update(domainUser.User);
             await context.SaveChangesAsync();
+            return new DomainUserDTO
+            {
+                Id = domainUser.Id,
+                UserId = domainUser.UserId,
+                FirstName = domainUser.FirstName,
+                LastName = domainUser.LastName,
+                Address = domainUser.Address,
+                IsActive = domainUser.IsActive,
+                PhoneNumber = domainUser.PreferredContactMethod,
+                Email = domainUser.User.Email ?? "",
+                Roles = (await userManager.GetRolesAsync(domainUser.User)).ToArray()
+            };
         }
-        return userWasUpdated;
+                 throw new NullReferenceException($"Domain user with UserId {id} not found.");
+
     }
 }

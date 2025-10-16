@@ -6,19 +6,23 @@ import { useFormContext } from "react-hook-form";
 
 interface UserFormProps {
   errorCode?: string;
+  includePassword?: boolean;
 }
 
-const UserForm = ({ errorCode }: UserFormProps) => {
+const UserForm = ({ errorCode, includePassword }: UserFormProps) => {
   const { control } = useFormContext();
   return (
     <>
       <FormTextField label="Email" control={control} name="email" />
-      <FormTextField
-        label="Password"
-        control={control}
-        name="password"
-        type="password"
-      />
+      {includePassword && (
+        <FormTextField
+          label="Password"
+          control={control}
+          name="password"
+          type="password"
+        />
+      )}
+
       <FormTextField label="First Name" control={control} name="firstName" />
       <FormTextField label="Last Name" control={control} name="lastName" />
       <FormTextField

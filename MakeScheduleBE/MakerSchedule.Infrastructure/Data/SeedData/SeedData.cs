@@ -13,27 +13,6 @@ namespace MakerSchedule.Infrastructure.Data;
 
 public class SeedData
 {
-    // Remove SeedUsers since we'll create users through UserManager
-    // public static List<User> SeedUsers => new List<User> { ... };
-
-    public static List<DomainUser> SeedEmployees => new List<DomainUser>
-    {
-        new DomainUser
-        {
-            Id = Guid.NewGuid(),
-            UserId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            PreferredContactMethod = "Email",
-            Email = new Email("admin@ms.com"),
-            PhoneNumber = new PhoneNumber("1234567890"),
-            FirstName = "Admin",
-            LastName = "User",
-            Address = "123 Admin St, City, Country",
-            CreatedAt = DateTime.UtcNow,
-            IsActive = true
-        }
-    };
-
-
     // Generate GUIDs for each event and store them for reuse - match migration GUIDs
     private static readonly Guid event1Id = Guid.Parse("c2f8d0f9-b2af-4d3a-91da-13c112c6212c"); // Advanced Pottery
     private static readonly Guid event2Id = Guid.Parse("3709300b-3c35-4350-9f3c-277759214bbb"); // Woodworking Workshop

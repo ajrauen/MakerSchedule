@@ -10,25 +10,24 @@ using Microsoft.Extensions.Logging;
 
 namespace MakerSchedule.Application.DomainUsers.Queries;
 
-public class GetDomainUserByIdQueryHandler(
+public class GetDomainUserByUserIdQueryHandler(
     IApplicationDbContext context,
-    UserManager<User> userManager,
-    ILogger<GetDomainUserByIdQueryHandler> logger) : IRequestHandler<GetDomainUserByIdQuery, DomainUserDTO>
+     UserManager<User> userManager,
+    ILogger<GetDomainUserByUserIdQueryHandler> logger) : IRequestHandler<GetDomainUserByUserIdQuery, DomainUserDTO>
 {
-    public async Task<DomainUserDTO> Handle(GetDomainUserByIdQuery request, CancellationToken cancellationToken)
+    public async Task<DomainUserDTO> Handle(GetDomainUserByUserIdQuery request, CancellationToken cancellationToken)
     {
-
-        var currentDomainUser = await context.DomainUsers.Include(du => du.User).FirstOrDefaultAsync(du => du.Id == request.Id);
-        if (currentDomainUser == null)
+        var user = await userManager.FindByIdAsync(request.UserId.ToString());
+        if(user == null)
         {
-            logger.LogWarning("User not found: {UserId}", request.Id);
-            throw new KeyNotFoundException($"User with ID {request.Id} not found.");
+            logger.LogWarning("User not found: {UserId}", request.UserId);
+            throw new KeyNotFoundException($"User with ID {request.UserId} not found.");
         }
 
-        var roles = await userManager.GetRolesAsync(currentDomainUser.User);
+        var role = await userManager.GetRolesAsync(user);
 
         var domainUser = await context.DomainUsers
-            .Where(du => du.Id == request.Id)
+            .Where(du => du.UserId == request.UserId)
             .Select(du => new DomainUserDTO
             {
                 Id = du.Id,
@@ -39,14 +38,14 @@ public class GetDomainUserByIdQueryHandler(
                 PhoneNumber = du.PhoneNumber.Value,
                 Address = du.Address,
                 IsActive = du.IsActive,
-                Roles = roles.ToArray()
+                Roles = role.ToArray()
             })
             .FirstOrDefaultAsync(cancellationToken);
 
         if (domainUser == null)
         {
-            logger.LogWarning("Domain user not found: {UserId}", request.Id);
-            throw new KeyNotFoundException($"Domain user with ID {request.Id} not found.");
+            logger.LogWarning("Domain user not found: {UserId}", request.UserId);
+            throw new KeyNotFoundException($"Domain user with ID {request.UserId} not found.");
         }
 
         return domainUser;

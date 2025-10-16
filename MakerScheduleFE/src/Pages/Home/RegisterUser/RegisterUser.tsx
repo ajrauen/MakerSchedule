@@ -1,6 +1,5 @@
 import { Paper } from "@mui/material";
 import { FormProvider, useForm } from "react-hook-form";
-import { z } from "zod/v4";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -11,6 +10,7 @@ import type { AxiosError } from "axios";
 import type { RequestError } from "@ms/types/request-error.types";
 import { registerNewDomainUser } from "@ms/api/domain-user.api";
 import { UserForm } from "@ms/Components/UserForm/UserForm";
+import { userInfoValidationSchema } from "@ms/common/FormSchemas/UserInfo.schema";
 
 const registerInitialFormData: RegisterDomainUserRequest = {
   email: "",
@@ -20,36 +20,14 @@ const registerInitialFormData: RegisterDomainUserRequest = {
   phoneNumber: "",
   address: "",
   preferredContactMethod: "Phone",
-  roles: [],
 };
-
-const registerValidationSchema = z.object({
-  email: z.string().email(),
-  password: z
-    .string()
-    .min(7, { message: "Password must be at least 7 characters" })
-    .regex(/[A-Z]/, { message: "Password must contain an uppercase letter" })
-    .regex(/[a-z]/, { message: "Password must contain a lowercase letter" })
-    .regex(/[0-9]/, { message: "Password must contain a number" })
-    .regex(/[^A-Za-z0-9]/, {
-      message: "Password must contain a special character",
-    }),
-  firstName: z.string().min(1, { message: "First name is required" }),
-  lastName: z.string().min(1, { message: "Last name is required" }),
-  phoneNumber: z.string().min(7, { message: "Phone number is required" }),
-  address: z.string().min(1, { message: "Address is required" }),
-  preferredContactMethod: z.enum(["Phone", "Email"], {
-    message: "Preferred contact method is required",
-  }),
-  roles: z.array(z.string()),
-});
 
 const RegisterUser = () => {
   const [isRegisterFormOpen, setIsRegisterFormOpen] = useState(false);
   const [errorCode, setErrorCode] = useState<string | undefined>();
 
   const hookForm = useForm<RegisterDomainUserRequest>({
-    resolver: zodResolver(registerValidationSchema),
+    resolver: zodResolver(userInfoValidationSchema),
     defaultValues: registerInitialFormData,
   });
 
