@@ -15,8 +15,11 @@ import { useMutation } from "@tanstack/react-query";
 import { login } from "@ms/api/authentication.api";
 
 const loginInitialFormData = {
-  email: "admin@ms.com",
-  password: "Admin123!",
+  // email: "admin@ms.com",
+  // password: "Admin123!",
+
+  email: "customer1@ms.com",
+  password: "Password123!",
 };
 
 const loginValidationSchema = z.object({

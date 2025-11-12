@@ -608,7 +608,7 @@ namespace MakerSchedule.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("MakerSchedule.Domain.Aggregates.DomainUser.DomainUser", "User")
-                        .WithMany("OccurrencesAttended")
+                        .WithMany("OccurrenceRegistrations")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -690,7 +690,7 @@ namespace MakerSchedule.Infrastructure.Migrations
 
             modelBuilder.Entity("MakerSchedule.Domain.Aggregates.DomainUser.DomainUser", b =>
                 {
-                    b.Navigation("OccurrencesAttended");
+                    b.Navigation("OccurrenceRegistrations");
 
                     b.Navigation("OccurrencesLed");
                 });

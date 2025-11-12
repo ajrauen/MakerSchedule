@@ -5,9 +5,6 @@ import { getRouterTree } from "@ms/configs/router.config";
 import { CircularProgress, createTheme, ThemeProvider } from "@mui/material";
 import { Provider } from "react-redux";
 import { store } from "@ms/redux/store";
-import { useIsLoggedIn } from "@ms/hooks/useIsLoggedIn";
-import { useQuery } from "@tanstack/react-query";
-import { getActiveUser } from "@ms/api/domain-user.api";
 
 declare module "@mui/material/styles" {
   interface Palette {
@@ -26,15 +23,6 @@ declare module "@mui/material/Button" {
 }
 
 const App = () => {
-  const isLoggedIn = useIsLoggedIn();
-
-  useQuery({
-    queryKey: ["userInfo"],
-    queryFn: getActiveUser,
-    enabled: isLoggedIn,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-
   const theme = createTheme({
     palette: {
       ochre: {

@@ -48,7 +48,6 @@ const PasswordChange = ({ userData }: PasswordChangeProps) => {
     <Accordion
       title="Change Password"
       containerClassName="w-full max-w-2xl"
-      defaultExpanded
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="flex flex-col gap-4 w-full">

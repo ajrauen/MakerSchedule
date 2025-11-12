@@ -27,5 +27,5 @@ public class DomainUser
 
     // Navigation properties for many-to-many relationships
     public ICollection<OccurrenceLeader> OccurrencesLed { get; set; } = new List<OccurrenceLeader>();
-    public ICollection<OccurrenceAttendee> OccurrencesAttended { get; set; } = new List<OccurrenceAttendee>();
+    public ICollection<OccurrenceAttendee> OccurrenceRegistrations { get; set; } = new List<OccurrenceAttendee>();
 }

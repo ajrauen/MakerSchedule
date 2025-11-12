@@ -7,6 +7,7 @@ const Home = () => {
     <div className="w-full h-full ">
       <div className="w-full h-full absolute">
         <video
+          key="home-video"
           autoPlay
           muted
           loop

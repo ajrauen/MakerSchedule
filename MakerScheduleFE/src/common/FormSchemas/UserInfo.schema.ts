@@ -23,32 +23,63 @@ const userInfoValidationSchema = z.object({
   }),
 });
 
-// Helper to treat empty strings as undefined for partial updates
-const emptyStringToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
-  z.preprocess((val) => (val === "" ? undefined : val), schema);
-
-const updateUserInfoValidationSchema = z.object({
-  email: emptyStringToUndefined(z.email().optional()),
-  firstName: emptyStringToUndefined(
-    z.string().min(1, { message: "First name is required" }).optional()
-  ),
-  lastName: emptyStringToUndefined(
-    z.string().min(1, { message: "Last name is required" }).optional()
-  ),
-  phoneNumber: emptyStringToUndefined(
-    z.string().min(7, { message: "Phone number is required" }).optional()
-  ),
-  address: emptyStringToUndefined(
-    z.string().min(1, { message: "Address is required" }).optional()
-  ),
-  preferredContactMethod: emptyStringToUndefined(
-    z
-      .enum(["Phone", "Email"], {
-        message: "Preferred contact method is required",
-      })
-      .optional()
-  ),
-});
+const updateUserInfoValidationSchema = z
+  .object({
+    email: z.string().optional(),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    phoneNumber: z.string().optional(),
+    address: z.string().optional(),
+    preferredContactMethod: z.enum(["Phone", "Email"]).optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.email && data.email.trim() !== "") {
+        return z.email().safeParse(data.email).success;
+      }
+      return true;
+    },
+    { message: "Invalid email format", path: ["email"] }
+  )
+  .refine(
+    (data) => {
+      if (data.firstName && data.firstName.trim() !== "") {
+        return data.firstName.trim().length >= 1;
+      }
+      return true;
+    },
+    { message: "First name is required", path: ["firstName"] }
+  )
+  .refine(
+    (data) => {
+      if (data.lastName && data.lastName.trim() !== "") {
+        return data.lastName.trim().length >= 1;
+      }
+      return true;
+    },
+    { message: "Last name is required", path: ["lastName"] }
+  )
+  .refine(
+    (data) => {
+      if (data.phoneNumber && data.phoneNumber.trim() !== "") {
+        return data.phoneNumber.trim().length >= 7;
+      }
+      return true;
+    },
+    {
+      message: "Phone number must be at least 7 characters",
+      path: ["phoneNumber"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.address && data.address.trim() !== "") {
+        return data.address.trim().length >= 1;
+      }
+      return true;
+    },
+    { message: "Address is required", path: ["address"] }
+  );
 
 const updateUserPasswordValidationSchema = z
   .object({

@@ -1,6 +1,7 @@
 import { sendRequest } from "@ms/api/api.utils";
 import type {
   DomainUser,
+  DomainUserRegisteredEvent,
   RegisterDomainUserRequest,
   UpdateDomainUserRequest,
 } from "@ms/types/domain-user.types";
@@ -184,6 +185,17 @@ const updateUserPassword = async ({
   return response.data;
 };
 
+const getDomainUserByIdEvents = async (id: string) => {
+  const req: AxiosRequestConfig = {
+    method: "GET",
+    url: `${BASE_DOMAIN_USER_ENDPOINT}/${id}/events`,
+    withCredentials: true,
+  };
+  const response = await sendRequest<DomainUserRegisteredEvent[]>(req);
+
+  return response.data;
+};
+
 export {
   getDomainUserList,
   registerNewDomainUser,
@@ -195,4 +207,5 @@ export {
   resetPassword,
   updateUserPassword,
   updateUserProfile,
+  getDomainUserByIdEvents,
 };

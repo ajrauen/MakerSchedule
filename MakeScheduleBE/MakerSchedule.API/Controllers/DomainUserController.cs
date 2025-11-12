@@ -160,7 +160,7 @@ public class DomainUsersController(IMediator mediator, IUserAuthorizationService
         await mediator.Send(command);
 
         return Ok(new { Message = "Your password has been reset successfully." });
-  
+
     }
 
     [HttpPut]
@@ -170,7 +170,7 @@ public class DomainUsersController(IMediator mediator, IUserAuthorizationService
     {
         var domainUser = await mediator.Send(new GetDomainUserByIdQuery(id));
 
-        var isAuthorized= authService.IsAuthorizedForUserResource(domainUser.UserId);
+        var isAuthorized = authService.IsAuthorizedForUserResource(domainUser.UserId);
 
         if (!isAuthorized)
         {
@@ -181,6 +181,27 @@ public class DomainUsersController(IMediator mediator, IUserAuthorizationService
         await mediator.Send(command);
 
         return Ok();
+
+    }
+    
+    [HttpGet]
+    [Route("{id:guid}/events")]
+    [Authorize]
+    public async Task<IActionResult> GetUserEvents(Guid id)
+    {
+        var domainUser = await mediator.Send(new GetDomainUserByIdQuery(id));
+
+        var isAuthorized = authService.IsAuthorizedForUserResource(domainUser.UserId);
+
+        if (!isAuthorized)
+        {
+            return Forbid();
+        }
+
+        var command = new GetUserByIdEventsQuery(id);
+        var events = await mediator.Send(command);
+
+        return Ok(events);
 
     }
 

@@ -30,10 +30,23 @@ interface UserMetaData {
   roles: string[];
 }
 
+interface DomainUserRegisteredEvent {
+  attended: boolean;
+  description?: string;
+  eventId: string;
+  eventName: string;
+  occurrenceId: string;
+  occurrenceStartTime: string;
+  scheduleEnd: string;
+  registeredAt: string;
+  duration: number;
+}
+
 export {
   type RegisterDomainUserRequest,
   type UpdateDomainUserRequest,
   type DomainUser,
   type UserMetaData,
   type UpdateUserPassword,
+  type DomainUserRegisteredEvent,
 };

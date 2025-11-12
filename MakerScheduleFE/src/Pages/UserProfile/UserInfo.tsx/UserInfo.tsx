@@ -16,9 +16,7 @@ interface UserInfoProps {
 }
 
 const UserInfo = ({ userData }: UserInfoProps) => {
-  const registerInitialFormData: UpdateDomainUserRequest = {
-    // Leave fields undefined so Zod's .partial() skips validation on empty fields
-  };
+  const registerInitialFormData: UpdateDomainUserRequest = {};
 
   const { reset, handleSubmit, ...rest } = useForm<UpdateDomainUserRequest>({
     resolver: zodResolver(updateUserInfoValidationSchema),

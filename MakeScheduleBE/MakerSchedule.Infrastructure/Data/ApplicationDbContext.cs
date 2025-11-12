@@ -101,7 +101,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
                 .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(oa => oa.User)
-                .WithMany(u => u.OccurrencesAttended)
+                .WithMany(u => u.OccurrenceRegistrations)
                 .HasForeignKey(oa => oa.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
         });
