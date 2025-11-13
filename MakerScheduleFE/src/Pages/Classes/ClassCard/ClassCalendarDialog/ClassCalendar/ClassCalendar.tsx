@@ -20,9 +20,15 @@ export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
   const isEventDay = (date: Date) => {
     if (!event?.occurrences || event.occurrences.length === 0) return false;
 
-    return event.occurrences.some((occurrence) =>
-      isSameDay(date, new Date(occurrence.scheduleStart))
-    );
+    const now = new Date();
+    const threeHoursFromNow = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+
+    return event.occurrences.some((occurrence) => {
+      const occurrenceDate = new Date(occurrence.scheduleStart);
+      return (
+        isSameDay(date, occurrenceDate) && occurrenceDate > threeHoursFromNow
+      );
+    });
   };
 
   const CustomDay = (props: PickersDayProps) => {
@@ -68,7 +74,8 @@ export const ClassCalendar = ({ onDateSelect, event }: ClassCalendarProps) => {
           onChange={handleDateChange}
           slots={{ day: CustomDay }}
           shouldDisableDate={(date) => !isEventDay(date)}
-          className="rounded-lg bg-gray-50"
+          className="rounded-lg "
+          sx={{ transform: "scale(1.3)" }}
         />
       </LocalizationProvider>
     </div>

@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { LoginForm } from "@ms/Pages/Home/Login/LoginForm/LoginForm";
-import { ForgotPasswordForm } from "@ms/Pages/Home/Login/ForgotPasswordForm/ForgotPasswordForm";
-import { Dialog } from "@mui/material";
 
-const Login = () => {
+import { Dialog } from "@mui/material";
+import { Login } from "@ms/common/Login/Login";
+
+const LoginHeader = () => {
   const [isLoginFormOpen, setIsLoginFormOpen] = useState(false);
-  const [isForgotPasswordView, setIsForgotPasswordView] = useState(false);
 
   return (
     <>
@@ -17,23 +16,13 @@ const Login = () => {
         onClose={() => setIsLoginFormOpen(false)}
         fullWidth
       >
-        {isForgotPasswordView ? (
-          <ForgotPasswordForm
-            closeFormDialog={() => {
-              setIsForgotPasswordView(false);
-            }}
-            isOpen={isForgotPasswordView}
-          />
-        ) : (
-          <LoginForm
-            closeFormDialog={() => setIsLoginFormOpen(false)}
-            isOpen={isLoginFormOpen}
-            showForgotPassword={() => setIsForgotPasswordView(true)}
-          />
-        )}
+        <Login
+          isOpen={isLoginFormOpen}
+          onClose={() => setIsLoginFormOpen(false)}
+        />
       </Dialog>
     </>
   );
 };
 
-export { Login };
+export { LoginHeader };

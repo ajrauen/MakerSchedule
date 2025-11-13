@@ -1,7 +1,7 @@
 import { getActiveUser } from "@ms/api/domain-user.api";
 import { useIsLoggedIn } from "@ms/hooks/useIsLoggedIn";
 import { useRefreshTokenOnLoad } from "@ms/hooks/useRefreshTokenOnLoad";
-import { Login } from "@ms/Pages/Home/Login/Login";
+import { LoginHeader } from "@ms/Pages/Home/Login/Login";
 import { RegisterUser } from "@ms/Pages/Home/RegisterUser/RegisterUser";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
@@ -29,7 +29,7 @@ const Header = () => {
           {!isLoggedIn && (
             <>
               <li className="border-r-[1px] pr-2">
-                <Login />
+                <LoginHeader />
               </li>
               <li>
                 <RegisterUser />
@@ -49,9 +49,9 @@ const Header = () => {
           )}
         </ul>
         <div>
-          {/* <Link to={"classes"}> */}
-          {/* <MuiLink>Class Scheduel</MuiLink>
-            </Link> */}
+          <Link to={"classes"}>
+            <li>Admin</li>
+          </Link>
         </div>
       </div>
     </div>

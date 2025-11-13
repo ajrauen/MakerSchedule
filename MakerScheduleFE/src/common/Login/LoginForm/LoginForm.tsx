@@ -40,10 +40,14 @@ type loginFormData = z.infer<typeof loginValidationSchema>;
 interface LoginFormProps {
   closeFormDialog: () => void;
   showForgotPassword: () => void;
-  isOpen: boolean;
+  showWelcomeMessage?: boolean;
 }
 
-const LoginForm = ({ closeFormDialog, showForgotPassword }: LoginFormProps) => {
+const LoginForm = ({
+  closeFormDialog,
+  showForgotPassword,
+  showWelcomeMessage = true,
+}: LoginFormProps) => {
   const { getValues, control, handleSubmit, reset, formState, watch } =
     useForm<loginFormData>({
       resolver: zodResolver(loginValidationSchema),
@@ -73,7 +77,7 @@ const LoginForm = ({ closeFormDialog, showForgotPassword }: LoginFormProps) => {
 
   return (
     <form onSubmit={handleSubmit(submit)}>
-      <DialogTitle>Welcome back!</DialogTitle>
+      {showWelcomeMessage && <DialogTitle>Welcome back!</DialogTitle>}
       <DialogContent>
         <Paper elevation={0} className="flex flex-col gap-4 p-2">
           <FormTextField label="Email" control={control} name="email" />

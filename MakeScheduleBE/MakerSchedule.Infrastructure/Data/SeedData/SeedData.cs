@@ -56,60 +56,72 @@ public class SeedData
             var occurrences = new List<Occurrence>();
             var random = new Random(42); // deterministic for repeatability
             var now = DateTime.UtcNow;
-            var durationOptions = Enumerable.Range(2, 8).Select(i => i * 15).ToArray(); // 30, 45, ..., 120
-
+            
+            // CST timezone
+            var cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+            
             // Use the static event IDs for occurrences
             var eventIds = new[] { event1Id, event2Id, event3Id };
+            
             foreach (var eventId in eventIds)
             {
-                int count = random.Next(3, 8); // 3 to 7 occurrences
-                for (int i = 0; i < count; i++)
+                // Create 5 classes per month for the next 12 months
+                for (int month = 0; month < 12; month++)
                 {
-                    // Alternate between past and future occurrences
-                    int daysOffset;
-                    if (i % 2 == 0)
+                    for (int classNum = 0; classNum < 5; classNum++)
                     {
-                        // Past: 1 to 45 days ago
-                        daysOffset = -random.Next(1, 46);
+                        // Distribute classes throughout the month
+                        // Week 1-4, skip week 5 if exists
+                        int weekOfMonth = classNum % 4; // 0-3 (4 weeks)
+                        int dayOfWeek = random.Next(1, 6); // Monday-Friday (1-5)
+                        
+                        // Calculate the target date
+                        var targetMonth = now.AddMonths(month);
+                        var firstDayOfMonth = new DateTime(targetMonth.Year, targetMonth.Month, 1);
+                        
+                        // Find the first occurrence of the target day of week
+                        var daysUntilTargetDay = ((int)dayOfWeek - (int)firstDayOfMonth.DayOfWeek + 7) % 7;
+                        var targetDate = firstDayOfMonth.AddDays(daysUntilTargetDay + (weekOfMonth * 7));
+                        
+                        // Make sure we're still in the same month
+                        if (targetDate.Month != targetMonth.Month)
+                        {
+                            targetDate = targetDate.AddDays(-7); // Go back a week
+                        }
+                        
+                        // Business hours: 9 AM to 5 PM (leaving 1 hour buffer before 6 PM)
+                        var businessHourStart = 9;
+                        var businessHourEnd = 17;
+                        var businessHours = businessHourEnd - businessHourStart;
+                        
+                        // Random hour within business hours
+                        var randomHour = businessHourStart + random.Next(businessHours);
+                        // Random minute (0, 15, 30, or 45 for cleaner times)
+                        var randomMinute = random.Next(4) * 15;
+                        
+                        // Generate the local CST time with Kind=Unspecified
+                        var localCstDate = DateTime.SpecifyKind(
+                            targetDate.Date
+                                .AddHours(randomHour)
+                                .AddMinutes(randomMinute),
+                            DateTimeKind.Unspecified
+                        );
+                        
+                        // Convert CST to UTC
+                        var start = TimeZoneInfo.ConvertTimeToUtc(localCstDate, cstZone);
+                        
+                        // Create occurrence directly with ScheduleStart.ForSeeding to bypass future date validation
+                        var occurrence = new Occurrence
+                        {
+                            Id = Guid.NewGuid(),
+                            EventId = eventId,
+                            ScheduleStart = ScheduleStart.ForSeeding(start),
+                            Status = (start < DateTime.UtcNow)
+                                ? OccurrenceStatus.Complete
+                                : OccurrenceStatus.Pending
+                        };
+                        occurrences.Add(occurrence);
                     }
-                    else
-                    {
-                        // Future: 1 to 45 days ahead
-                        daysOffset = random.Next(1, 46);
-                    }
-                    // Business hours: 9 AM to 6 PM (9:00 to 18:00) CST
-                    var businessHourStart = 9; // 9 AM
-                    var businessHourEnd = 18; // 6 PM
-                    var businessHours = businessHourEnd - businessHourStart; // 9 hours
-                    // Random hour within business hours
-                    var randomHour = businessHourStart + random.Next(businessHours);
-                    // Random minute (0, 15, 30, or 45 for cleaner times)
-                    var randomMinute = random.Next(4) * 15;
-                    // Define CST zone before use
-                    var cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
-                    // Generate the local CST time with Kind=Unspecified
-                    var localCstDate = DateTime.SpecifyKind(
-                        now.Date.AddDays(daysOffset)
-                            .AddHours(randomHour)
-                            .AddMinutes(randomMinute),
-                        DateTimeKind.Unspecified
-                    );
-                    // Convert CST to UTC
-                    var start = TimeZoneInfo.ConvertTimeToUtc(localCstDate, cstZone);
-                    
-                    var duration = durationOptions[random.Next(durationOptions.Length) ] * 60 ;
-                    
-                    // Create occurrence directly with ScheduleStart.ForSeeding to bypass future date validation
-                    var occurrence = new Occurrence
-                    {
-                        Id = Guid.NewGuid(),
-                        EventId = eventId,
-                        ScheduleStart = ScheduleStart.ForSeeding(start),
-                        Status = (start.AddMinutes(duration) < DateTime.UtcNow)
-                            ? OccurrenceStatus.Complete
-                            : OccurrenceStatus.Pending
-                    };
-                    occurrences.Add(occurrence);
                 }
             }
             return occurrences;
